@@ -20,6 +20,7 @@ export default class CommonModal extends Component {
         }
 
     }
+    Add = ()=>{}
 
 
     ToggleModal = () => {

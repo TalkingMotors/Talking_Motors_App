@@ -11,6 +11,9 @@ import {
     Keyboard,
     TouchableOpacity
 } from 'react-native';
+import * as Utilities from "../helpers/Utilities";
+import * as LoginService from '../services/Login';
+import Storage from '../helpers/Storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
@@ -24,10 +27,34 @@ export default class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            secureTextEntry: true
+            secureTextEntry: true,
+            username: "",
+            password: ""
         }
     }
-    Login = () => { }
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value })
+      }
+    Login = async () => {
+         try{
+            if(Utilities.stringIsEmpty(this.state.username)) {
+                
+            }
+            else if(Utilities.stringIsEmpty(this.state.password)){
+
+            }
+            let params = {  "email": this.state.username, "password": this.state.password }
+            LoginService.login(params).then(respose => {
+               if(respose){
+                   Storage.userData = JSON.parse(respose)
+               }
+            })
+            
+         }
+         catch(e){
+             console.log("error", e.message)
+         }
+     }
     render() {
         return (
 
@@ -67,6 +94,12 @@ export default class Login extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
+                            value={this.state.username}
+                            onChangeText={val => {
+                            this.onChangeText('username', val.trim())
+                            //this.setState({ emptyemail: false, loginLoader: false })
+                            }}
+                    
                         />
                         <View>
                             <TextField
@@ -81,6 +114,11 @@ export default class Login extends React.Component {
                                 autoCorrect={false}
                                 labelFontSize={13}
                                 secureTextEntry={this.state.secureTextEntry}
+                                value={this.state.password}
+                                onChangeText={val => {
+                                    this.onChangeText('password', val.trim())
+                                    //this.setState({ emptyemail: false, loginLoader: false })
+                                }}
                             />
                             <TouchableOpacity onPress={() =>
                                 this.setState({
@@ -103,7 +141,7 @@ export default class Login extends React.Component {
                         </TouchableOpacity>
 
                         <View style={styles.LoginButtonView}>
-                            <TouchableOpacity style={styles.GradientButtonView}>
+                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.Login()}} >
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
                                         LOGIN

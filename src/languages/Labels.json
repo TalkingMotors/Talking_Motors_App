@@ -1,0 +1,13 @@
+{
+    "Login" : {
+        "heading" : "Login",
+        "username": "Enter Email",
+        "password": "Enter Password",
+        "forgotPassword" : "Forgot Password?",
+        "login": "LOGIN",
+        "register":"REGISTER",
+        "message": "You can use the App without an account,but you need to register to message users or list a car.",
+        "useWithoutAccount": "USE WITHOUT ACCOUNT"
+
+    }
+}

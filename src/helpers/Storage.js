@@ -1,6 +1,7 @@
 const Storage = {
     networkStatus: { isConnected: true, isLimited: false},
-    userData: {}
+    userData: {},
+    jwt_Token: ""
 
 }
 

@@ -9,5 +9,13 @@
         "message": "You can use the App without an account,but you need to register to message users or list a car.",
         "useWithoutAccount": "USE WITHOUT ACCOUNT"
 
+    },
+    "Profile" : {
+        "changePassword" : "Change Password",
+        "email" : "Email",
+        "userName" : "User Name",
+        "displayName" : "Display Name",
+        "telephone" : "Telephone Number",
+        "save" : "SAVE"
     }
 }

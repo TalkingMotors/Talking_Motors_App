@@ -15,15 +15,35 @@ import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommponStyle, { Apptheme, linkText, lightText, darkText, LinearColor, lightBg, darkBg } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
+import * as Utilities from "../helpers/Utilities";
+import * as LoginService from '../services/Login';
+import Storage from '../helpers/Storage';
+import Labels from "../languages/Labels";
 export default class Profile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            uname: "Maaz Mehtab",
-            dname: "Maaz-Mehtab",
-            phone: "03243424011",
-            email: 'Maazmehtabuddin95@gmail.com'
+            userData: Storage.userData,
+            displayName: "",
+            nickName: "",
+            telephone: "",
+            email: ""
         }
+
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            if (Object.keys(Storage.userData).length > 0) {
+                this.props.navigation.goBack()
+            }
+          });
+    }
+
+    setProfileData = () =>{
+       this.setState({
+        displayName: this.state.userData.name,
+        email: this.state.userData.email,
+        nickName: this.state.userData.nickname,
+        telephone: this.state.userData.telephone
+       })
     }
     render() {
         return (
@@ -41,13 +61,13 @@ export default class Profile extends React.Component {
                             </View>
                         </View>
                     </View>
-                    <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>Maaz Mehtab</Text>
+                    <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>{ this.state.displayName }</Text>
 
                     <TouchableOpacity
                         style={styles.ChangePasswordView}>
                         <FontAwesome name="edit" style={{ paddingHorizontal: 5 }} color={linkText} size={16} />
                         <Text style={styles.ChangePasswordText}>
-                            Change Password
+                           {Labels.Profile.changePassword} 
                         </Text>
                     </TouchableOpacity>
 
@@ -55,7 +75,7 @@ export default class Profile extends React.Component {
 
                     <View style={styles.TextFieldView}>
                         <TextField
-                            label='Email'
+                            label= {Labels.Profile.email}
                             fontSize={13}
                             keyboardType='default'
                             tintColor={Apptheme}
@@ -69,7 +89,7 @@ export default class Profile extends React.Component {
                             value={this.state.email}
                         />
                         <TextField
-                            label='User Name'
+                            label= {Labels.Profile.userName}
                             fontSize={13}
                             keyboardType='default'
                             tintColor={Apptheme}
@@ -79,10 +99,10 @@ export default class Profile extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
-                            value={this.state.uname}
+                            value={this.state.nickName}
                         />
                         <TextField
-                            label='Display Name'
+                            label= {Labels.Profile.displayName}
                             fontSize={13}
                             keyboardType='default'
                             tintColor={Apptheme}
@@ -92,11 +112,11 @@ export default class Profile extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
-                            value={this.state.dname}
+                            value={this.state.displayName}
                         />
 
                         <TextField
-                            label='Telephone Number'
+                            label= {Labels.Profile.telephone}
                             fontSize={13}
                             keyboardType='phone-pad'
                             tintColor={Apptheme}
@@ -106,7 +126,7 @@ export default class Profile extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
-                            value={this.state.phone}
+                            value={this.state.telephone}
                         />
 
                     </View>
@@ -115,7 +135,7 @@ export default class Profile extends React.Component {
                         <TouchableOpacity style={styles.GradientButtonView} >
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
-                                    SAVE
+                                {Labels.Profile.save}
                                 </Text>
                             </LinearGradient>
                         </TouchableOpacity>

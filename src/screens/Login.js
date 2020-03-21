@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import * as Utilities from "../helpers/Utilities";
 import * as LoginService from '../services/Login';
+import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -22,31 +23,58 @@ import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, link
 import {
     TextField,
 } from 'react-native-material-textfield';
+import { parse } from '@babel/core';
 export default class Login extends React.Component {
 
     constructor(props) {
         super(props)
         this.state = {
             secureTextEntry: true,
-            username: "",
-            password: ""
+            username: "ikm_kbq@hotmail.com",
+            password: "123456789",
+            loginFail: false,
+            loginFailMessage: ""
         }
+        
+        if (Object.keys(Storage.userData).length > 0) {
+            this.props.navigation.navigate("Home")
+          }else{
+              Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(respose => {
+                  if(respose){
+                      Storage.userData = parse.JSON(respose);
+                      this.props.navigation.navigate("Home")
+                  }
+              })
+              
+          }
     }
     onChangeText = (key, value) => {
-        this.setState({ [key]: value })
+        this.setState({ [key]: value, loginFail:false })
       }
     Login = async () => {
          try{
             if(Utilities.stringIsEmpty(this.state.username)) {
-                
+                return
             }
             else if(Utilities.stringIsEmpty(this.state.password)){
-
+                return
             }
             let params = {  "email": this.state.username, "password": this.state.password }
             LoginService.login(params).then(respose => {
                if(respose){
-                   Storage.userData = JSON.parse(respose)
+                   if(respose.success){
+                    Storage.userData = respose.user;
+                    Storage.jwt_Token = respose.token;
+                    Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
+                    Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(respose.token))
+                    this.props.navigation.navigate("Home")
+                   }
+                   else{
+                    this.setState({
+                        loginFail: true,
+                        loginFailMessage: respose.message
+                    })
+                   }
                }
             })
             
@@ -81,7 +109,17 @@ export default class Login extends React.Component {
                             Login
                     </Text>
                     </View>
-
+                    {
+                        this.state.loginFail && 
+                        <View style={styles.LoginView}>
+                            <Text style={styles.LoginFail}>
+                                   {
+                                       this.state.loginFailMessage
+                                   }             
+                            </Text>
+                    </View>
+                    }
+                    
                     <View style={styles.TextFieldView}>
                         <TextField
                             label='Enter Email'
@@ -204,6 +242,11 @@ const styles = StyleSheet.create({
     LoginText: {
         color: darkText,
         fontSize: 24,
+        fontWeight: 'bold'
+    },
+    LoginFail: {
+        color: "red",
+        fontSize: 14,
         fontWeight: 'bold'
     },
     TextFieldView: {

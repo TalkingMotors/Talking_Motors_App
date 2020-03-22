@@ -64,116 +64,118 @@ export default class Home extends React.Component {
         return (
             <View style={styles.ParentView}>
                 <Topbar Dashboard={this.navigateToDashboard} ParentPage="Home" navigation={this.props} />
-                <View style={{ height: '93%', flexDirection: 'column', width: '100%' }}>
-                    <View style={{ width: '100%', height: '20%' }}>
+                <View style={styles.BoxView}>
+                    <View style={styles.BoxParent}>
                         <TouchableHighlight
                             activeOpacity={1}
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text1: Apptheme })}
                             onPressOut={() => this.setState({ Text1: darkText })}
                             onPress={() => { this.props.navigation.navigate("ListVehicle") }}
-                            style={{ width: '100%', height: '100%' }}>
-                            <View style={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ fontWeight: 'bold', color: this.state.Text1, fontSize: 30, textAlign: 'center' }}>
+                            style={styles.ButtonView}>
+                            <View style={styles.BoxTitleView}>
+                                <Text style={[styles.BoxTitleText, { color: this.state.Text1 }]}>
                                     ADD A VEHICLE
                         </Text>
-                                <Text style={{ textAlign: 'center' }}>
+                                <Text style={styles.BoxListText}>
                                     list your vehicle to join the community
                         </Text>
-                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={{ position: 'absolute', right: 20 }} />
+                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
                             </View>
                         </TouchableHighlight>
                     </View>
 
-                    <View style={{ width: '100%', height: '20%' }}>
+                    <View style={styles.BoxParent}>
                         <TouchableHighlight
                             activeOpacity={1}
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text2: Apptheme })}
                             onPressOut={() => this.setState({ Text2: lightText })}
-                            onPress={() => this.TalkModalToggle()} style={{ backgroundColor: "green", alignItems: 'center', alignContent: 'center', width: '100%', height: '100%', justifyContent: 'center', }}>
-                            <View style={{ backgroundColor: 'red', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            onPress={() => this.TalkModalToggle()}
+                            style={styles.ButtonViewImage}>
+                            <View style={styles.ImageView}>
                                 <Image
                                     source={require('../images/third.png')}
-                                    style={{ width: '100%', height: '100%' }}
+                                    style={styles.Image}
                                 />
                                 <View style={{ position: 'absolute' }}>
-                                    <Text style={{ fontWeight: 'bold', color: this.state.Text2, fontSize: 30, textAlign: 'center' }}>
+                                    <Text style={[styles.BoxTitleText, { color: this.state.Text2 }]}>
                                         TALK
                                      </Text>
                                     <Text style={{ textAlign: 'center', color: lightText }}>
                                         message other Taking Motors users
                                     </Text>
                                 </View>
-                                <FontAwesome5 name="angle-right" size={24} color={lightText} style={{ position: 'absolute', right: 20 }} />
+                                <FontAwesome5 name="angle-right" size={24} color={lightText} style={styles.BoxIcon} />
                             </View>
                         </TouchableHighlight>
                     </View>
 
-                    <View style={{ width: '100%', height: '20%' }}>
+                    <View style={styles.BoxParent}>
                         <TouchableHighlight
                             activeOpacity={1}
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text3: Apptheme })}
                             onPressOut={() => this.setState({ Text3: darkText })}
-                            onPress={() => this.props.navigation.navigate("ListingType")} style={{ width: '100%', height: '100%', justifyContent: 'center', }}>
-                            <View style={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            onPress={() => this.props.navigation.navigate("ListingType")}
+                            style={styles.ButtonView}>
+                            <View style={styles.BoxTitleView}>
 
-                                <Text style={{ fontWeight: 'bold', color: this.state.Text3, fontSize: 30, textAlign: 'center' }}>
+                                <Text style={[styles.BoxTitleText, { color: this.state.Text3 }]}>
                                     SELL
                         </Text>
-                                <Text style={{ textAlign: 'center' }}>
+                                <Text style={styles.BoxListText}>
                                     advertise your vehicle for sale
                         </Text>
-                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={{ position: 'absolute', right: 20 }} />
+                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
                             </View>
                         </TouchableHighlight>
                     </View>
 
-                    <View style={{ width: '100%', height: '20%' }}>
+                    <View style={styles.BoxParent}>
                         <TouchableHighlight
                             activeOpacity={1}
                             // underlayColor="transparent"
                             onPressIn={() => this.setState({ Text4: Apptheme })}
                             onPressOut={() => this.setState({ Text4: lightText })}
                             onPress={() => this.SearchVehicleModalToggle()}
-                            style={{ alignItems: 'center', alignContent: 'center', width: '100%', height: '100%', justifyContent: 'center', }}>
-                            <View style={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            style={styles.ButtonViewImage}>
+                            <View style={styles.ImageView}>
                                 <Image
                                     source={require('../images/third.png')}
-                                    style={{ width: '100%', height: '100%' }}
+                                    style={styles.Image}
                                 />
                                 <View style={{ position: 'absolute' }}>
-                                    <Text style={{ fontWeight: 'bold', color: this.state.Text4, fontSize: 30, textAlign: 'center' }}>
+                                    <Text style={[styles.BoxTitleText, { color: this.state.Text4 }]}>
                                         SEARCH
                                      </Text>
                                     <Text style={{ textAlign: 'center', color: lightText }}>
                                         browse all vehicles that are available now
                                     </Text>
                                 </View>
-                                <FontAwesome5 name="angle-right" size={24} color={lightText} style={{ position: 'absolute', right: 20 }} />
+                                <FontAwesome5 name="angle-right" size={24} color={lightText} style={styles.BoxIcon} />
                             </View>
                         </TouchableHighlight>
                     </View>
 
 
-                    <View style={{ width: '100%', height: '20%' }}>
+                    <View style={styles.BoxParent}>
                         <TouchableHighlight
                             activeOpacity={1}
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text5: Apptheme })}
                             onPressOut={() => this.setState({ Text5: darkText })}
                             onPress={() => this.TalkModalToggle()}
-                            style={{ width: '100%', height: '100%', justifyContent: 'center', }}>
-                            <View style={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            style={styles.ButtonView}>
+                            <View style={styles.BoxTitleView}>
 
-                                <Text style={{ fontWeight: 'bold', color: this.state.Text5, fontSize: 30, textAlign: 'center' }}>
+                                <Text style={[styles.BoxTitleText, { color: this.state.Text5 }]}>
                                     VEHICLE CHECK
                         </Text>
-                                <Text style={{ textAlign: 'center' }}>
+                                <Text style={styles.BoxListText}>
                                     perform an official DVLA vehicle check
                         </Text>
-                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={{ position: 'absolute', right: 20 }} />
+                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
                             </View>
                         </TouchableHighlight>
                     </View>
@@ -202,75 +204,54 @@ const styles = StyleSheet.create({
 
     },
     BoxView: {
-        borderWidth: 1.2,
-        borderRadius: 5,
-        borderColor: Apptheme,
-        shadowOffset: { width: 50, height: 50 },
-        shadowOpacity: 0.8,
-        shadowRadius: 5,
-        elevation: 5,
-        width: '44%',
-        marginHorizontal: '3%',
-        marginVertical: 5,
-        backgroundColor: lightBg,
-        justifyContent: 'center'
+        height: '93%', flexDirection: 'column', width: '100%'
     },
-    UserView: {
+    BoxParent: {
+        width: '100%', height: '20%'
+    },
+    ButtonView: {
         width: '100%',
-        height: 150,
-        backgroundColor: Apptheme,
-        alignItems: 'center'
+        height: '100%',
+        justifyContent: 'center',
     },
-    UserImageView: {
-        borderWidth: 3,
-        borderColor: '#ff8f00',
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: lightText,
+    ButtonViewImage: {
+        alignItems: 'center',
+        alignContent: 'center',
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+    },
+    BoxTitleView: {
+        height: '100%',
+        width: '100%',
         alignItems: 'center',
         justifyContent: 'center'
     },
-    UserText: {
-        color: lightText,
-        paddingLeft: 10,
-        paddingTop: 10
-    },
-    MainBoxView: {
-        // marginVertical:40,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: Apptheme,
-        elevation: 3,
-        marginVertical: 10,
-        width: '94%',
-        marginHorizontal: '3%',
-
-    },
-
-    ParentBoxView: {
-        width: '100%',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        height: 120,
-        marginTop: 10
-    },
-    TextHeader: {
-        backgroundColor: Apptheme,
-        color: lightText,
-        textAlign: 'center',
+    BoxTitleText: {
         fontWeight: 'bold',
-        fontSize: 24
+        fontSize: 30,
+        textAlign: 'center'
     },
-    TextDetail: {
-        paddingTop: 4,
-        paddingHorizontal: 2,
-        textAlign: 'center',
-        fontSize: 14,
-        color: darkText
+    BoxListText: {
+        textAlign: 'center'
     },
     BoxIcon: {
-        textAlign: 'center',
-        paddingBottom: 5
+        position: 'absolute',
+        right: 20
+    },
+
+    ImageView:{
+        height: '100%', 
+        width: '100%', 
+        alignItems: 'center', 
+        justifyContent: 'center'
+    },
+    Image:{
+        width: '100%', 
+        height: '100%' 
     }
+
+
+
+
 })

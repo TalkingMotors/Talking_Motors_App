@@ -86,8 +86,8 @@ export default class SearchVehicle extends Component {
                                     <Text style={{ color: Apptheme }} >SEARCH BY FIELD</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity onPress={() => this.SearchVehicleModalToggle()} style={styles.modalFooterButton}>
-                                    <Text style={{ color: Apptheme }} >CANCEL</Text>
+                                <TouchableOpacity onPress={() => this.SearchVehicleModalToggle()} style={styles.modalFooterButtonCancel}>
+                                    <Text style={{ color: lightText,textAlign:'center' }} >CANCEL</Text>
                                 </TouchableOpacity>
                             </View>
                         </View >
@@ -111,7 +111,18 @@ const styles = StyleSheet.create({
         marginHorizontal: '4%'
     },
     modalFooterButton: {
-        padding: 10,
+        // marginVertical:2,
+        alignItems:'center',
+        padding: 9,
+        width:'60%',
+        marginHorizontal: 5
+    },
+    modalFooterButtonCancel: {
+        backgroundColor:Apptheme,
+        width:'40%',
+        marginTop:8,
+        padding: 9,
+        borderRadius:10,
         marginHorizontal: 5
     },
 

@@ -16,6 +16,7 @@ import ListingType from './src/screens/ListingType';
 import VehicleType from './src/screens/VehicleType';
 import ChangePassword from './src/screens/ChangePassword';
 import ResetPassword from './src/screens/ResetPassword';
+import Messenger from './src/screens/Messenger';
 
 const MyStackNavigator = createStackNavigator(
     {
@@ -32,6 +33,7 @@ const MyStackNavigator = createStackNavigator(
         VehicleType: { screen: VehicleType },
         ChangePassword: { screen: ChangePassword },
         ResetPassword: { screen: ResetPassword },
+        Messenger: { screen: Messenger },
     },
     {
         initialRouteName: 'Login',

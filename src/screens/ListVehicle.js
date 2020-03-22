@@ -57,7 +57,7 @@ export default class ListVehicle extends React.Component {
                             baseColor={Apptheme}
                             errorColor="red"
                             activeLineWidth={2}
-                            autoCapitalize="none"
+                            autoCapitalize="characters"
                             autoCorrect={false}
                             labelFontSize={13}
                         />

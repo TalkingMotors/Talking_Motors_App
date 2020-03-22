@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     StyleSheet,
     Picker,
+    Switch,
     Image
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -24,6 +25,7 @@ export default class VehicleType extends React.Component {
         super(props);
         this.state = {
             ModalTitle: '',
+            switchValue: false,
             isModal: false,
             ModalProps: {},
             selectedsort: 1,
@@ -74,6 +76,12 @@ export default class VehicleType extends React.Component {
         this.seletedvehiclemakeItem = this.seletedvehiclemakeItem.bind(this)
         this.seletedvehiclemodelItem = this.seletedvehiclemodelItem.bind(this)
     }
+
+    toggleSwitch = (value) => {
+        this.setState({ switchValue: value })
+    }
+
+
     ModalToggle() {
         this.setState({
             isModal: !this.state.isModal
@@ -130,11 +138,29 @@ export default class VehicleType extends React.Component {
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Vehicle Type" navigation={this.props} />
+                <View style={{ width: '100%', height: 50, position: 'absolute', bottom: 0 }}>
+                    <View style={styles.ButtonView}>
+                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.props.navigation.navigate("Home") }}>
+                            <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
+                                <Text style={styles.ButtonInnerText}>
+                                    SEARCH
+                                </Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <ScrollView>
                     <View style={styles.MainView}>
+                        <View>
+                            <Text>
+                                Enter as many of the details below as you would like.
+                            </Text>
+
+                        </View>
                         <View style={styles.BoxView}>
-                            <View style={styles.InputView}>
+                            <View style={[styles.DropDownButton, styles.InputView]}>
                                 <TextField
+
                                     label='Enter Post Code'
                                     fontSize={13}
                                     keyboardType='default'
@@ -145,9 +171,12 @@ export default class VehicleType extends React.Component {
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     labelFontSize={13}
+
                                 />
                             </View>
                         </View>
+
+
 
 
                         <View style={styles.BoxView}>
@@ -337,11 +366,19 @@ export default class VehicleType extends React.Component {
                             <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon} />
                         </View>
                     </View>
+                    <View style={[styles.ButtonView,{flexDirection:'row'}]}>
+                        <Text >For Sale? </Text>
+                        <Switch
+                            // style={{ marginTop: 30 }}
+                            thumbColor={Apptheme}
+                            onValueChange={this.toggleSwitch}
+                            value={this.state.switchValue} />
+                    </View>
                     <View style={styles.ButtonView}>
                         <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.props.navigation.navigate("Home") }}>
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
-                                    SEARCH
+                                    RESET
                                 </Text>
                             </LinearGradient>
                         </TouchableOpacity>
@@ -367,13 +404,15 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: lightBg,
+        paddingBottom: 55
         // backgroundColor: 'lightgray',
 
     },
     MainView: {
         width: '94%',
         marginHorizontal: '3%',
-        marginTop: 10
+        marginTop: 10,
+
     },
     BoxView: {
         width: '100%',
@@ -388,7 +427,9 @@ const styles = StyleSheet.create({
         // borderColor: '#d2d2d2',
         // borderWidth: 1,
         height: 55,
+        // backgroundColor:'red',
         borderRadius: 5,
+        paddingBottom: 5,
         justifyContent: 'center',
         paddingHorizontal: 10
     },
@@ -438,7 +479,7 @@ const styles = StyleSheet.create({
     },
     DropDownLabel: {
         // fontWeight: 'bold',
-        color:Apptheme
+        color: Apptheme
     },
     GradientButtonView: {
         ...CommponStyle.GradiendButtonView
@@ -447,7 +488,9 @@ const styles = StyleSheet.create({
         ...CommponStyle.ButtonInnerText
     },
     ButtonView: {
-       ...CommponStyle.ButtonView
+        ...CommponStyle.ButtonView,
+
+        height: 45
     },
 
 })

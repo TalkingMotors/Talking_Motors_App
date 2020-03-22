@@ -21,6 +21,8 @@ import ListingType from './src/screens/ListingType';
 import VehicleType from './src/screens/VehicleType';
 import ChangePassword from './src/screens/ChangePassword';
 import ResetPassword from './src/screens/ResetPassword';
+import Messenger from './src/screens/Messenger';
+
 const MyDrawerNavigator = createDrawerNavigator({
     Home: { screen: StackNavigator },
     Profile: { screen: Profile },
@@ -35,6 +37,7 @@ const MyDrawerNavigator = createDrawerNavigator({
     VehicleType: { screen: VehicleType, },
     ChangePassword: { screen: ChangePassword, },
     ResetPassword: { screen: ResetPassword, },
+    Messenger: { screen: Messenger, },
 },
     {
         initialRouteName: 'Home',

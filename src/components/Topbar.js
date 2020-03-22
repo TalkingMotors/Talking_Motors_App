@@ -34,8 +34,15 @@ export default class Topbar extends React.Component {
                     <Feather
                         onPress={() => this.props.navigation.screenProps.openDraw()}
                         name="menu" color={lightText} size={22} style={styles.Icons} />
-                    <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
-                    <FontAwesome onPress={()=>this.props.Dashboard()} name="dashboard" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    {/* <Text style={styles.ScreenName}>{this.props.ParentPage}</Text> */}
+                    <View style={{justifyContent:'center',alignItems:'center',width:'75%'}}>
+                     <Image
+                        resizeMode="contain"
+                        style={{ height: 50, width: 50 }}
+                        source={require('../images/header-logo.png')}
+                        />
+                        </View>
+                    <FontAwesome onPress={() => this.props.Dashboard()} name="dashboard" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )
         }
@@ -69,6 +76,23 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
+                    <Feather name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    <FontAwesome name="user-times" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
+                </View>
+            )
+        }
+        else if (this.props.ParentPage == "Messenger") {
+            return (
+                <View style={styles.MainView}>
+                    <Feather
+                        onPress={() => this.props.navigation.navigation.goBack()}
+                        name="arrow-left" color={lightText} size={22} style={styles.Icons} />
+                    {/* <Text style={styles.ScreenName}>{this.props.ParentPage}</Text> */}
+                    <Image
+                        style={{ width: 34, height: 34, borderRadius: 17, marginLeft: 15 }}
+                        source={require('../images/userImage.jpg')}
+                    />
+                    <Text style={styles.ScreenName}>Maaz</Text>
                     <Feather name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                     <FontAwesome name="user-times" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                 </View>

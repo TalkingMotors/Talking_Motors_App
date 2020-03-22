@@ -38,7 +38,7 @@ export default class Register extends React.Component {
                         <LinearGradient colors={LinearColor} style={styles.LogoGradient}>
                             <Image
                                 resizeMode="contain"
-                                style={{ height: 100, width: 100 }}
+                                style={{ height: 90, width: 90 }}
                                 source={require('../images/header-logo.png')}
                             />
                         </LinearGradient>
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     LogoGradient: {
         justifyContent: 'center',
         alignItems: 'center',
-        width: '35%',
+        width: 100,
         height: 100,
         borderRadius: 10
     },

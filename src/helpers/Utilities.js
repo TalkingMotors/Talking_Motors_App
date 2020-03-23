@@ -1,5 +1,5 @@
 import Storage from './Storage';
-
+import AsyncStorage from '@react-native-community/async-storage'
 export let stringIsEmpty = (str) => {
     return (!str || /^\s*$/.test(str));
 };
@@ -35,10 +35,6 @@ export let setHeaders = () => {
             return   {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'ApplicationId': Settings.gv_applicationId,
-                'AuthenticationTicket': Storage.userLoginDetails.AuthenticationToken,
-                'UserID' : Storage.userLoginDetails.MembershipUserId,
-                'DeviceID' : Storage.deviceUUID
             }
         }else{
             return   {

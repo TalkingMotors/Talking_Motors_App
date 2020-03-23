@@ -23,7 +23,7 @@ import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, link
 import {
     TextField,
 } from 'react-native-material-textfield';
-import { parse } from '@babel/core';
+//import { parse } from '@babel/core';
 export default class Login extends React.Component {
 
     constructor(props) {
@@ -41,7 +41,7 @@ export default class Login extends React.Component {
           }else{
               Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(respose => {
                   if(respose){
-                      Storage.userData = parse.JSON(respose);
+                      Storage.userData = JSON.parse(respose);
                       this.props.navigation.navigate("Home")
                   }
               })

@@ -21,6 +21,13 @@ import Topbar from '../components/Topbar';
 import TalkModal from '../components/Talk';
 import SearchVehicleModal from '../components/SearchVehicle';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+
+import * as UserService from '../services/User';
+import * as Utilities from "../helpers/Utilities";
+import Storage from '../helpers/Storage';
+import Labels from "../languages/Labels";
+import Constants from "../helpers/Constants";
+
 export var SearchVehicleModalToggle;
 export default class Home extends React.Component {
     constructor(props) {
@@ -38,7 +45,27 @@ export default class Home extends React.Component {
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
         this.navigateToVehicleType = this.navigateToVehicleType.bind(this)
     }
+    componentDidMount = () => {
+        if (Object.keys(Storage.userData).length > 0) {
+            this.getUserBy(Storage.userData.userId)
+        }
+        
+    }
+    getUserBy = (userId) => {
+        try{
+            UserService.getUserById(userId).then(respose => {
+                if(respose){
+                    if(respose.success){
+                     Storage.userData = respose.user;
+                     Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
+                    }
+                }
+             })
+        }
+        catch(e){
 
+        }
+    }
     navigateToDashboard = () => {
         this.props.navigation.navigate("Dashboard")
     }

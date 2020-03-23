@@ -15,36 +15,34 @@ import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommponStyle, { Apptheme, linkText, lightText, darkText, LinearColor, lightBg, darkBg } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
+
 import * as Utilities from "../helpers/Utilities";
 import * as LoginService from '../services/Login';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
+
 export default class Profile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             userData: Storage.userData,
-            displayName: "",
-            nickName: "",
-            telephone: "",
-            email: ""
+            displayName: Storage.userData.name,
+            email: Storage.userData.email,
+            nickName: Storage.userData.nickname,
+            telephone: Storage.userData.telephone
         }
 
-        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
-            if (Object.keys(Storage.userData).length > 0) {
-                this.props.navigation.goBack()
-            }
-          });
+        
     }
+    componentDidMount = () => {
+        if (Object.keys(Storage.userData).length == 0) {
+            this.props.navigation.goBack()
+        }
+    }
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value, loginFail:false })
+      }
 
-    setProfileData = () =>{
-       this.setState({
-        displayName: this.state.userData.name,
-        email: this.state.userData.email,
-        nickName: this.state.userData.nickname,
-        telephone: this.state.userData.telephone
-       })
-    }
     render() {
         return (
             <View style={styles.ParentView}>
@@ -85,9 +83,10 @@ export default class Profile extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
-                            editable={false}
                             value={this.state.email}
+                            onChangeText={val => { this.onChangeText('email', val) }}
                         />
+                        <Text>{this.state.email}</Text>
                         <TextField
                             label= {Labels.Profile.userName}
                             fontSize={13}
@@ -100,6 +99,8 @@ export default class Profile extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.nickName}
+                            onChangeText={val => { this.onChangeText('nickName', val)}}
+                            
                         />
                         <TextField
                             label= {Labels.Profile.displayName}
@@ -113,6 +114,7 @@ export default class Profile extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.displayName}
+                            onChangeText={val => { this.onChangeText('displayName', val)}}
                         />
 
                         <TextField
@@ -127,6 +129,7 @@ export default class Profile extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.telephone}
+                            onChangeText={val => { this.onChangeText('telephone', val)}}
                         />
 
                     </View>

@@ -11,19 +11,19 @@ import {
     Keyboard,
     TouchableOpacity
 } from 'react-native';
-import * as Utilities from "../helpers/Utilities";
-import * as LoginService from '../services/Login';
-import Constants from "../helpers/Constants";
-import Storage from '../helpers/Storage';
+
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
-import {
-    TextField,
-} from 'react-native-material-textfield';
-//import { parse } from '@babel/core';
+import {  TextField} from 'react-native-material-textfield';
+
+import * as Utilities from "../helpers/Utilities";
+import * as LoginService from '../services/Login';
+import Constants from "../helpers/Constants";
+import Storage from '../helpers/Storage';
+
 export default class Login extends React.Component {
 
     constructor(props) {
@@ -47,6 +47,14 @@ export default class Login extends React.Component {
               })
               
           }
+    }
+    componentDidMount = () => {
+       this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
+        if (Object.keys(Storage.userData).length > 0) {
+            this.props.navigation.navigate("Home")
+        }
+      }
+      );
     }
     onChangeText = (key, value) => {
         this.setState({ [key]: value, loginFail:false })
@@ -135,7 +143,6 @@ export default class Login extends React.Component {
                             value={this.state.username}
                             onChangeText={val => {
                             this.onChangeText('username', val.trim())
-                            //this.setState({ emptyemail: false, loginLoader: false })
                             }}
                     
                         />
@@ -231,7 +238,7 @@ const styles = StyleSheet.create({
     LogoGradient: {
         justifyContent: 'center',
         alignItems: 'center',
-        width: '35%',
+        width: 100,
         height: 100,
         borderRadius: 10
     },

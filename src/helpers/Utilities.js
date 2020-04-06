@@ -35,6 +35,7 @@ export let setHeaders = () => {
             return   {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Authorization':  "Bearer "+ Storage.jwt_Token   
             }
         }else{
             return   {

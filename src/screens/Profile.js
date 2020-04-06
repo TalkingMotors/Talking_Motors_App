@@ -15,9 +15,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommponStyle, { Apptheme, linkText, lightText, darkText, LinearColor, lightBg, darkBg } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
+import ImagePicker from 'react-native-image-crop-picker';
 
+import Constants from "../helpers/Constants";
 import * as Utilities from "../helpers/Utilities";
-import * as LoginService from '../services/Login';
+import * as UserService from '../services/User';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 
@@ -29,7 +31,10 @@ export default class Profile extends React.Component {
             displayName: Storage.userData.name,
             email: Storage.userData.email,
             nickName: Storage.userData.nickname,
-            telephone: Storage.userData.telephone
+            telephone: Storage.userData.telephone,
+            photoUrl: Storage.userData.thumbUrl,
+            disableButton: false
+            
         }
 
         
@@ -40,8 +45,92 @@ export default class Profile extends React.Component {
         }
     }
     onChangeText = (key, value) => {
+        if(key.length == 0) {
+
+        }
         this.setState({ [key]: value, loginFail:false })
-      }
+    }
+
+    openCamera = () => {
+        ImagePicker.openCamera({
+            width: 200,
+            height: 200,
+            cropping: true,
+            includeBase64: true,
+            useFrontCamera: true
+        }).then(imageDetail => {
+            if (Object.keys(imageDetail).length > 0) {
+                var base64Image = `data:${imageDetail.mime};base64,${imageDetail.data}`
+                this.changeProfileImage(base64Image);
+            }
+
+        });
+    } 
+    openGallery = () => {
+        ImagePicker.clean();
+        this.setState({
+            ModalOpen: !this.state.ModalOpen
+        }, ()=>{
+            ImagePicker.openPicker({
+                width: 200,
+                height: 200,
+                cropping: true,
+                includeBase64: true,
+            }).then(imageDetail => {
+                if (Object.keys(imageDetail).length > 0) {
+                    var base64Image = `data:${imageDetail.mime};base64,${imageDetail.data}`
+                    //this.changeProfileImage(base64Image, imageName, this.state.userDetail.AuthenticationToken);
+                }
+    
+            });
+        }
+        ) 
+    }
+    updateUser = () => {
+        try {
+            userObject = {
+                email: this.state.email,
+                name: this.state.displayName,
+                nickname: this.state.nickName,
+                telephone: this.state.telephone,
+                notificationsEnabled: Storage.userData.notificationsEnabled,
+                locationServicesEnabled: Storage.userData.locationServicesEnabled
+              }
+            UserService.updateUser(userObject).then(response => {
+                if(response){
+                    if(response.success){
+                     Storage.userData = response.user;
+                     Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
+                    }
+                }
+            });
+        }
+        catch (e) {
+            Utilities.logAppException("Profile", "changeProfileImage", "User", "Exception", e.message)
+        }
+    }
+    changeProfileImage = async (base64Image) => {
+        try {
+
+            UserService.changeProfilePhoto(base64Image).then(response => {
+                if(response){
+                    if(response.success){
+                     Storage.userData = response.user;
+                     Storage.jwt_Token = response.token;
+                     Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
+                     Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(response.token))
+                     //this.props.navigation.navigate("Home")
+                     this.setState({
+                        photoUrl: Storage.userData.thumbUrl
+                     })
+                    }
+                }
+            });
+        }
+        catch (e) {
+            
+        }
+    }
 
     render() {
         return (
@@ -52,10 +141,14 @@ export default class Profile extends React.Component {
                         <View style={{ borderWidth: 2, justifyContent: 'center', alignItems: 'center', width: 110, height: 110, borderRadius: 55, borderColor: Apptheme }}>
                             <Image
                                 style={{ borderRadius: 55, width: '100%', height: '100%' }}
-                                source={require("../images/userImage.jpg")}
+                                source={{ uri: this.state.photoUrl }}
                             />
                             <View style={{ width: 40, justifyContent: 'center', backgroundColor: Apptheme, alignItems: 'center', height: 40, borderColor: lightBg, borderWidth: 1, borderRadius: 20, position: 'absolute', bottom: 1, right: 0 }}>
-                                <FontAwesome name="camera" size={15} color={lightBg} />
+                                 <TouchableOpacity
+                                            onPress={() => this.openCamera()}
+                                            style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                        <FontAwesome name="camera" size={15} color={lightBg} />     
+                                        </TouchableOpacity>
                             </View>
                         </View>
                     </View>
@@ -86,7 +179,6 @@ export default class Profile extends React.Component {
                             value={this.state.email}
                             onChangeText={val => { this.onChangeText('email', val) }}
                         />
-                        <Text>{this.state.email}</Text>
                         <TextField
                             label= {Labels.Profile.userName}
                             fontSize={13}
@@ -135,7 +227,7 @@ export default class Profile extends React.Component {
                     </View>
 
                     <View style={styles.LoginButtonView}>
-                        <TouchableOpacity style={styles.GradientButtonView} >
+                        <TouchableOpacity style={styles.GradientButtonView} disabled = {this.state.disableButton} onPress= {()=> {this.updateUser()}} >
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
                                 {Labels.Profile.save}

@@ -15,19 +15,29 @@ import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import { SearchVehicleModalToggle } from './src/screens/Home';
 import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor } from './src/helpers/CommponStyle';
+
+import * as Utilities from "./src/helpers/Utilities";
+import Constants from "./src/helpers/Constants";
+import Storage from './src/helpers/Storage';
+
 export default class ContentContainer extends React.Component {
     constructor(props) {
         super(props);
+
     }
     render() {
         return (
             <View style={styles.ParentView}>
                 <LinearGradient colors={LinearColor} style={styles.SidebarProfileView}>
                     <View style={styles.userProfileView}>
-                        <FontAwesome name='user' color="gray" size={40} />
+                        {/* <FontAwesome name='user' color="gray" size={40} /> */}
+                        <Image
+                                style={{ borderRadius: 55, width: '100%', height: '100%' }}
+                                source={{ uri: Storage.userData.thumbUrl }}
+                            />
                     </View>
                     <Text style={styles.userEmail}>
-                        Wel come To {'\n'} abc user name
+                        Wellcome  {'\n'} {Storage.userData.name}
                     </Text>
                 </LinearGradient>
                 <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')} style={styles.SideMenuItemView}>
@@ -114,13 +124,18 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Login')} style={styles.SideMenuItemView}>
+                <TouchableOpacity onPress={() => { 
+                    Utilities.asyncStorage_RemoveKey(Constants.USER_DATA)
+                    Utilities.asyncStorage_RemoveKey(Constants.JWT_TOKEN)
+                    Storage.userData = {}
+                    this.props.navigation.navigate('Login')}
+                    } style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <FontAwesome name='user' style={styles.SideMenuIcon}
                         />
                     </View>
                     <Text style={styles.SideMenuText}>
-                        Login
+                        Logout
                     </Text>
                 </TouchableOpacity>
             </View>

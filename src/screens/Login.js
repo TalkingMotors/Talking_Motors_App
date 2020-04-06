@@ -30,7 +30,7 @@ export default class Login extends React.Component {
         super(props)
         this.state = {
             secureTextEntry: true,
-            username: "ikm_kbq@hotmail.com",
+            username: "imrankhanmemon@outlook.com",
             password: "123456789",
             loginFail: false,
             loginFailMessage: ""
@@ -39,9 +39,9 @@ export default class Login extends React.Component {
         if (Object.keys(Storage.userData).length > 0) {
             this.props.navigation.navigate("Home")
           }else{
-              Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(respose => {
-                  if(respose){
-                      Storage.userData = JSON.parse(respose);
+              Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(response => {
+                  if(response){
+                      Storage.userData = JSON.parse(response);
                       this.props.navigation.navigate("Home")
                   }
               })
@@ -68,19 +68,19 @@ export default class Login extends React.Component {
                 return
             }
             let params = {  "email": this.state.username, "password": this.state.password }
-            LoginService.login(params).then(respose => {
-               if(respose){
-                   if(respose.success){
-                    Storage.userData = respose.user;
-                    Storage.jwt_Token = respose.token;
-                    Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
-                    Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(respose.token))
+            LoginService.login(params).then(response => {
+               if(response){
+                   if(response.success){
+                    Storage.userData = response.user;
+                    Storage.jwt_Token = response.token;
+                    Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
+                    Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(response.token))
                     this.props.navigation.navigate("Home")
                    }
                    else{
                     this.setState({
                         loginFail: true,
-                        loginFailMessage: respose.message
+                        loginFailMessage: response.message
                     })
                    }
                }

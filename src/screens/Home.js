@@ -40,10 +40,14 @@ export default class Home extends React.Component {
             Text3: darkText,
             Text4: lightText,
             Text5: darkText,
+            parent:''
         }
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
         this.navigateToVehicleType = this.navigateToVehicleType.bind(this)
+        Utilities.asyncStorage_GetKey(Constants.JWT_TOKEN).then(response => {
+             Storage.jwt_Token = JSON.parse(response)
+        })
     }
     componentDidMount = () => {
         if (Object.keys(Storage.userData).length > 0) {
@@ -70,9 +74,10 @@ export default class Home extends React.Component {
         this.props.navigation.navigate("Dashboard")
     }
 
-    TalkModalToggle = () => {
+    TalkModalToggle = (parent) => {
         this.setState({
-            isTalkModal: !this.state.isTalkModal
+            isTalkModal: !this.state.isTalkModal,
+           
         })
     }
     SearchVehicleModalToggle = SearchVehicleModalToggle = () => {
@@ -118,7 +123,11 @@ export default class Home extends React.Component {
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text2: Apptheme })}
                             onPressOut={() => this.setState({ Text2: lightText })}
-                            onPress={() => this.TalkModalToggle()}
+                            onPress={() => {
+                                this.setState({
+                                    parent:"talk"
+                                })
+                                this.TalkModalToggle()}}
                             style={styles.ButtonViewImage}>
                             <View style={styles.ImageView}>
                                 <Image
@@ -192,7 +201,11 @@ export default class Home extends React.Component {
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text5: Apptheme })}
                             onPressOut={() => this.setState({ Text5: darkText })}
-                            onPress={() => this.TalkModalToggle()}
+                            onPress={() => {
+                                this.setState({
+                                    parent:"vehicle_Check"
+                                })
+                                this.TalkModalToggle()}}
                             style={styles.ButtonView}>
                             <View style={styles.BoxTitleView}>
 
@@ -212,7 +225,7 @@ export default class Home extends React.Component {
                 </View>
 
                 {this.state.isTalkModal &&
-                    <TalkModal TalkModalToggle={this.TalkModalToggle} />
+                    <TalkModal parent={this.state.parent} navigation={this.props.navigation} TalkModalToggle={this.TalkModalToggle} />
                 }
                 {this.state.isSearchVehicleModal &&
                     <SearchVehicleModal navigateToVehicleType={this.navigateToVehicleType} TalkModalToggle={this.TalkModalToggle} SearchVehicleModalToggle={this.SearchVehicleModalToggle} />

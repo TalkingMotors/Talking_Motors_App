@@ -10,12 +10,15 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
 import LinearGradient from 'react-native-linear-gradient';
+import * as Utilities from "../helpers/Utilities";
+import * as VehicleService from '../services/Vehicle';
 export default class Talk extends Component {
     constructor(props) {
         super(props);
         this.state = {
             TalkModal: true,
             isKeyboard: false,
+            registerNo: '',
         }
 
         this._keyboardDidShow = this._keyboardDidShow.bind(this);
@@ -45,12 +48,26 @@ export default class Talk extends Component {
             isKeyboard: false
         })
     }
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value, })
+    }
+    searchVehicleBy = async () => {
+        let { registerNo } = this.state
+        if (!Utilities.stringIsEmpty(registerNo)) {
+            var response = await VehicleService.getVehicleBy(registerNo)
+            if (!Utilities.stringIsEmpty(response.vehicle) && response.vehicle.registrationNumber.toLowerCase() == registerNo.toLowerCase()) {
+                this.TalkModalToggle();
+                this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+            }
+            else {
+                this.TalkModalToggle();
+                alert("this register no is not valid ");
+            }
+        }
 
-
+    }
     render() {
-
-
-        return (
+         return (
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -66,7 +83,7 @@ export default class Talk extends Component {
                 <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '30%', height: (this.state.isKeyboard) ? '60%' : '35%', width: '86%', marginHorizontal: '7%', }}>
                     <ScrollView keyboardShouldPersistTaps='handled'>
                         <View style={{ width: '100%', height: '100%' }}>
-                            <View style={{ margin: 5,marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
+                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
                                 <Text style={[styles.headerModalText, { paddingTop: 0 }]}>
                                     Vehicle search
                             </Text>
@@ -87,6 +104,10 @@ export default class Talk extends Component {
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     labelFontSize={13}
+                                    value={this.state.registerNo}
+                                    onChangeText={val => {
+                                        this.onChangeText('registerNo', val.trim())
+                                    }}
                                 />
                             </View>
 
@@ -94,14 +115,14 @@ export default class Talk extends Component {
 
                     </ScrollView>
 
-                    <View style={{ justifyContent:'flex-end',alignItems:'center', flexDirection: 'row', width: '100%', height: 45, position: 'absolute', bottom: 10 }}>
+                    <View style={{ justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row', width: '100%', height: 45, position: 'absolute', bottom: 10 }}>
                         <TouchableOpacity onPress={() => this.TalkModalToggle()} style={styles.modalFooterButton}>
-                            <Text  style={{color:Apptheme}} >CANCEL</Text>
+                            <Text style={{ color: Apptheme }} >CANCEL</Text>
                         </TouchableOpacity>
-                            <TouchableOpacity onPress={() => this.TalkModalToggle()} style={styles.modalFooterButton}>
-                                <Text style={{ color: Apptheme }}  >SEARCH</Text>
-                            </TouchableOpacity>
-                        
+                        <TouchableOpacity onPress={() => this.searchVehicleBy()} style={styles.modalFooterButton}>
+                            <Text style={{ color: Apptheme }}  >SEARCH</Text>
+                        </TouchableOpacity>
+
                     </View>
                 </SafeAreaView>
             </Modal >
@@ -121,9 +142,9 @@ const styles = StyleSheet.create({
         width: '92%',
         marginHorizontal: '4%'
     },
-    modalFooterButton:{
-        padding:10,
-        marginHorizontal:5
+    modalFooterButton: {
+        padding: 10,
+        marginHorizontal: 5
     },
-    
+
 })

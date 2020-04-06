@@ -24,21 +24,53 @@ export default class Detail extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            registerNo: '',
+            make: '',
+            model: '',
+            year: '',
+            transmission: '',
+            engine: '',
+            doors: '',
+            seats: '',
+            bodyType: '',
+            color: '',
+            image: '',
+            descrption: '',
+            parent: ''
         }
         // this.props.navigation.navigate('details', { item, index });
     }
 
+    UNSAFE_componentWillMount() {
+        let vehicleData = this.props.navigation.state.params.item
+        let parent = this.props.navigation.state.params.parent
+        this.setState({
+            registerNo: vehicleData.registrationNumber,
+            make: vehicleData.make,
+            model: vehicleData.model,
+            year: vehicleData.buildYear,
+            transmission: vehicleData.transmissionType,
+            engine: vehicleData.engineSize + " " + vehicleData.fuelType,
+            doors: vehicleData.doorCount,
+            seats: vehicleData.seatCount,
+            bodyType: vehicleData.bodyType,
+            color: vehicleData.colour,
+            image: vehicleData.user.imageUrl,
+            descrption: vehicleData.description,
+            parent: parent
+        })
+    }
     render() {
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Detail" navigation={this.props} />
                 <ScrollView style={{ paddingBottom: 20 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
-                        <Transition shared={`image${this.props.navigation.state.params.index}`}>
+                        <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
                             <Image
-                                resizeMode="contain"
+                                resizeMode='cover'
                                 style={{ width: '100%', height: '100%' }}
-                                source={this.props.navigation.state.params.item.image}
+                                source={{ uri: this.props.navigation.state.params.item.user.imageUrl }}
                             />
                         </Transition>
 
@@ -49,11 +81,11 @@ export default class Detail extends React.Component {
                         </Text>
                     </View>
 
-                    <View>
+                    {/* <View>
                         <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5 }}>
                             £600.00
                         </Text>
-                    </View>
+                    </View> */}
 
 
                     <View style={[styles.MainItemView, { backgroundColor: '#FFF3E0', height: 50 }]}>
@@ -66,7 +98,7 @@ export default class Detail extends React.Component {
                                     Registration No
                                 </Text>
                                 <Text style={styles.TextTail}>
-                                    H5GTT
+                                    {this.state.registerNo}
                                 </Text>
                             </View>
                         </View>
@@ -79,8 +111,8 @@ export default class Detail extends React.Component {
                                     Make
                             </Text>
                                 <Text style={styles.TextTail}>
-                                    PROSCHE
-                            </Text>
+                                    {this.state.make}
+                                </Text>
                             </View>
                         </View>
                     </View>
@@ -95,7 +127,7 @@ export default class Detail extends React.Component {
                                     Model
                             </Text>
                                 <Text style={styles.TextTail}>
-                                    CAYENNE V6 D
+                                    {this.state.model}
                                 </Text>
                             </View>
                         </View>
@@ -108,7 +140,7 @@ export default class Detail extends React.Component {
                                     Year
                                 </Text>
                                 <Text style={styles.TextTail}>
-                                    2012
+                                    {this.state.year}
                                 </Text>
                             </View>
                         </View>
@@ -124,8 +156,8 @@ export default class Detail extends React.Component {
                                     Trasnmission
                             </Text>
                                 <Text style={styles.TextTail}>
-                                    Automatic
-                            </Text>
+                                    {this.state.transmission}
+                                </Text>
                             </View>
                         </View>
                         <View style={styles.ItemViewBox1}>
@@ -137,8 +169,8 @@ export default class Detail extends React.Component {
                                     Engine
                             </Text>
                                 <Text style={styles.TextTail}>
-                                    3.00 Diesel
-                            </Text>
+                                    {this.state.engine}
+                                </Text>
                             </View>
                         </View>
                     </View>
@@ -153,8 +185,8 @@ export default class Detail extends React.Component {
                                     Doors
                             </Text>
                                 <Text style={styles.TextTail}>
-                                    5
-                            </Text>
+                                    {this.state.doors}
+                                </Text>
                             </View>
                         </View>
                         <View style={styles.ItemViewBox1}>
@@ -166,7 +198,7 @@ export default class Detail extends React.Component {
                                     Seats
                                 </Text>
                                 <Text style={styles.TextTail}>
-                                    5
+                                    {this.state.seats}
                                 </Text>
                             </View>
                         </View>
@@ -183,8 +215,8 @@ export default class Detail extends React.Component {
                                     Body Type
                             </Text>
                                 <Text style={styles.TextTail}>
-                                    Estate
-                            </Text>
+                                    {this.state.bodyType}
+                                </Text>
                             </View>
                         </View>
                         <View style={styles.ItemViewBox1}>
@@ -196,33 +228,36 @@ export default class Detail extends React.Component {
                                     Color
                             </Text>
                                 <Text style={styles.TextTail}>
-                                    Black
-                            </Text>
+                                    {this.state.color}
+                                </Text>
                             </View>
                         </View>
                     </View>
 
 
-                   
-                    <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ color: Apptheme, fontSize: 16 }}>MORE DESCRPTION</Text>
-                    </View>
+                    {this.state.parent == "talk" &&
+                        <View>
+                            <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ color: Apptheme, fontSize: 16 }}>MORE DESCRPTION</Text>
+                            </View>
 
-                    <View style={{ width: '100%', paddingHorizontal: 20 }}>
-                        <Text>
-                            V6 Turbo Diesel
-                        </Text>
-                    </View>
+                            <View style={{ width: '100%', paddingHorizontal: 20 }}>
+                                <Text>
+                                    {this.state.descrption}
+                                </Text>
+                            </View>
 
-                    <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 20 }} >
-                        <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
+                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 20 }} >
+                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
 
-                            <Feather
-                                // onPress={() => this.props.navigation.navigation.goBack()}
-                                name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} />
-                            <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>VIEW MESSAGES</Text>
-                        </TouchableOpacity>
-                    </LinearGradient>
+                                    <Feather
+                                        // onPress={() => this.props.navigation.navigation.goBack()}
+                                        name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} />
+                                    <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>VIEW MESSAGES</Text>
+                                </TouchableOpacity>
+                            </LinearGradient>
+                        </View>
+                    }
 
 
                 </ScrollView>
@@ -257,12 +292,12 @@ const styles = StyleSheet.create({
         width: '50%'
     },
     TextHead: {
-        color:"#333",
+        color: "#333",
         fontSize: 12
         // fontWeight: 'bold'
     },
     TextTail: {
-        color:"#777",
+        color: "#777",
         fontSize: 14
     }
 })

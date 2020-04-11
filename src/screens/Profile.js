@@ -60,7 +60,7 @@ export default class Profile extends React.Component {
             useFrontCamera: true
         }).then(imageDetail => {
             if (Object.keys(imageDetail).length > 0) {
-                var base64Image = `data:${imageDetail.mime};base64,${imageDetail.data}`
+                var base64Image = `${imageDetail.data}`
                 this.changeProfileImage(base64Image);
             }
 
@@ -116,10 +116,7 @@ export default class Profile extends React.Component {
                 if(response){
                     if(response.success){
                      Storage.userData = response.user;
-                     Storage.jwt_Token = response.token;
                      Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
-                     Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(response.token))
-                     //this.props.navigation.navigate("Home")
                      this.setState({
                         photoUrl: Storage.userData.thumbUrl
                      })

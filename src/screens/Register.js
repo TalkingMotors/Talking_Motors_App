@@ -18,15 +18,69 @@ import LinearGradient from 'react-native-linear-gradient';
 import Topbar from '../components/Topbar';
 import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
+
+import * as Utilities from "../helpers/Utilities";
+import * as UserService from '../services/User';
+import Constants from "../helpers/Constants";
+import Storage from '../helpers/Storage';
+
 export default class Register extends React.Component {
 
     constructor(props) {
         super(props)
         this.state = {
+            email: "",
+            password: "",
+            confirmPassword: "",
+            name: "",
+            nickName: "",
+            telephone: "",
+            notificationsEnabled: true,
+            locationServicesEnabled: true,
+            motTestingStation: true,
             secureTextEntry: true
         }
+        
     }
-    Login = () => { }
+
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value, loginFail:false })
+    }
+    register = () => { 
+        try{
+            if(Utilities.stringIsEmpty(this.state.password)) {
+                return
+            }
+            else if(Utilities.stringIsEmpty(this.state.confirmPassword)){
+                return
+            }
+            else if(this.state.password != this.state.confirmPassword){
+                return
+            }
+            let params = { name: this.state.name, nickName: this.state.nickName, telephone : this.state.telephone,  email: this.state.email, password: this.state.password, confirmPassword: this.state.confirmPassword, notificationsEnabled : true, locationServicesEnabled: true }
+               UserService.register(params).then(response => {
+               if(response){
+                   if(response.success){
+                    Storage.userData = response.user;
+                    Storage.jwt_Token = response.token;
+                    Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
+                    Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(response.token))
+                    this.props.navigation.navigate("Home")
+                   }
+                   else{
+                    this.setState({
+                        loginFail: true,
+                        loginFailMessage: response.message
+                    })
+                   }
+               }
+            })
+            
+         }
+         catch(e){
+             console.log("error", e.message)
+         }
+    }
     render() {
         return (
 
@@ -62,6 +116,8 @@ export default class Register extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
+                            value={this.state.name}
+                            onChangeText={val => { this.onChangeText('name', val)}}
                         />
                         <TextField
                             label='Enter User Name'
@@ -74,6 +130,8 @@ export default class Register extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
+                            value={this.state.nickName}
+                            onChangeText={val => { this.onChangeText('nickName', val)}}
                         />
 
                         <TextField
@@ -87,6 +145,8 @@ export default class Register extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
+                            value={this.state.telephone}
+                            onChangeText={val => { this.onChangeText('telephone', val)}}
                         />
 
                         <TextField
@@ -100,6 +160,8 @@ export default class Register extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
+                            value={this.state.email}
+                            onChangeText={val => { this.onChangeText('email', val)}}
                         />
                         <View>
                             <TextField
@@ -114,6 +176,8 @@ export default class Register extends React.Component {
                                 autoCorrect={false}
                                 labelFontSize={13}
                                 secureTextEntry={this.state.secureTextEntry}
+                                value={this.state.password}
+                                onChangeText={val => { this.onChangeText('password', val)}}
                             />
                             <TouchableOpacity onPress={() =>
                                 this.setState({
@@ -142,10 +206,12 @@ export default class Register extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             secureTextEntry={this.state.secureTextEntry}
+                            value={this.state.confirmPassword}
+                            onChangeText={val => { this.onChangeText('confirmPassword', val)}}
                         />
 
                         <View style={styles.LoginButtonView}>
-                            <TouchableOpacity style={styles.GradientButtonView} >
+                            <TouchableOpacity style={styles.GradientButtonView} onPress = {()=> this.register() } >
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
                                         REGISTER

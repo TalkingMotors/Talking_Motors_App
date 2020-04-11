@@ -3,7 +3,7 @@ const API_Path = {
     IP_URL : "http://54.171.245.252:80/",
     DEV_URL : "http://dev.talkingmotorsapp.com/",
     LIVE_URL : "http://live.talkingmotorsapp.com/",
-    BASE_URL : "http://live.talkingmotorsapp.com/"
+    BASE_URL : "http://dev.talkingmotorsapp.com/"
 };
 
 const APIService = {

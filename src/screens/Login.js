@@ -20,7 +20,7 @@ import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, link
 import {  TextField} from 'react-native-material-textfield';
 
 import * as Utilities from "../helpers/Utilities";
-import * as LoginService from '../services/Login';
+import * as UserService from '../services/User';
 import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
 
@@ -68,7 +68,7 @@ export default class Login extends React.Component {
                 return
             }
             let params = {  "email": this.state.username, "password": this.state.password }
-            LoginService.login(params).then(response => {
+            UserService.login(params).then(response => {
                if(response){
                    if(response.success){
                     Storage.userData = response.user;

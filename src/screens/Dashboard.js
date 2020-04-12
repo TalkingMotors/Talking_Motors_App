@@ -18,43 +18,71 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import { FluidNavigator, Transition } from '../../lib';
+import * as Utilities from "../helpers/Utilities";
+import * as VehicleService from '../services/Vehicle';
 export default class Dashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            list: [
-                {
-                    id: 1,
-                    image: require("../images/dashboard1.png"),
-                    title: 'PORSCHE CAYENNE V6 D TIPTRONIC',
-                    detail: '2012 | 5 door | Automatic | 3.00L | Diesel',
-                    moredetail: 'V6 Turbo Diesel'
-                },
-                {
-                    id: 2,
-                    image: require("../images/car.png"),
-                    title: 'PORSCHE CAYENNE V6 D TIPTRONIC',
-                    detail: '2012 | 5 door | Automatic | 3.00L | Diesel',
-                    moredetail: 'V6 Turbo Diesel'
-                },
-                {
-                    id: 3,
-                    image: require("../images/dashboard1.png"),
-                    title: 'PORSCHE CAYENNE V6 D TIPTRONIC',
-                    detail: '2012 | 5 door | Automatic | 3.00L | Diesel',
-                    moredetail: 'V6 Turbo Diesel'
-                }
-            ]
+            list:[],
+            // list: [
+            //     {
+            //         id: 1,
+            //         image: require("../images/dashboard1.png"),
+            //         title: 'PORSCHE CAYENNE V6 D TIPTRONIC',
+            //         detail: '2012 | 5 door | Automatic | 3.00L | Diesel',
+            //         moredetail: 'V6 Turbo Diesel'
+            //     },
+            //     {
+            //         id: 2,
+            //         image: require("../images/car.png"),
+            //         title: 'PORSCHE CAYENNE V6 D TIPTRONIC',
+            //         detail: '2012 | 5 door | Automatic | 3.00L | Diesel',
+            //         moredetail: 'V6 Turbo Diesel'
+            //     },
+            //     {
+            //         id: 3,
+            //         image: require("../images/dashboard1.png"),
+            //         title: 'PORSCHE CAYENNE V6 D TIPTRONIC',
+            //         detail: '2012 | 5 door | Automatic | 3.00L | Diesel',
+            //         moredetail: 'V6 Turbo Diesel'
+            //     }
+            // ]
+        }
+       
+    }
+
+    componentWillMount(){
+        this.myVehicle();
+    }
+    myVehicle = async () => {
+        var response = await VehicleService.myVehicle()
+        if (!Utilities.stringIsEmpty(response.vehicles)) {
+            if (response.vehicles.length > 0) {
+                this.setState({
+                    list: response.vehicles
+                })
+            }
+            else {
+                this.setState({
+                    emptyList: "there is no records"
+                })
+            }
+       }
+        else {
+            alert("invalid operation");
         }
     }
+  
     detail = (item,index) => {
         // alert("AAaa");
-        this.props.navigation.navigate('Detail', { item, index });
+        this.props.navigation.navigate('Detail', { item:item, index:index,parent: "talk" });
     }
     render() {
-        return (
+        console.log("list",this.state.list);
+       return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Dashboard" navigation={this.props} />
+                <Topbar ParentPage="Dashboard" navigation={this.props.navigation} />
                 <ScrollView>
                     <LinearGradient colors={LinearColor} style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
                         <Text style={{ fontSize: 18, color: lightText, fontWeight: 'bold' }}>
@@ -81,17 +109,24 @@ export default class Dashboard extends React.Component {
                                                     <Image
                                                         resizeMode='cover'
                                                         style={{ marginLeft: 2, borderRadius: 20, width: '100%', height: '98%', }}
-                                                        source={item.image}
+                                                        source={{uri:item.images[0].url}}
                                                     />
                                                 </Transition>
                                             </View>
                                             <View style={{ width: '65%', justifyContent: 'center' }}>
-                                                <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>{item.title}</Text>
+                                                <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
+                                                    {item.make + " " + item.model}
+                                                    </Text>
                                                 <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                    {item.detail}
+                                                    {item.engineSize + " " + item.derivative}
                                                 </Text>
                                                 <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                    {item.moredetail}
+                                               {item.buildYear +" . "+
+                                                ((item.doorCount > 0 ) ? item.doorCount + " doors . ":"" )
+                                                +item.transmissionType+" . "
+                                                +item.engineSize+ " . "
+                                                +item.fuelType
+                                                }
                                                 </Text>
                                             </View>
                                         </TouchableOpacity>

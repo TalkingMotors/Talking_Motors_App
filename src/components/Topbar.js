@@ -54,7 +54,10 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
-                    <FontAwesome name="folder-open" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    <FontAwesome name="folder-open" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
+                    <FontAwesome
+                    onPress={()=>this.props.navigation.navigate("ListVehicle")}
+                    name="plus" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )
         }

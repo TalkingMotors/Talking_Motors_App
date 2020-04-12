@@ -9,14 +9,30 @@ export let getVehicleBy = async (vrn) => {
             let response = await fetch(APIConstants.GET_VEHICLE_BY_VRM_ENDPOINT + vrn, {
                 method: 'GET',
                 crossDomain: true,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': "Bearer "+ Storage.jwt_Token,            
-                },
-            })
+                headers:Utilities.setHeaders()
+              })
             let result = response.json()
             return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+
+export let myVehicle = async () => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.MY_VEHICLES_ENDPOINT )
+            let response = await fetch(APIConstants.MY_VEHICLES_ENDPOINT , {
+                method: 'GET',
+                crossDomain: true,
+                headers:Utilities.setHeaders()
+              })
+            let result = response.json()
+             return result;
         } else {
             return null
         }

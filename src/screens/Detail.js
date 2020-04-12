@@ -10,6 +10,7 @@ import {
     TextInput,
     StatusBar,
     StyleSheet,
+    Switch,
     TouchableOpacity
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -36,7 +37,9 @@ export default class Detail extends React.Component {
             color: '',
             image: '',
             descrption: '',
-            parent: ''
+            parent: '',
+            price:'',
+            saleSwitch: false,
         }
         // this.props.navigation.navigate('details', { item, index });
     }
@@ -55,10 +58,17 @@ export default class Detail extends React.Component {
             seats: vehicleData.seatCount,
             bodyType: vehicleData.bodyType,
             color: vehicleData.colour,
-            image: vehicleData.user.imageUrl,
+            // image: vehicleData.user.imageUrl,
+            image: vehicleData.images[0].url,
             descrption: vehicleData.description,
-            parent: parent
+            price:vehicleData.price,
+            saleSwitch:vehicleData.forSale,
+            parent: parent,
         })
+    }
+
+    toggleSwitch = (value) => {
+        this.setState({ saleSwitch: value })
     }
     render() {
         return (
@@ -70,7 +80,7 @@ export default class Detail extends React.Component {
                             <Image
                                 resizeMode='cover'
                                 style={{ width: '100%', height: '100%' }}
-                                source={{ uri: this.props.navigation.state.params.item.user.imageUrl }}
+                                source={{ uri: this.state.image }}
                             />
                         </Transition>
 
@@ -80,12 +90,13 @@ export default class Detail extends React.Component {
                             {this.props.navigation.state.params.item.title}
                         </Text>
                     </View>
-
-                    {/* <View>
-                        <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5 }}>
-                            £600.00
+                    {this.state.price != "" &&
+                        <View>
+                            <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5 }}>
+                                ${this.state.price}
                         </Text>
-                    </View> */}
+                        </View>
+                    }
 
 
                     <View style={[styles.MainItemView, { backgroundColor: '#FFF3E0', height: 50 }]}>
@@ -247,7 +258,14 @@ export default class Detail extends React.Component {
                                 </Text>
                             </View>
 
-                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 20 }} >
+                        <View style={[styles.ButtonView, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
+                            <Text >For Sale? </Text>
+                            <Switch
+                                 thumbColor={Apptheme}
+                                onValueChange={this.toggleSwitch}
+                                value={this.state.saleSwitch} />
+                        </View>
+                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
                                 <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
 
                                     <Feather
@@ -256,6 +274,13 @@ export default class Detail extends React.Component {
                                     <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>VIEW MESSAGES</Text>
                                 </TouchableOpacity>
                             </LinearGradient>
+
+                        <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
+                                 {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
+                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>UPGRADE TO PREMIUM</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
                         </View>
                     }
 

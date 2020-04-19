@@ -21,6 +21,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import { FluidNavigator, Transition } from '../../lib';
+import * as Utilities from "../helpers/Utilities";
 export default class Detail extends React.Component {
     constructor(props) {
         super(props);
@@ -59,7 +60,7 @@ export default class Detail extends React.Component {
             bodyType: vehicleData.bodyType,
             color: vehicleData.colour,
             // image: vehicleData.user.imageUrl,
-            image: vehicleData.images[0].url,
+            image: vehicleData.images[0],
             descrption: vehicleData.description,
             price:vehicleData.price,
             saleSwitch:vehicleData.forSale,
@@ -71,18 +72,24 @@ export default class Detail extends React.Component {
         this.setState({ saleSwitch: value })
     }
     render() {
-        return (
+       return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Detail" navigation={this.props} />
                 <ScrollView style={{ paddingBottom: 20 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
+                        {!Utilities.stringIsEmpty(this.state.image) ?
                         <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
                             <Image
                                 resizeMode='cover'
                                 style={{ width: '100%', height: '100%' }}
-                                source={{ uri: this.state.image }}
+                                source={{ uri: this.state.image.url }}
                             />
                         </Transition>
+                        :
+                        <View style={{justifyContent:'center',alignItems:'center',width:'100%',height:'100%',backgroundColor:lightBg}}>
+                            <FontAwesome name="car" size={150} color={Apptheme}/>
+                        </View>
+                        }
 
                     </View>
                     <View>
@@ -93,7 +100,7 @@ export default class Detail extends React.Component {
                     {this.state.price != "" &&
                         <View>
                             <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5 }}>
-                                ${this.state.price}
+                            £{this.state.price.toFixed(2)}
                         </Text>
                         </View>
                     }

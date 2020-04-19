@@ -62,11 +62,18 @@ export default class CommonModal extends Component {
                         </View>
                         <ScrollView keyboardShouldPersistTaps='handled'>
                             <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
-
+                            <TouchableOpacity onPress={() => this.seletedItem({id:0 ,name:"Any"})} style={{ width: '100%', marginVertical: 10, marginHorizontal: 1 }} >
+                                            <Text style={{ paddingHorizontal: 10, color: "#333", fontSize: 14 }}>Any</Text>
+                                            {(this.state.seletedItem == 0) ?
+                                                <MaterialIcons name="radio-button-checked" style={{ position: 'absolute', right: 25 }} size={20} color={Apptheme} />
+                                                :
+                                                <MaterialIcons name="radio-button-unchecked" style={{ position: 'absolute', right: 25 }} size={20} color={Apptheme} />
+                                            }
+                                        </TouchableOpacity>
                                 {this.props.ModalData.map((item, index) => {
                                     return (
                                         <TouchableOpacity onPress={() => this.seletedItem(item)} style={{ width: '100%', marginVertical: 10, marginHorizontal: 1 }} key={index}>
-                                            <Text style={{ paddingHorizontal: 10, color: "#333", fontSize: 14 }}>{item.value}</Text>
+                                            <Text style={{ paddingHorizontal: 10, color: "#333", fontSize: 14 }}>{item.name}</Text>
                                             {(this.state.seletedItem == item.id) ?
                                                 <MaterialIcons name="radio-button-checked" style={{ position: 'absolute', right: 25 }} size={20} color={Apptheme} />
                                                 :

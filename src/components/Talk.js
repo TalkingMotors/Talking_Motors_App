@@ -64,8 +64,7 @@ export default class Talk extends Component {
                 alert("this register no is not valid ");
             }
         }
-
-    }
+  }
     render() {
          return (
             <Modal

@@ -71,7 +71,12 @@ export default class Home extends React.Component {
         }
     }
     navigateToDashboard = () => {
+        if (Object.keys(Storage.userData).length > 0) {
         this.props.navigation.navigate("Dashboard")
+        }
+        else{
+            this.props.navigation.navigate("Login")
+        }
     }
 
     TalkModalToggle = (parent) => {

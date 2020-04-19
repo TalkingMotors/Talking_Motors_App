@@ -17,9 +17,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import CommponStyle, { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import CommonModal from '../components/CommonModal';
-import {
-    TextField,
-} from 'react-native-material-textfield';
+import { TextField } from 'react-native-material-textfield';
+import * as Utilities from "../helpers/Utilities";
+import * as VehicleLooks from '../services/SearchVehicleType';
+import { PriceList, AgeList, mileageList, seatsList, doorsList, distanceList } from '../helpers/Listing'
 export default class VehicleType extends React.Component {
     constructor(props) {
         super(props);
@@ -28,14 +29,15 @@ export default class VehicleType extends React.Component {
             switchValue: false,
             isModal: false,
             ModalProps: {},
-            selectedsort: 1,
+            postcode: '',
+            selectedsort: 5,
             sort: [
-                { id: 1, value: "From lowest price" },
-                { id: 2, value: "From highest price" },
-                { id: 3, value: "By distance" },
-                { id: 4, value: "By mileage" },
-                { id: 5, value: "From newest" },
-                { id: 6, value: "From oldest" },
+                { id: 1, name: "From lowest price" },
+                { id: 2, name: "From highest price" },
+                { id: 3, name: "By distance" },
+                { id: 4, name: "By mileage" },
+                { id: 5, name: "From newest" },
+                { id: 6, name: "From oldest" },
 
             ],
             selectedvehicleMake: 1,
@@ -69,12 +71,63 @@ export default class VehicleType extends React.Component {
                 { id: 13, value: "TRANSIT BUS D" },
                 { id: 14, value: "YARIS HYBRID ICON + CVT" },
                 { id: 15, value: "ZAFIRA ENERGY CDTI E-FLEX" },
-            ]
+            ],
+            bodyTypes: [],
+            selectedbodyTypes: 0,
+            colours: [],
+            selectedcolours: 0,
+            makes: [],
+            selectedmakes: 0,
+            models: [],
+            selectedmodels: 0,
+            priceList: PriceList,
+            seletedMinPrice: 0,
+            selectedMaxPrice: 0,
+            ageList: AgeList,
+            seletedMinAge: 0,
+            seletedMaxAge: 0,
+            mileageList: mileageList,
+            seletedmileage: 0,
+            fuelTypes: [],
+            selectedfuelTypes: 0,
+            engineSizes: [],
+            selectedengineSizes: 0,
+            gearbox: [],
+            selectedgearbox: 0,
+            doors: doorsList,
+            selecteddoors: 0,
+            seats: seatsList,
+            selectedseats: 0,
+            distance: distanceList,
+            selecteddistance: 0
+
         }
         this.ModalToggle = this.ModalToggle.bind(this)
-        this.seletedSortItem = this.seletedSortItem.bind(this)
-        this.seletedvehiclemakeItem = this.seletedvehiclemakeItem.bind(this)
-        this.seletedvehiclemodelItem = this.seletedvehiclemodelItem.bind(this)
+        this.BodyTypeList();
+    }
+
+    BodyTypeList = async () => {
+        var response = await VehicleLooks.VehicleLookup()
+        console.log("response", response);
+        this.setState({
+            makes: response.makes,
+            models: response.models,
+            bodyTypes: response.bodyTypes,
+            colours: response.colours,
+            driverSeatPositions: response.driverSeatPositions,
+            driveTypes: response.driveTypes,
+            engineCylinderConfigs: response.engineCylinderConfigs,
+            engineFuelDeliveries: response.engineFuelDeliveries,
+            enginePositions: response.enginePositions,
+            engineSizes: response.engineSizes,
+            features: response.features,
+            fuelTypes: response.fuelTypes,
+            roadFundLicenseBands: response.roadFundLicenseBands,
+            roadFundLicenseStatuses: response.roadFundLicenseStatuses,
+            gearbox: response.transmissionTypes,
+        }, () => {
+            console.log("this.state", this.state);
+        })
     }
 
     toggleSwitch = (value) => {
@@ -88,6 +141,239 @@ export default class VehicleType extends React.Component {
         })
     }
 
+    bodyTypes = () => {
+        this.setState({
+            ModalTitle: 'body Types',
+            ModalData: this.state.bodyTypes,
+            ModalSeleted: this.state.selectedbodyTypes,
+            ModalseletedItem: this.seletedBodyTypeItem
+
+        })
+        this.ModalToggle();
+    }
+    seletedBodyTypeItem = (item) => {
+        this.setState({
+            selectedbodyTypes: item.id
+        })
+    }
+
+    colours = () => {
+        this.setState({
+            ModalTitle: 'body Colours',
+            ModalData: this.state.colours,
+            ModalSeleted: this.state.selectedcolours,
+            ModalseletedItem: this.seletedBodyColours
+
+        })
+        this.ModalToggle();
+    }
+    seletedBodyColours = (item) => {
+        this.setState({
+            selectedcolours: item.id
+        })
+    }
+    makes = () => {
+        this.setState({
+            ModalTitle: 'Vehicle Makes',
+            ModalData: this.state.makes,
+            ModalSeleted: this.state.selectedmakes,
+            ModalseletedItem: this.seletedmakes
+
+        })
+        this.ModalToggle();
+    }
+    seletedmakes = (item) => {
+        this.setState({
+            selectedmakes: item.id
+        })
+    }
+    models = () => {
+        this.setState({
+            ModalTitle: 'Vehicle Models',
+            ModalData: this.state.models,
+            ModalSeleted: this.state.selectedmodels,
+            ModalseletedItem: this.seletedmodels
+
+        })
+        this.ModalToggle();
+    }
+    seletedmodels = (item) => {
+        this.setState({
+            selectedmodels: item.id
+        })
+    }
+    minPrice = () => {
+        this.setState({
+            ModalTitle: 'Min Price',
+            ModalData: this.state.priceList,
+            ModalSeleted: this.state.seletedMinPrice,
+            ModalseletedItem: this.seletedMinPrice
+
+        })
+        this.ModalToggle();
+    }
+    seletedMinPrice = (item) => {
+        this.setState({
+            seletedMinPrice: item.id
+        })
+    }
+
+    maxPrice = () => {
+        this.setState({
+            ModalTitle: 'Max Price',
+            ModalData: this.state.priceList,
+            ModalSeleted: this.state.selectedMaxPrice,
+            ModalseletedItem: this.selectedMaxPrice
+
+        })
+        this.ModalToggle();
+    }
+    selectedMaxPrice = (item) => {
+        this.setState({
+            selectedMaxPrice: item.id
+        })
+    }
+
+    minAge = () => {
+        this.setState({
+            ModalTitle: 'Min Age',
+            ModalData: this.state.ageList,
+            ModalSeleted: this.state.seletedMinAge,
+            ModalseletedItem: this.seletedMinAge
+
+        })
+        this.ModalToggle();
+    }
+    seletedMinAge = (item) => {
+        this.setState({
+            seletedMinAge: item.id
+        })
+    }
+
+    maxAge = () => {
+        this.setState({
+            ModalTitle: 'Max Age',
+            ModalData: this.state.ageList,
+            ModalSeleted: this.state.seletedMaxAge,
+            ModalseletedItem: this.seletedMaxAge
+
+        })
+        this.ModalToggle();
+    }
+    seletedMaxAge = (item) => {
+        this.setState({
+            seletedMaxAge: item.id
+        })
+    }
+    mileage = () => {
+        this.setState({
+            ModalTitle: 'Max mileage',
+            ModalData: this.state.mileageList,
+            ModalSeleted: this.state.seletedmileage,
+            ModalseletedItem: this.seletedmileage
+
+        })
+        this.ModalToggle();
+    }
+    seletedmileage = (item) => {
+        this.setState({
+            seletedmileage: item.id
+        })
+    }
+    fuelTypes = () => {
+        this.setState({
+            ModalTitle: 'Fuel Type',
+            ModalData: this.state.fuelTypes,
+            ModalSeleted: this.state.selectedfuelTypes,
+            ModalseletedItem: this.selectedfuelTypes
+
+        })
+        this.ModalToggle();
+    }
+    selectedfuelTypes = (item) => {
+        this.setState({
+            selectedfuelTypes: item.id
+        })
+    }
+    gearbox = () => {
+        this.setState({
+            ModalTitle: 'Gear Box',
+            ModalData: this.state.gearbox,
+            ModalSeleted: this.state.selectedgearbox,
+            ModalseletedItem: this.selectedgearbox
+
+        })
+        this.ModalToggle();
+    }
+    selectedgearbox = (item) => {
+        this.setState({
+            selectedgearbox: item.id
+        })
+    }
+    engineSizes = () => {
+        this.setState({
+            ModalTitle: 'Engine size',
+            ModalData: this.state.engineSizes,
+            ModalSeleted: this.state.selectedengineSizes,
+            ModalseletedItem: this.selectedengineSizes
+
+        })
+        this.ModalToggle();
+    }
+    selectedengineSizes = (item) => {
+        this.setState({
+            selectedengineSizes: item.id
+        })
+    }
+
+    doors = () => {
+        this.setState({
+            ModalTitle: 'Doors',
+            ModalData: this.state.doors,
+            ModalSeleted: this.state.selecteddoors,
+            ModalseletedItem: this.selecteddoors
+
+        })
+        this.ModalToggle();
+    }
+    selecteddoors = (item) => {
+        this.setState({
+            selecteddoors: item.id
+        })
+    }
+
+    seats = () => {
+        this.setState({
+            ModalTitle: 'Seats',
+            ModalData: this.state.seats,
+            ModalSeleted: this.state.selectedseats,
+            ModalseletedItem: this.selectedseats
+
+        })
+        this.ModalToggle();
+    }
+    selectedseats = (item) => {
+        this.setState({
+            selectedseats: item.id
+        })
+    }
+
+    distance = () => {
+        this.setState({
+            ModalTitle: 'Distance',
+            ModalData: this.state.distance,
+            ModalSeleted: this.state.selecteddistance,
+            ModalseletedItem: this.selecteddistance
+
+        })
+        this.ModalToggle();
+    }
+    selecteddistance = (item) => {
+        this.setState({
+            selecteddistance: item.id
+        })
+    }
+
     sort = () => {
         this.setState({
             ModalTitle: 'Sort by',
@@ -98,49 +384,86 @@ export default class VehicleType extends React.Component {
         })
         this.ModalToggle();
     }
-    vehiclemake = () => {
-        this.setState({
-            ModalTitle: 'Vehicle Make',
-            ModalData: this.state.vehiclemake,
-            ModalSeleted: this.state.selectedvehicleMake,
-            ModalseletedItem: this.seletedvehiclemakeItem
-
-        })
-        this.ModalToggle();
-    }
-    vehiclemodal = () => {
-        this.setState({
-            ModalTitle: 'Vehicle Model',
-            ModalData: this.state.vehiclemodal,
-            ModalSeleted: this.state.selectedvehiclemodal,
-            ModalseletedItem: this.seletedvehiclemodelItem
-
-        })
-        this.ModalToggle();
-    }
     seletedSortItem = (item) => {
         this.setState({
             selectedsort: item.id
         })
     }
-    seletedvehiclemakeItem = (item) => {
+
+
+
+    resetAllFields() {
         this.setState({
-            selectedvehicleMake: item.id
-        })
-    }
-    seletedvehiclemodelItem = (item) => {
-        this.setState({
-            selectedvehiclemodal: item.id
+            selectedbodyTypes: 0,
+            selectedcolours: 0,
+            selectedmakes: 0,
+            selectedmodels: 0,
+            selectedMaxPrice: 0,
+            seletedMinPrice: 0,
+            seletedMinAge: 0,
+            seletedMaxAge: 0,
+            seletedmileage: 0,
+            selectedfuelTypes: 0,
+            selectedengineSizes: 0,
+            selectedseats: 0,
+            selectedgearbox: 0,
+            selecteddoors: 0,
+            selecteddistance: 0,
+            postcode: '',
         })
     }
 
+    searchVehicle = async () => {
+        let param = {
+            makeID: this.state.selectedmakes,
+            modelID: this.state.selectedmodels,
+            minPrice: this.state.seletedMinPrice,
+            maxPrice: this.state.selectedMaxPrice,
+            minAge: this.state.seletedMinAge,
+            maxAge: this.state.seletedMaxAge,
+            maxMileage: this.state.seletedmileage,
+            colourID: this.state.selectedcolours,
+            fuelTypeID: this.state.selectedfuelTypes,
+            engineSizeID: this.state.selectedengineSizes,
+            transmissionTypeID: this.state.selectedgearbox,
+            bodyTypeID: this.state.selectedbodyTypes,
+            doorCount: this.state.selecteddoors,
+            seatCount: this.state.selectedseats,
+            postcode: this.state.postcode,
+            distance: this.state.selecteddistance,
+            stolen: false,
+            forSale: this.state.switchValue,
+            vehicleId: 0,
+            numberOfResults: '',
+            orderBy: 0,
+            description: '',
+            // longitude: 0.0,
+            // latitude: 0.0,
+        }
+        var filterparam = {};
+        let items = Object.entries(param);
+        items.map(item => {
+            let key = item[0];
+            let value = item[1];
+            if (value != '' || value > 0) {
+                filterparam[key] = value
+            }
+        });
+        var response = await VehicleLooks.SearchVehicleTypes(filterparam)
+        console.log("response", response);
+        this.props.navigation.navigate("SearchResultVehicle",
+        {
+        listVehicle:response.vehicles,
+        resultcount:response.numberOfResults,
+        })
+    }
     render() {
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Vehicle Type" navigation={this.props} />
                 <View style={{ width: '100%', height: 50, position: 'absolute', bottom: 0 }}>
                     <View style={styles.ButtonView}>
-                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.props.navigation.navigate("Home") }}>
+                        <TouchableOpacity onPress={() => this.searchVehicle()} style={styles.GradientButtonView} >
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
                                     SEARCH
@@ -184,7 +507,7 @@ export default class VehicleType extends React.Component {
                                 onPress={() => this.sort()}
                                 style={styles.DropDownButton}>
                                 <Text style={styles.DropDownLabel}>Sort By</Text>
-                                <Text style={styles.DropDownText}>{this.state.sort.filter(a => a.id == this.state.selectedsort)[0].value}</Text>
+                                <Text style={styles.DropDownText}>{this.state.sort.filter(a => a.id == this.state.selectedsort)[0].name}</Text>
                             </TouchableOpacity>
                             <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon} />
 
@@ -192,10 +515,16 @@ export default class VehicleType extends React.Component {
 
                         <View style={styles.BoxView}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemake()}
+                                onPress={() => this.makes()}
                                 style={styles.DropDownButton}>
                                 <Text style={styles.DropDownLabel}>Vehicle make</Text>
-                                <Text style={styles.DropDownText}>{this.state.vehiclemake.filter(a => a.id == this.state.selectedvehicleMake)[0].value}</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedmakes == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.makes.filter(a => a.id == this.state.selectedmakes)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon} />
 
@@ -203,10 +532,16 @@ export default class VehicleType extends React.Component {
 
                         <View style={styles.BoxView}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.models()}
                                 style={styles.DropDownButton}>
                                 <Text style={styles.DropDownLabel}>Vehicle model</Text>
-                                <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedmodels == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.models.filter(a => a.id == this.state.selectedmodels)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon} />
 
@@ -214,22 +549,32 @@ export default class VehicleType extends React.Component {
 
                         <View style={{ width: '100%', flexDirection: 'row', marginVertical: 5, justifyContent: 'center', alignItems: 'center' }}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.minPrice()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Min Price</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>$600000</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.seletedMinPrice == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.priceList.filter(a => a.id == this.state.seletedMinPrice)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIconRow} />
                             </View>
 
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.maxPrice()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Max Price</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>$600000</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedMaxPrice == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.priceList.filter(a => a.id == this.state.selectedMaxPrice)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon2} />
@@ -240,22 +585,32 @@ export default class VehicleType extends React.Component {
 
                         <View style={{ width: '100%', flexDirection: 'row', marginVertical: 5, justifyContent: 'center', alignItems: 'center' }}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.minAge()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Min Age</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>$600000</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.seletedMinAge == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.ageList.filter(a => a.id == this.state.seletedMinAge)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIconRow} />
                             </View>
 
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.maxAge()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Max Age</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>Upto 15 years old</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.seletedMaxAge == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.ageList.filter(a => a.id == this.state.seletedMaxAge)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon2} />
@@ -264,10 +619,16 @@ export default class VehicleType extends React.Component {
 
                         <View style={styles.BoxView}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.mileage()}
                                 style={styles.DropDownButton}>
                                 <Text style={styles.DropDownLabel}>Max mileage</Text>
-                                <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.seletedmileage == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.mileageList.filter(a => a.id == this.state.seletedmileage)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon} />
 
@@ -275,10 +636,16 @@ export default class VehicleType extends React.Component {
 
                         <View style={styles.BoxView}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.bodyTypes()}
                                 style={styles.DropDownButton}>
                                 <Text style={styles.DropDownLabel}>Body type</Text>
-                                <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedbodyTypes == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.bodyTypes.filter(a => a.id == this.state.selectedbodyTypes)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon} />
 
@@ -286,22 +653,32 @@ export default class VehicleType extends React.Component {
 
                         <View style={{ width: '100%', flexDirection: 'row', marginVertical: 5, justifyContent: 'center', alignItems: 'center' }}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.fuelTypes()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Fuel type</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>Hybrid Electric</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedfuelTypes == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.fuelTypes.filter(a => a.id == this.state.selectedfuelTypes)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIconRow} />
                             </View>
 
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.colours()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Color</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>Upto 20000 mi</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedcolours == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.colours.filter(a => a.id == this.state.selectedcolours)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon2} />
@@ -310,22 +687,32 @@ export default class VehicleType extends React.Component {
 
                         <View style={{ width: '100%', flexDirection: 'row', marginVertical: 5, justifyContent: 'center', alignItems: 'center' }}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.engineSizes()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Engine size</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>2.5</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedengineSizes == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.engineSizes.filter(a => a.id == this.state.selectedengineSizes)[0].name
+                                    }</Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIconRow} />
                             </View>
 
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.gearbox()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Gearbox</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>Automatic</Text>
+
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedgearbox == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.gearbox.filter(a => a.id == this.state.selectedgearbox)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon2} />
@@ -334,22 +721,32 @@ export default class VehicleType extends React.Component {
 
                         <View style={{ width: '100%', flexDirection: 'row', marginVertical: 5, justifyContent: 'center', alignItems: 'center' }}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.doors()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Doors</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>4</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selecteddoors == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.seats.filter(a => a.id == this.state.selecteddoors)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIconRow} />
                             </View>
 
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.seats()}
                                 style={styles.DropDownButtonRow}>
                                 <Text style={styles.DropDownLabel}>Seats</Text>
-                                {/* <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text> */}
-                                <Text style={styles.DropDownText}>5</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selectedseats == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.seats.filter(a => a.id == this.state.selectedseats)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <View>
                                 <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon2} />
@@ -358,15 +755,21 @@ export default class VehicleType extends React.Component {
 
                         <View style={styles.BoxView}>
                             <TouchableOpacity
-                                onPress={() => this.vehiclemodal()}
+                                onPress={() => this.distance()}
                                 style={styles.DropDownButton}>
                                 <Text style={styles.DropDownLabel}>Distance</Text>
-                                <Text style={styles.DropDownText}>{this.state.vehiclemodal.filter(a => a.id == this.state.selectedvehiclemodal)[0].value}</Text>
+                                <Text style={styles.DropDownText}>
+                                    {(this.state.selecteddistance == 0) ?
+                                        "Any"
+                                        :
+                                        this.state.distance.filter(a => a.id == this.state.selecteddistance)[0].name
+                                    }
+                                </Text>
                             </TouchableOpacity>
                             <FontAwesome name="sort-down" size={30} color={Apptheme} style={styles.DropDownIcon} />
                         </View>
                     </View>
-                    <View style={[styles.ButtonView,{flexDirection:'row'}]}>
+                    <View style={[styles.ButtonView, { flexDirection: 'row' }]}>
                         <Text >For Sale? </Text>
                         <Switch
                             // style={{ marginTop: 30 }}
@@ -375,7 +778,8 @@ export default class VehicleType extends React.Component {
                             value={this.state.switchValue} />
                     </View>
                     <View style={styles.ButtonView}>
-                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.props.navigation.navigate("Home") }}>
+                        <TouchableOpacity style={styles.GradientButtonView}
+                            onPress={() => { this.resetAllFields() }}>
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
                                     RESET

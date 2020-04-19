@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
     SafeAreaView,
@@ -21,126 +22,61 @@ import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
 import * as VehicleService from '../services/Vehicle';
 import VehicleImage from '../components/VehicleImage';
-export default class Dashboard extends React.Component {
+export default class SearchResultVehicle extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             list: [],
+            result: 0
 
         }
 
     }
 
     componentWillMount() {
-        this.myVehicle();
+        this.setState({
+            list: this.props.navigation.state.params.listVehicle,
+            result: this.props.navigation.state.params.resultcount,
+        })
     }
-    myVehicle = async () => {
-        var response = await VehicleService.myVehicle()
-        if (!Utilities.stringIsEmpty(response.vehicles)) {
-            if (response.vehicles.length > 0) {
-                this.setState({
-                    list: response.vehicles
-                })
-            }
-            else {
-                this.setState({
-                    emptyList: "No records found"
-                })
-            }
-        }
-        else {
-            alert("invalid operation");
-        }
-    }
+
 
     detail = (item, index) => {
         // alert("AAaa");
         this.props.navigation.navigate('Detail', { item: item, index: index, parent: "talk" });
     }
-    mainTitle = (item) => {
-        let make = "";
-        let model = "";
-        let derivative = "";
-        let engineSize = "";
-        
-        if (!Utilities.stringIsEmpty(item.make) || item.make > 0) {
-            make = item.make+" ";
+    flatListEmptyMessage = () => {
+        if (this.state.list == [] || this.state.list.length == 0) {
+            return (
+                <View style={{ width: '96%',marginHorizontal:'2%',height:450, justifyContent: 'center', alignItems: 'center' }}>
+                    <FontAwesome name="car" size={80} style={{marginVertical:20}} color={Apptheme} />
+                    <Text style={{color:Apptheme,fontSize:20,fontWeight:'bold'}}>
+                        VEHICLE SEARCH
+                    </Text>
+                    <Text style={{paddingTop:10}}>
+                        No vehicle found
+                    </Text>
+                </View>
+            )
         }
-        if (!Utilities.stringIsEmpty(item.model) || item.model > 0) {
-            model = item.model+" ";
-        }
-        if (!Utilities.stringIsEmpty(item.derivative) || item.derivative > 0) {
-            derivative = item.derivative;
-        }
-        if (!Utilities.stringIsEmpty(item.engineSize) || item.engineSize > 0) {
-            engineSize = item.engineSize;
-        }
-        return make + model + engineSize + derivative 
     }
-
-    subTitle = (item) => {
-        let postcode = "";
-        let price = ""
-        if (!Utilities.stringIsEmpty(item.postcode) || item.postcode > 0) {
-            postcode = item.postcode+" ";
-        }
-        if (!Utilities.stringIsEmpty(item.price) || item.price > 0) {
-            price = "£" + item.price.toFixed(2)+" ";
-        }
-        return price + postcode
-    }
-
-
-    detailText = (item) => {
-
-        let buildYear = "";
-        let doorCount = "";
-        let transmissionType = "";
-        let engineSize = "";
-        let fuelType = "";
-        let userMileage="";
-
-        if (!Utilities.stringIsEmpty(item.doorCount) || item.doorCount > 0) {
-            doorCount = item.doorCount+" doors . ";
-        }
-        if (!Utilities.stringIsEmpty(item.buildYear) || item.buildYear > 0) {
-            buildYear = item.buildYear+" . ";
-        }
-
-        if (!Utilities.stringIsEmpty(item.transmissionType) || item.transmissionType > 0) {
-            transmissionType = item.transmissionType+" . ";
-        }
-        if (!Utilities.stringIsEmpty(item.engineSize) || item.engineSize > 0) {
-            engineSize = item.engineSize+"| . ";
-        }
-        if (!Utilities.stringIsEmpty(item.fuelType) || item.fuelType > 0) {
-            fuelType = item.fuelType+"  ";
-        }
-        if (!Utilities.stringIsEmpty(item.userMileage) || item.userMileage > 0) {
-            userMileage = item.userMileage+"m . ";
-        }
-
-        return buildYear + userMileage + doorCount + transmissionType + engineSize + fuelType
-
-       
-    }
-    
     render() {
-        console.log("list", this.state.list);
         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Dashboard" navigation={this.props.navigation} />
+                <Topbar ParentPage="Vehicle Search" navigation={this.props} />
                 <ScrollView>
                     <LinearGradient colors={LinearColor} style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
                         <Text style={{ fontSize: 18, color: lightText, fontWeight: 'bold' }}>
-                            YOUR VEHICLES
+                            {this.state.result} results
                         </Text>
                     </LinearGradient>
+                    <View style={{width:'100%',height:'100%'}}>
                     <FlatList
                         data={this.state.list}
                         listKey={(item, index) => 'recent-' + index.toString()}
                         keyExtractor={(item, index) => index.toString()}
                         showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={this.flatListEmptyMessage}
                         shouldItemUpdate={this.state.loadMore}
                         renderItem={({ item, index }) =>
                             (
@@ -156,15 +92,18 @@ export default class Dashboard extends React.Component {
                                             </View>
                                             <View style={{ width: '65%', justifyContent: 'center' }}>
                                                 <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
-
-                                                    {this.mainTitle(item)}
+                                                    {item.make + " " + item.model}
                                                 </Text>
                                                 <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                    {this.subTitle(item)}
-
+                                                    {item.engineSize + " " + item.derivative}
                                                 </Text>
                                                 <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                   {this.detailText(item)}
+                                                    {item.buildYear + " . " +
+                                                        ((item.doorCount > 0) ? item.doorCount + " doors . " : "")
+                                                        + item.transmissionType + " . "
+                                                        + item.engineSize + " . "
+                                                        + item.fuelType
+                                                    }
                                                 </Text>
                                             </View>
                                         </TouchableOpacity>
@@ -173,6 +112,7 @@ export default class Dashboard extends React.Component {
                             )}
 
                     />
+                    </View>
                 </ScrollView>
             </View>
         )

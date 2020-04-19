@@ -29,6 +29,23 @@ export let asyncStorage_RemoveKey = async (key) => {
     }
 }
 
+export let Generate_GET_Params = (params) => {
+    try {
+        var Keys = Object.keys(params)
+        var parameters = Keys.length > 0 ? "?" : "";
+
+        Keys.forEach((element, index) => {
+            parameters += element + "=" + params[element] + "&"
+        });
+        parameters = Keys.length > 0 ? parameters.substring(0, parameters.length - 1) : parameters
+        return parameters
+    }
+    catch (e) {
+        console.log("Generate_GET_Params", e)
+    }
+}
+
+
 export let setHeaders = () => {
     try{
         if(Object.keys(Storage.userData).length > 0){

@@ -1,0 +1,98 @@
+export const PriceList = [
+    { id: '500.00', name: '£500' },
+    { id: "1000.00", name: '£1000' },
+    { id: "1500.00", name: '£1500' },
+    { id: "2000.00", name: '£2000' },
+    { id: "2500.00", name: '£2500' },
+    { id: "3000.00", name: '£3000' },
+    { id: "3500.00", name: '£3500' },
+    { id: "4000.00", name: '£4000' },
+    { id: "4500.00", name: '£4500' },
+    { id: "5000.00", name: '£5000' },
+    { id: "5500.00", name: '£5500' },
+    { id: "6000.00", name: '£6000' },
+    { id: "6500.00", name: '£6500' },
+    { id: "7000.00", name: '£7000' },
+    { id: "7500.00", name: '£7500' },
+    { id: "8000.00", name: '£8000' },
+    { id: "8500.00", name: '£8500' },
+    { id: "9000.00", name: '£9000' },
+    { id: "9500.00", name: '£9500' },
+    { id: "10000.00", name: '£10000' },
+    { id: "11000.00", name: '£11000' },
+    { id: "12000.00", name: '£12000' },
+    { id: "13000.00", name: '£13000' },
+    { id: "14000.00", name: '£14000' },
+    { id: "15000.00", name: '£15000' },
+    { id: "16000.00", name: '£16000' },
+    { id: "17000.00", name: '£17000' },
+    { id: "18000.00", name: '£18000' },
+    { id: "19000.00", name: '£19000' },
+    { id: "20000.00", name: '£20000' },
+]
+
+export const AgeList = [
+    {id :1 , name:"From 1 year old"},
+    {id :2 , name:"From 2 years old"},
+    {id :3 , name:"From 3 years old"},
+    {id :4 , name:"From 4 years old"},
+    {id :5 , name:"From 5 years old"},
+    {id :6 , name:"From 6 years old"},
+    {id :7 , name:"From 7 years old"},
+    {id :8 , name:"From 8 years old"},
+    {id :9 , name:"From 9 years old"},
+    {id :10 , name:"From 10 years old"},
+]
+
+export const mileageList = [
+    { id: '100.00', name: "Up to 100 mi" },
+    { id: '1000.00', name: "Up to 1000 mi" },
+    { id: '5000.00', name: "Up to 5000 mi" },
+    { id: '10000.00', name: "Up to 10000 mi" },
+    { id: '15000.00', name: "Up to 15000 mi" },
+    { id: '20000.00', name: "Up to 20000 mi" },
+    { id: '25000.00', name: "Up to 25000 mi" },
+    { id: '30000.00', name: "Up to 30000 mi" },
+    { id: '35000.00', name: "Up to 35000 mi" },
+    { id: '40000.00', name: "Up to 40000 mi" },
+    { id: '45000.00', name: "Up to 45000 mi" },
+    { id: '50000.00', name: "Up to 50000 mi" },
+    { id: '60000.00', name: "Up to 60000 mi" },
+    { id: '70000.00', name: "Up to 70000 mi" },
+    { id: '80000.00', name: "Up to 80000 mi" },
+    { id: '90000.00', name: "Up to 90000 mi" },
+    { id: '100000.00', name: "Up to 100000 mi" },
+]
+
+export const doorsList = [
+    { id: 2, name: "2" },
+    { id: 3, name: "3" },
+    { id: 4, name: "4" },
+    { id: 5, name: "5" },
+]
+
+export const seatsList = [
+    { id: 2, name: "2" },
+    { id: 3, name: "3" },
+    { id: 4, name: "4" },
+    { id: 5, name: "5" },
+    { id: 6, name: "6" },
+    { id: 7, name: "7" },
+]
+
+export const distanceList = [
+    { id: 1, name: "1 mi" },
+    { id: 5, name: "5 mi" },
+    { id: 10, name: "10 mi" },
+    { id: 20, name: "20 mi" },
+    { id: 30, name: "30 mi" },
+    { id: 40, name: "40 mi" },
+    { id: 50, name: "50 mi" },
+    { id: 60, name: "60 mi" },
+    { id: 70, name: "70 mi" },
+    { id: 80, name: "80 mi" },
+    { id: 90, name: "90 mi" },
+    { id: 100, name: "100 mi" },
+    { id: 200, name: "200 mi" },
+
+]

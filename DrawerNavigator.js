@@ -22,6 +22,7 @@ import VehicleType from './src/screens/VehicleType';
 import ChangePassword from './src/screens/ChangePassword';
 import ResetPassword from './src/screens/ResetPassword';
 import Messenger from './src/screens/Messenger';
+import SearchResultVehicle from './src/screens/SearchResultVehicle';
 
 const MyDrawerNavigator = createDrawerNavigator({
     Home: { screen: StackNavigator },
@@ -38,6 +39,7 @@ const MyDrawerNavigator = createDrawerNavigator({
     ChangePassword: { screen: ChangePassword, },
     ResetPassword: { screen: ResetPassword, },
     Messenger: { screen: Messenger, },
+    SearchResultVehicle: { screen: SearchResultVehicle, },
 },
     {
         initialRouteName: 'Home',

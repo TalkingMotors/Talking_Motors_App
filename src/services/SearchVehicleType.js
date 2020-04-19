@@ -4,38 +4,15 @@ import Storage from '../helpers/Storage';
 
 
 
-
-
-export let getVehicleBy = async (vrn) => {
+export let VehicleLookup = async () => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.GET_VEHICLE_BY_VRM_ENDPOINT + vrn)
-            console.log("Bearer " + Storage.jwt_Token);
-            let response = await fetch(APIConstants.GET_VEHICLE_BY_VRM_ENDPOINT + vrn, {
+            console.log(APIConstants.VEHICLE_LOOKUPS_ENDPOINT  )
+            let response = await fetch(APIConstants.VEHICLE_LOOKUPS_ENDPOINT , {
                 method: 'GET',
                 crossDomain: true,
-                headers: Utilities.setHeaders()
-            })
-            let result = response.json()
-            return result;
-        } else {
-            return null
-        }
-    } catch (e) {
-        console.log(e.message)
-        return null
-    }
-}
-
-export let myVehicle = async () => {
-    try {
-        if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.MY_VEHICLES_ENDPOINT)
-            let response = await fetch(APIConstants.MY_VEHICLES_ENDPOINT, {
-                method: 'GET',
-                crossDomain: true,
-                headers: Utilities.setHeaders()
-            })
+                headers:Utilities.setHeaders()
+              })
             let result = response.json()
             return result;
         } else {
@@ -48,3 +25,21 @@ export let myVehicle = async () => {
 }
 
 
+export let SearchVehicleTypes = async (param) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            var parameters = Utilities.Generate_GET_Params(param)
+            let response = await fetch(APIConstants.SEARCH_ENDPOINT + parameters, {
+                method: 'GET',
+                crossDomain: true,
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}

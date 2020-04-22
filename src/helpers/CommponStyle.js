@@ -52,9 +52,21 @@ export default StyleSheet.create({
     ButtonView: {
         marginTop: 0,
         width: '90%',
-        marginHorizontal:'5%',
+        marginHorizontal: '5%',
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    errorView:{
+        alignSelf:"center"
+    },
+    errorViewText: {
+        borderRadius: 10,
+        color: '#fa3335',
+        textAlign: 'center',
+        backgroundColor: '#ffe0e0',
+        padding: 2,
+        paddingHorizontal:20,
+        fontSize:14
     }
 })
 

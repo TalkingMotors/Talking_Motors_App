@@ -7,8 +7,10 @@ import {
     StyleSheet,
     TouchableHighlight,
     Image,
+    ActivityIndicator,
     StatusBar,
     Keyboard,
+    Dimensions,
     TouchableOpacity
 } from 'react-native';
 
@@ -17,7 +19,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
-import {  TextField} from 'react-native-material-textfield';
+import { TextField } from 'react-native-material-textfield';
 
 import * as Utilities from "../helpers/Utilities";
 import * as UserService from '../services/User';
@@ -30,77 +32,108 @@ export default class Login extends React.Component {
         super(props)
         this.state = {
             secureTextEntry: true,
-            username: "imrankhanmemon@outlook.com",
-            password: "123456789",
+            username: "",
+            password: "",
             loginFail: false,
-            loginFailMessage: ""
+            loginFailMessage: "",
+            isloader: false,
+            errorEmail: false,
+            errorEmailMessage: '',
+            errorPassword: false,
+            errorPasswordMessage: '',
         }
-        
+
         if (Object.keys(Storage.userData).length > 0) {
             this.props.navigation.navigate("Home")
-          }else{
-              Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(response => {
-                  if(response){
-                      Storage.userData = JSON.parse(response);
-                      this.props.navigation.navigate("Home")
-                  }
-              })
-              
-          }
+        } else {
+            Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(response => {
+                if (response) {
+                    Storage.userData = JSON.parse(response);
+                    this.props.navigation.navigate("Home")
+                }
+            })
+
+        }
     }
     componentDidMount = () => {
-       this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
-        if (Object.keys(Storage.userData).length > 0) {
-            this.props.navigation.navigate("Home")
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
+            if (Object.keys(Storage.userData).length > 0) {
+                this.props.navigation.navigate("Home")
+            }
         }
-      }
-      );
+        );
     }
     onChangeText = (key, value) => {
-        this.setState({ [key]: value, loginFail:false })
-      }
+        this.setState({ [key]: value, loginFail: false })
+    }
     Login = async () => {
-         try{
-            if(Utilities.stringIsEmpty(this.state.username)) {
+        try {
+            if (Utilities.stringIsEmpty(this.state.username)) {
+                this.setState({
+                    errorEmail: true,
+                    errorEmailMessage: "Enter your Email"
+                })
                 return
             }
-            else if(Utilities.stringIsEmpty(this.state.password)){
+            else if (Utilities.stringIsEmpty(this.state.password)) {
+                this.setState({
+                    errorPassword: true,
+                    errorPasswordMessage: "Enter your Password"
+                })
                 return
             }
-            let params = {  "email": this.state.username, "password": this.state.password }
-            UserService.login(params).then(response => {
-               if(response){
-                   if(response.success){
-                    Storage.userData = response.user;
-                    Storage.jwt_Token = response.token;
-                    Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
-                    Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(response.token))
-                    this.props.navigation.navigate("Home")
-                   }
-                   else{
-                    this.setState({
-                        loginFail: true,
-                        loginFailMessage: response.message
-                    })
-                   }
-               }
+            this.setState({
+                isloader: true
             })
-            
-         }
-         catch(e){
-             console.log("error", e.message)
-         }
-     }
+            let params = { "email": this.state.username, "password": this.state.password }
+            UserService.login(params).then(response => {
+                if (response) {
+                    if (response.success) {
+                        Storage.userData = response.user;
+                        Storage.jwt_Token = response.token;
+                        Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
+                        Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(response.token))
+                        this.setState({
+                            isloader: false
+                        })
+                        this.props.navigation.navigate("Home")
+                    }
+                    else {
+                        this.setState({
+                            loginFail: true,
+                            isloader: false,
+                            loginFailMessage: response.message
+                        })
+                    }
+                }
+            })
+
+        }
+        catch (e) {
+            console.log("error", e.message)
+            this.setState({
+                isloader: false
+            })
+        }
+    }
     render() {
         return (
 
 
             <View style={styles.ParentView}>
-                  <StatusBar
+                <StatusBar
                     barStyle="light-content"
                     translucent={false}
                     backgroundColor={Apptheme}
-                    />
+                />
+                {this.state.isloader &&
+                    <View style={styles.menuLoaderView}>
+                        <ActivityIndicator
+                            color="#ed0000"
+                            size="large"
+                        />
+                    </View>
+                }
                 <ScrollView keyboardShouldPersistTaps="always">
                     <View style={styles.LogoView}>
                         <LinearGradient colors={LinearColor} style={styles.LogoGradient}>
@@ -118,16 +151,18 @@ export default class Login extends React.Component {
                     </Text>
                     </View>
                     {
-                        this.state.loginFail && 
-                        <View style={styles.LoginView}>
-                            <Text style={styles.LoginFail}>
-                                   {
-                                       this.state.loginFailMessage
-                                   }             
-                            </Text>
-                    </View>
+                        this.state.loginFail &&
+                        <View style={styles.TextFieldView}>
+                            <View style={styles.LoginView}>
+                                <Text style={styles.errorViewText}>
+                                    {
+                                        this.state.loginFailMessage
+                                    }
+                                </Text>
+                            </View>
+                        </View>
                     }
-                    
+
                     <View style={styles.TextFieldView}>
                         <TextField
                             label='Enter Email'
@@ -142,10 +177,21 @@ export default class Login extends React.Component {
                             labelFontSize={13}
                             value={this.state.username}
                             onChangeText={val => {
-                            this.onChangeText('username', val.trim())
+                                this.onChangeText('username', val.trim())
+                                this.setState({
+                                    errorEmailMessage: '',
+                                    errorEmail: false
+                                })
                             }}
-                    
+
                         />
+                        {this.state.errorEmail &&
+                            <View style={styles.errorView}>
+                                <Text style={styles.errorViewText}>
+                                    {this.state.errorEmailMessage}
+                                </Text>
+                            </View>
+                        }
                         <View>
                             <TextField
                                 label='Enter Password'
@@ -162,9 +208,19 @@ export default class Login extends React.Component {
                                 value={this.state.password}
                                 onChangeText={val => {
                                     this.onChangeText('password', val.trim())
-                                    //this.setState({ emptyemail: false, loginLoader: false })
+                                    this.setState({
+                                        errorPasswordMessage: '',
+                                        errorPassword: false
+                                    })
                                 }}
                             />
+                            {this.state.errorPassword &&
+                                <View style={styles.errorView}>
+                                    <Text style={styles.errorViewText}>
+                                        {this.state.errorPasswordMessage}
+                                    </Text>
+                                </View>
+                            }
                             <TouchableOpacity onPress={() =>
                                 this.setState({
                                     secureTextEntry: !this.state.secureTextEntry
@@ -186,7 +242,7 @@ export default class Login extends React.Component {
                         </TouchableOpacity>
 
                         <View style={styles.LoginButtonView}>
-                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.Login()}} >
+                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.Login() }} >
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
                                         LOGIN
@@ -194,7 +250,7 @@ export default class Login extends React.Component {
                                 </LinearGradient>
                             </TouchableOpacity>
 
-                            <TouchableOpacity onPress={()=>this.props.navigation.navigate("Register")} style={styles.GradientButtonView} >
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate("Register")} style={styles.GradientButtonView} >
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
                                         REGISTER
@@ -207,7 +263,7 @@ export default class Login extends React.Component {
                                 need to register to message users or list a car.
                         </Text>
 
-                            <TouchableOpacity style={styles.GradientButtonView} onPress={() =>{this.props.navigation.navigate("Home")}}>
+                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.props.navigation.navigate("Home") }}>
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
                                         USE WITHOUT ACCOUNT
@@ -253,7 +309,8 @@ const styles = StyleSheet.create({
     },
     LoginFail: {
         color: "red",
-        fontSize: 14,
+        fontSize: 12,
+        padding: 5,
         fontWeight: 'bold'
     },
     TextFieldView: {
@@ -291,5 +348,22 @@ const styles = StyleSheet.create({
         top: 15,
         right: 0,
         padding: 10
+    },
+    menuLoaderView: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255, 0.7)',
+        // backgroundColor: 'red',
+        zIndex: 10000,
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 0
+    },
+    errorViewText: {
+        ...CommponStyle.errorViewText
+    },
+    errorView: {
+        ...CommponStyle.errorView
     }
 });

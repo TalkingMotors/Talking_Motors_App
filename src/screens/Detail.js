@@ -39,10 +39,9 @@ export default class Detail extends React.Component {
             image: '',
             descrption: '',
             parent: '',
-            price:'',
+            price: '',
             saleSwitch: false,
         }
-        // this.props.navigation.navigate('details', { item, index });
     }
 
     UNSAFE_componentWillMount() {
@@ -62,8 +61,8 @@ export default class Detail extends React.Component {
             // image: vehicleData.user.imageUrl,
             image: vehicleData.images[0],
             descrption: vehicleData.description,
-            price:vehicleData.price,
-            saleSwitch:vehicleData.forSale,
+            price: vehicleData.price,
+            saleSwitch: vehicleData.forSale,
             parent: parent,
         })
     }
@@ -71,24 +70,31 @@ export default class Detail extends React.Component {
     toggleSwitch = (value) => {
         this.setState({ saleSwitch: value })
     }
+
+    EditVehicle = () => {
+        let data = this.props.navigation.state.params.item;
+        this.props.navigation.navigate("EditVehicle", {
+            item: data
+        })
+    }
     render() {
-       return (
+        return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Detail" navigation={this.props} />
+                <Topbar ParentPage="Detail" EditVehicle={this.EditVehicle} parent={this.state.parent} navigation={this.props} />
                 <ScrollView style={{ paddingBottom: 20 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
                         {!Utilities.stringIsEmpty(this.state.image) ?
-                        <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
-                            <Image
-                                resizeMode='cover'
-                                style={{ width: '100%', height: '100%' }}
-                                source={{ uri: this.state.image.url }}
-                            />
-                        </Transition>
-                        :
-                        <View style={{justifyContent:'center',alignItems:'center',width:'100%',height:'100%',backgroundColor:lightBg}}>
-                            <FontAwesome name="car" size={150} color={Apptheme}/>
-                        </View>
+                            <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
+                                <Image
+                                    resizeMode='cover'
+                                    style={{ width: '100%', height: '100%' }}
+                                    source={{ uri: this.state.image.url }}
+                                />
+                            </Transition>
+                            :
+                            <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: lightBg }}>
+                                <FontAwesome name="car" size={150} color={Apptheme} />
+                            </View>
                         }
 
                     </View>
@@ -100,8 +106,8 @@ export default class Detail extends React.Component {
                     {this.state.price != "" &&
                         <View>
                             <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5 }}>
-                            £{this.state.price.toFixed(2)}
-                        </Text>
+                                £{this.state.price.toFixed(2)}
+                            </Text>
                         </View>
                     }
 
@@ -265,13 +271,13 @@ export default class Detail extends React.Component {
                                 </Text>
                             </View>
 
-                        <View style={[styles.ButtonView, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
-                            <Text >For Sale? </Text>
-                            <Switch
-                                 thumbColor={Apptheme}
-                                onValueChange={this.toggleSwitch}
-                                value={this.state.saleSwitch} />
-                        </View>
+                            <View style={[styles.ButtonView, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
+                                <Text >For Sale? </Text>
+                                <Switch
+                                    thumbColor={Apptheme}
+                                    onValueChange={this.toggleSwitch}
+                                    value={this.state.saleSwitch} />
+                            </View>
                             <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
                                 <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
 
@@ -282,12 +288,12 @@ export default class Detail extends React.Component {
                                 </TouchableOpacity>
                             </LinearGradient>
 
-                        <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
-                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
-                                 {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
-                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>UPGRADE TO PREMIUM</Text>
-                            </TouchableOpacity>
-                        </LinearGradient>
+                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
+                                    {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
+                                    <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>UPGRADE TO PREMIUM</Text>
+                                </TouchableOpacity>
+                            </LinearGradient>
                         </View>
                     }
 

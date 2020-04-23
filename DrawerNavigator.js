@@ -23,6 +23,8 @@ import ChangePassword from './src/screens/ChangePassword';
 import ResetPassword from './src/screens/ResetPassword';
 import Messenger from './src/screens/Messenger';
 import SearchResultVehicle from './src/screens/SearchResultVehicle';
+import EditVehicle from './src/screens/EditVehicle';
+import EditVehicleImage from './src/screens/EditVehicleImage';
 
 const MyDrawerNavigator = createDrawerNavigator({
     Home: { screen: StackNavigator },
@@ -40,6 +42,8 @@ const MyDrawerNavigator = createDrawerNavigator({
     ResetPassword: { screen: ResetPassword, },
     Messenger: { screen: Messenger, },
     SearchResultVehicle: { screen: SearchResultVehicle, },
+    EditVehicleImage: { screen: EditVehicleImage, },
+   EditVehicle: { screen: EditVehicle, },
 },
     {
         initialRouteName: 'Home',

@@ -18,11 +18,32 @@ import Topbar from '../components/Topbar';
 import {
     TextField,
 } from 'react-native-material-textfield';
-
+import * as VehicleService from '../services/Vehicle';
+import * as Utilities from "../helpers/Utilities";
 export default class ListVehicle extends React.Component {
     constructor(props) {
         super(props);
+        this.state={
+            registerNo:''
+        }
     }
+
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value, })
+    }
+
+    searchVehicleBy = async () => {
+        let { registerNo } = this.state
+        if (!Utilities.stringIsEmpty(registerNo)) {
+            var response = await VehicleService.getVehicleBy(registerNo)
+            if (!Utilities.stringIsEmpty(response.vehicle) && response.vehicle.registrationNumber.toLowerCase() == registerNo.toLowerCase()) {
+                this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
+            }
+            else {
+                alert("this register no is not valid ");
+            }
+        }
+  }
     render() {
         return (
             <View >
@@ -60,10 +81,14 @@ export default class ListVehicle extends React.Component {
                             autoCapitalize="characters"
                             autoCorrect={false}
                             labelFontSize={13}
+                            value={this.state.registerNo}
+                            onChangeText={val => {
+                                this.onChangeText('registerNo', val.trim())
+                            }}
                         />
                     </View>
                     <View style={{width:'94%',marginHorizontal:'3%',justifyContent:'center',alignItems:'center'}}>
-                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.props.navigation.navigate("Home") }}>
+                        <TouchableOpacity  style={styles.GradientButtonView} onPress={() => { this.searchVehicleBy()}}>
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
                                     AUTO COMPLETE DETAILS

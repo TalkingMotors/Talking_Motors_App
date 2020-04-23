@@ -18,6 +18,8 @@ import ChangePassword from './src/screens/ChangePassword';
 import ResetPassword from './src/screens/ResetPassword';
 import Messenger from './src/screens/Messenger';
 import SearchResultVehicle from './src/screens/SearchResultVehicle';
+import EditVehicle from './src/screens/EditVehicle';
+import EditVehicleImage from './src/screens/EditVehicleImage';
 
 const MyStackNavigator = createStackNavigator(
     {
@@ -36,6 +38,8 @@ const MyStackNavigator = createStackNavigator(
         ResetPassword: { screen: ResetPassword },
         Messenger: { screen: Messenger },
         SearchResultVehicle: { screen: SearchResultVehicle },
+        EditVehicle: { screen: EditVehicle },
+        EditVehicleImage: { screen: EditVehicleImage },
     },
     {
         initialRouteName: 'Login',

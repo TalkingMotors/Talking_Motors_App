@@ -48,3 +48,64 @@ export let myVehicle = async () => {
 }
 
 
+export let RemoveVehicleImage = async () => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.REMOVE_VEHICLE_IMAGE_ENDPOINT)
+            let response = await fetch(APIConstants.REMOVE_VEHICLE_IMAGE_ENDPOINT, {
+                method: 'GET',
+                crossDomain: true,
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let InsertVehicleImage = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.INSERT_VEHICLE_IMAGE_ENDPOINT)
+            let response = await fetch(APIConstants.INSERT_VEHICLE_IMAGE_ENDPOINT, {
+                method: 'POST',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let UpdateVehicle = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.VEHICLE_ENDPOINT)
+            let response = await fetch(APIConstants.VEHICLE_ENDPOINT, {
+                method: 'PATCH',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+
+
+
+
+

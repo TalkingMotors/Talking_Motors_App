@@ -1,25 +1,27 @@
 import React from 'react';
 import {
-    SafeAreaView,
     ScrollView,
     View,
     Text,
-    Button,
     FlatList,
     Image,
-    TextInput,
-    StatusBar,
     StyleSheet,
     TouchableOpacity
 } from 'react-native';
-import Feather from 'react-native-vector-icons/Feather';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
+// import Feather from 'react-native-vector-icons/Feather';
+// import FontAwesome from 'react-native-vector-icons/FontAwesome';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// import LinearGradient from 'react-native-linear-gradient';
+import Constants from "../helpers/Constants";
+import * as Utilities from "../helpers/Utilities";
+import * as MessagesService from '../services/Messages';
+import Storage from '../helpers/Storage';
+import Labels from "../languages/Labels";
+
+import { darkText, lightBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
-import { FluidNavigator, Transition } from '../../lib';
+//import { FluidNavigator, Transition } from '../../lib';
 export default class Message extends React.Component {
     constructor(props) {
         super(props);
@@ -35,9 +37,44 @@ export default class Message extends React.Component {
                 { id: 3, name: "XYZ", count: "2 users joined", friends: "(You, Maaz)" },
                 { id: 4, name: "John", count: "2 users joined", friends: "(You, Maaz, Dean)" },
                 { id: 5, name: "H5GTT", count: "2 users joined", friends: "(You, Dean)" },
-            ]
+            ],
+            myConversation : []
         }
-        // this.props.navigation.navigate('details', { item, index });
+        this.getMyConversations()
+    }
+    getMyConversations = () =>{
+          try{
+            MessagesService.MyConversations().then(respose => {
+                if(respose){
+                    if(respose.success){
+                        this.state.myConversation = respose.conversations
+                        console.log("ikm", this.state.myConversation)
+                        this.setState({
+                            myConversation : this.state.myConversation
+                        })
+                    }
+                }
+             })
+          }
+          catch(e){
+              console.log("get conversation error", e.message)
+          }
+    }
+    setMemberNames = (members) => {
+    try{
+        var memberNamesCSV = ""
+          members.forEach(member => {
+              if(member.user.userId === Storage.userData.userId){
+                memberNamesCSV = "You"
+              }else{
+                memberNamesCSV = `${memberNamesCSV}, ${member.user.nickname}`
+              }
+          });
+          return memberNamesCSV;
+    }
+    catch(e){
+        console.log("get conversation error", e.message)
+    }
     }
 
     render() {
@@ -48,7 +85,7 @@ export default class Message extends React.Component {
                     <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
 
 
-                        {this.state.listUser.map((users, index) => {
+                        {/* {this.state.myConversation.map((conversation, index) => {
                             return (
                                 <TouchableOpacity onPress={()=>this.props.navigation.navigate("Messenger")} key={index} style={styles.ChatBoxView}>
                                     <View style={styles.UserImageView}>
@@ -59,114 +96,60 @@ export default class Message extends React.Component {
                                     </View>
                                     <View style={styles.UserDetailView}>
                                         <Text style={styles.UserNameText}>
-                                            {users.name}
+                                            {conversation.members.length}
+                                            users joined
                                         </Text>
 
                                         <Text style={styles.UserCountText}>
-                                            {users.count}
+                                            {conversation.count}
                                             <Text style={styles.UserFriendsText}>
-                                                {users.friends}
+                                                {conversation.friends} 
                                             </Text>
                                         </Text>
                                     </View>
                                 </TouchableOpacity>
                             )
-                        })}
+                        })} */}
 
-
-                    </View>
-
-
-                    {/* <View style={{ flexDirection: 'row', marginTop: 0, width: '96%', marginHorizontal: '2%', height: 90, borderRadius: 10, backgroundColor: '#FFF' }}>
-                        <View style={{ width: '25%', justifyContent: 'center', alignItems: 'center', }}>
-                            <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Apptheme }}>
-
+                        <FlatList
+                            data={this.state.myConversation}
+                            renderItem={({ item, index }) => 
+                            <TouchableOpacity onPress={()=>this.props.navigation.navigate("Messenger")} key={index} style={styles.ChatBoxView}>
+                            <View style={styles.UserImageView}>
+                                {
+                                   Utilities.stringIsEmpty(item.owner.thumbUrl) ?
+                                <Image
+                                    style={styles.UserImage}
+                                    source={require('../images/userImage.jpg')}
+                                />
+                                :
+                                <Image
+                                    style={styles.UserImage}
+                                    source={{ uri: item.owner.thumbUrl }}
+                                />
+                                }
+                                
                             </View>
-                        </View>
-                        <View style={{ paddingLeft: 10, width: '75%', justifyContent: 'center' }}>
-                            <Text style={{ color: Apptheme }}>H5GTT</Text>
-                            <Text style={{ color: '#333' }}>2 users joined
-                                <Text style={{ color: "#777" }}>(You , Almas)</Text>
-                            </Text>
-
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', marginTop: 10, width: '96%', marginHorizontal: '2%', height: 90, borderRadius: 10, backgroundColor: '#FFF3E0' }}>
-                        <View style={{ width: '25%', justifyContent: 'center', alignItems: 'center', }}>
-                            <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Apptheme }}>
-
+                            <View >
+                                <Text style={styles.UserNameText}>
+                                    {item.name}
+                                </Text>
                             </View>
-                        </View>
-                        <View style={{ paddingLeft: 10, width: '75%', justifyContent: 'center' }}>
-                            <Text style={{ color: Apptheme }}>H5GTT</Text>
-                            <Text style={{ color: '#333' }}>2 users joined
-                                <Text style={{ color: "#777" }}>(You , Almas)</Text>
-                            </Text>
-
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', marginTop: 0, width: '96%', marginHorizontal: '2%', height: 90, borderRadius: 10, backgroundColor: '#FFF' }}>
-                        <View style={{ width: '25%', justifyContent: 'center', alignItems: 'center', }}>
-                            <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Apptheme }}>
-
+                            <View style={styles.UserDetailView}>
+                                <Text style={styles.UserCountText}>
+                                    {`${item.members.length} users joined `}
+                                    <Text style={styles.UserFriendsText}>
+                                        ({
+                                            this.setMemberNames(item.members)
+                                        })
+                                    </Text>
+                                </Text>
                             </View>
-                        </View>
-                        <View style={{ paddingLeft: 10, width: '75%', justifyContent: 'center' }}>
-                            <Text style={{ color: Apptheme }}>H5GTT</Text>
-                            <Text style={{ color: '#333' }}>2 users joined
-                                <Text style={{ color: "#777" }}>(You , Almas)</Text>
-                            </Text>
-
-                        </View>
+                        </TouchableOpacity> 
+                        }
+                        keyExtractor={(item, index) => index.toString()}
+                        />
                     </View>
-
-                    <View style={{ flexDirection: 'row', marginTop: 10, width: '96%', marginHorizontal: '2%', height: 90, borderRadius: 10, backgroundColor: '#FFF3E0' }}>
-                        <View style={{ width: '25%', justifyContent: 'center', alignItems: 'center', }}>
-                            <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Apptheme }}>
-
-                            </View>
-                        </View>
-                        <View style={{ paddingLeft: 10, width: '75%', justifyContent: 'center' }}>
-                            <Text style={{ color: Apptheme }}>H5GTT</Text>
-                            <Text style={{ color: '#333' }}>2 users joined
-                                <Text style={{ color: "#777" }}>(You , Almas)</Text>
-                            </Text>
-
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', marginTop: 10, width: '96%', marginHorizontal: '2%', height: 90, borderRadius: 10, backgroundColor: '#FFF' }}>
-                        <View style={{ width: '25%', justifyContent: 'center', alignItems: 'center', }}>
-                            <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Apptheme }}>
-
-                            </View>
-                        </View>
-                        <View style={{ paddingLeft: 10, width: '75%', justifyContent: 'center' }}>
-                            <Text style={{ color: Apptheme }}>H5GTT</Text>
-                            <Text style={{ color: '#333' }}>2 users joined
-                                <Text style={{ color: "#777" }}>(You , Almas)</Text>
-                            </Text>
-
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', marginTop: 10, width: '96%', marginHorizontal: '2%', height: 90, borderRadius: 10, backgroundColor: '#FFF3E0' }}>
-                        <View style={{ width: '25%', justifyContent: 'center', alignItems: 'center', }}>
-                            <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Apptheme }}>
-
-                            </View>
-                        </View>
-                        <View style={{ paddingLeft: 10, width: '75%', justifyContent: 'center' }}>
-                            <Text style={{ color: Apptheme }}>H5GTT</Text>
-                            <Text style={{ color: '#333' }}>2 users joined
-                                <Text style={{ color: "#777" }}>(You , Almas)</Text>
-                            </Text>
-
-                        </View>
-                    </View> */}
-
                 </ScrollView>
             </View>
         )

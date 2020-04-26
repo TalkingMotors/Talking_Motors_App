@@ -20,3 +20,21 @@ export let MyConversations = async () => {
     }
 }
 
+export let GetConversationDetail = async (id) => {
+    try {
+        if(Storage.networkStatus.isConnected){
+        let response = await fetch(APIConstants.GET_CONVERSATION_MESSAGE_ENDPOINT + "?id=" + id, {
+            method: 'GET',
+            headers: Utilities.setHeaders()
+        })
+        let result = response.json()
+        return result;
+    }else{
+        return null
+    }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+

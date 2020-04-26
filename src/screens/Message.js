@@ -47,8 +47,7 @@ export default class Message extends React.Component {
             MessagesService.MyConversations().then(respose => {
                 if(respose){
                     if(respose.success){
-                        this.state.myConversation = respose.conversations
-                        console.log("ikm", this.state.myConversation)
+                        this.state.myConversation = respose.conversations.reverse()
                         this.setState({
                             myConversation : this.state.myConversation
                         })
@@ -65,7 +64,7 @@ export default class Message extends React.Component {
         var memberNamesCSV = ""
           members.forEach(member => {
               if(member.user.userId === Storage.userData.userId){
-                memberNamesCSV = "You"
+                memberNamesCSV =  "You" + memberNamesCSV
               }else{
                 memberNamesCSV = `${memberNamesCSV}, ${member.user.nickname}`
               }
@@ -75,6 +74,10 @@ export default class Message extends React.Component {
     catch(e){
         console.log("get conversation error", e.message)
     }
+    }
+
+    viewMessageDetail = (id) => {
+        this.props.navigation.navigate("Messenger", {conversationId : id })
     }
 
     render() {
@@ -114,7 +117,7 @@ export default class Message extends React.Component {
                         <FlatList
                             data={this.state.myConversation}
                             renderItem={({ item, index }) => 
-                            <TouchableOpacity onPress={()=>this.props.navigation.navigate("Messenger")} key={index} style={styles.ChatBoxView}>
+                            <TouchableOpacity onPress={()=> this.viewMessageDetail(item.id)} key={index} style={styles.ChatBoxView}>
                             <View style={styles.UserImageView}>
                                 {
                                    Utilities.stringIsEmpty(item.owner.thumbUrl) ?
@@ -143,6 +146,15 @@ export default class Message extends React.Component {
                                             this.setMemberNames(item.members)
                                         })
                                     </Text>
+                                    {
+                                        item.numberOfUnreadMessages > 0  ? 
+                                        <Text style={{color:"red", fontSize:16, fontWeight:"bold"}}>
+                                            *
+                                        </Text>
+                                        :
+                                        null
+                                    }
+                                    
                                 </Text>
                             </View>
                         </TouchableOpacity> 

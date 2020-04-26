@@ -14,23 +14,55 @@ import {
     KeyboardAvoidingView,
     TouchableOpacity
 } from 'react-native';
-import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import LinearGradient from 'react-native-linear-gradient';
 import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
-import { FluidNavigator, Transition } from '../../lib';
+
+import Constants from "../helpers/Constants";
+import * as Utilities from "../helpers/Utilities";
+import * as MessagesService from '../services/Messages';
+import Storage from '../helpers/Storage';
+import Labels from "../languages/Labels";
+
 const image = require('../images/userImage.jpg')
 const screen_height = Dimensions.get('window').height
 export default class Messenger extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            conversationId : 0,
+            conversationDetail: [],
+            messages: [],
+            userId: Storage.userData.userId
         }
-        // this.props.navigation.navigate('details', { item, index });
+    }
+    UNSAFE_componentWillMount() {
+        this.state.conversationId = this.props.navigation.state.params.conversationId
+        console.log("ikm",this.state.conversationId)
+        this.setState({
+            conversationId: this.state.conversationId
+        })
+        this.getConverationDetail(this.state.conversationId);
+    }
+
+    getConverationDetail = (id) => {
+        try{
+            MessagesService.GetConversationDetail(id).then(respose => {
+                if(respose){
+                    if(respose.success){
+                        this.state.conversationDetail = respose.conversation
+                        this.state.messages = respose.conversation.messages.reverse()
+                        this.setState({
+                            conversationDetail : this.state.conversationDetail,
+                            messages: this.state.messages
+                        })
+                    }
+                }
+             })
+          }
+          catch(e){
+              console.log("get conversation error", e.message)
+          }
     }
 
     render() {
@@ -44,156 +76,37 @@ export default class Messenger extends React.Component {
                         <ScrollView>
                             <View style={styles.MessengerView}>
                                 <View style={styles.MessengerViewList}>
+                            <FlatList
+                            data={this.state.messages}
+                            renderItem={({ item, index }) => 
+                            <View>
+                            {
+                                item.user.userId == this.state.userId ?
+                                    <View style={styles.ReceivedMessageView}>
+                                        <Text style={styles.ReceivedMessageTextTime}>
+                                            {item.time}
+                                                        </Text>
+                                        <Text style={styles.ReceivedMessageText}>
+                                            {item.message}
+                                                        </Text>
+                                    </View>
+                                    :
                                     <View style={styles.SendMessageView}>
                                         <View style={styles.SendMessageBox}>
                                             <Text style={styles.SendMessageTextTime}>
-                                                12:04
-                                        </Text>
+                                            {item.time}
+                                                        </Text>
                                             <Text style={styles.SendMessageText}>
-                                                Assalam o alekum how are you bro where are you from
-                                         </Text>
+                                            {item.message}
+                                                        </Text>
                                         </View>
                                     </View>
+                            }
+                            </View>
+                         }
 
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Assalam o alekum how are you bro where are you from
-                                    </Text>
-                                    </View>
-
-                                    <View style={styles.SendMessageView}>
-                                        <View style={styles.SendMessageBox}>
-                                            <Text style={styles.SendMessageTextTime}>
-                                                12:07
-                                        </Text>
-                                            <Text style={styles.SendMessageText}>
-                                                Hello
-                                         </Text>
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Assalam o alekum how are you bro where are you from
-                                    </Text>
-                                    </View>
-
-
-                                    <View style={styles.SendMessageView}>
-                                        <View style={styles.SendMessageBox}>
-                                            <Text style={styles.SendMessageTextTime}>
-                                                12:07
-                                        </Text>
-                                            <Text style={styles.SendMessageText}>
-                                                Find New Design
-                                         </Text>
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Its Fine
-                                    </Text>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Assalam o alekum how are you bro where are you from
-                                    </Text>
-                                    </View>
-
-
-                                    <View style={styles.SendMessageView}>
-                                        <View style={styles.SendMessageBox}>
-                                            <Text style={styles.SendMessageTextTime}>
-                                                12:07
-                                        </Text>
-                                            <Text style={styles.SendMessageText}>
-                                                Find New Design
-                                         </Text>
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Its Fine
-                                    </Text>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Assalam o alekum how are you bro where are you from
-                                    </Text>
-                                    </View>
-
-
-                                    <View style={styles.SendMessageView}>
-                                        <View style={styles.SendMessageBox}>
-                                            <Text style={styles.SendMessageTextTime}>
-                                                12:07
-                                        </Text>
-                                            <Text style={styles.SendMessageText}>
-                                                Find New Design
-                                         </Text>
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Its Fine
-                                    </Text>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Assalam o alekum how are you bro where are you from
-                                    </Text>
-                                    </View>
-
-
-                                    <View style={styles.SendMessageView}>
-                                        <View style={styles.SendMessageBox}>
-                                            <Text style={styles.SendMessageTextTime}>
-                                                12:07
-                                        </Text>
-                                            <Text style={styles.SendMessageText}>
-                                                Find New Design
-                                         </Text>
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.ReceivedMessageView}>
-                                        <Text style={styles.ReceivedMessageTextTime}>
-                                            12:04
-                                    </Text>
-                                        <Text style={styles.ReceivedMessageText}>
-                                            Its Fine
-                                    </Text>
-                                    </View>
+                        keyExtractor={(item, index) => index.toString()}
+                        />
 
                                 </View>
                             </View>

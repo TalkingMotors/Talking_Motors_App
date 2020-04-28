@@ -33,7 +33,9 @@ export default class Messenger extends React.Component {
             conversationId : 0,
             conversationDetail: [],
             messages: [],
-            userId: Storage.userData.userId
+            userId: Storage.userData.userId,
+            sendButtonVisible: false,
+            typeMessage: ''
         }
     }
     UNSAFE_componentWillMount() {
@@ -52,6 +54,7 @@ export default class Messenger extends React.Component {
                     if(respose.success){
                         this.state.conversationDetail = respose.conversation
                         this.state.messages = respose.conversation.messages.reverse()
+                        console.log("ikm",this.state.conversationDetail)
                         this.setState({
                             conversationDetail : this.state.conversationDetail,
                             messages: this.state.messages
@@ -64,6 +67,18 @@ export default class Messenger extends React.Component {
               console.log("get conversation error", e.message)
           }
     }
+    onChangeText = (key, value) => {
+        if(Utilities.stringIsEmpty(value)) {
+            this.setState({ [key]: value, sendButtonVisible:false })
+        }else{
+            this.setState({ [key]: value, sendButtonVisible:true })
+        }
+        
+    }
+    sendMessage = () =>{
+
+    }
+
 
     render() {
         return (
@@ -123,8 +138,19 @@ export default class Messenger extends React.Component {
                             placeholderTextColor="#333"
                             style={{ backgroundColor: '#d2d2d2', width: '96%', borderRadius: 60, paddingLeft: 20, height: 40 }}
                             placeholder="Write message"
+                            value={this.state.typeMessage}
+                            onChangeText={val => { this.onChangeText('typeMessage', val) }}
                         />
+                        {
+                    this.state.sendButtonVisible ? 
+                    <TouchableOpacity onPress={()=> {this.sendMessage}} style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
+                                      <Text>Send</Text>  
+                                        </TouchableOpacity>
+                                        : null
+                    }
                     </View>
+                    
+                    
                 </View>
             </View>
         )

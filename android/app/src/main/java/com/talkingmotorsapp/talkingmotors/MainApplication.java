@@ -1,4 +1,4 @@
-package com.talkingmotors;
+package com.talkingmotorsapp.talkingmotors;
 
 import android.app.Application;
 import android.util.Log;

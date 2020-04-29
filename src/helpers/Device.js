@@ -1,7 +1,10 @@
+import * as DeviceService from '../services/Device';
+
+
 export let saveUpdateDevice = async (params) => {
-    let response = await DeviceService.registerDevice(params)
-    try {
-      console.log(response)
+  try {
+    let response = await DeviceService.Device(params)
+    console.log("saveUpdateDevice response",response)
     } catch (e) {
       console.log(e);
     }

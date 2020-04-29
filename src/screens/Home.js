@@ -27,7 +27,7 @@ import * as Utilities from "../helpers/Utilities";
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 import Constants from "../helpers/Constants";
-
+import AndroidNotification from '../components/AndroidNotification';
 export var SearchVehicleModalToggle;
 export default class Home extends React.Component {
     constructor(props) {
@@ -228,7 +228,7 @@ export default class Home extends React.Component {
 
 
                 </View>
-
+               <AndroidNotification/>
                 {this.state.isTalkModal &&
                     <TalkModal parent={this.state.parent} navigation={this.props.navigation} TalkModalToggle={this.TalkModalToggle} />
                 }

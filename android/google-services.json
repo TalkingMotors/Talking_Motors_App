@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "1005880369333",
+    "firebase_url": "https://talking-motors.firebaseio.com",
+    "project_id": "talking-motors",
+    "storage_bucket": "talking-motors.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005880369333:android:66499ad7579797c0",
+        "android_client_info": {
+          "package_name": "com.talkingmotorsapp.talkingmotors"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1005880369333-fkfmc2i43gpqa5cjskpp84ve0u7jb8h5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkingmotorsapp.talkingmotors",
+            "certificate_hash": "dfccbdc107eb709cf2823165a4c86897c143c4b9"
+          }
+        },
+        {
+          "client_id": "1005880369333-5s704hjvdoc20q4nas88h576pk2eghbt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkingmotorsapp.talkingmotors",
+            "certificate_hash": "66a645ca9fa534d178ba3514aa58da1ac1303afb"
+          }
+        },
+        {
+          "client_id": "1005880369333-n7uspcd08ovl6hrphn9nnphfjgbcog10.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "1005880369333-nuejm0keb81bnonnpvvs9bfqj38bfne0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqmW0KUtbL-rVkV7PYRIJTa-x9-P9D2_s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

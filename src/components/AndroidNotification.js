@@ -4,17 +4,17 @@ import firebase from 'react-native-firebase';
 import * as DeviceHelper from "../helpers/Device";
 import Storage from "../helpers/Storage";
 import DeviceInfo from 'react-native-device-info';
-
+import Constants from '../helpers/Constants';
 export default class AndroidNotification extends Component {
     async componentDidMount() {
             await  firebase.messaging().getToken()
             .then(fcmToken => {
               if (fcmToken) {
-                  NetInfo.isConnected.fetch().then(isConnected => {
+                 NetInfo.fetch().then(isConnected => {
                       if (isConnected) {
-                        let udid = DeviceInfo.getUniqueID();
+                        let udid = DeviceInfo.getUniqueId();
                         let params = { udid : udid, deviceType : 2, token : fcmToken }
-                        DeviceHelper.saveUpdateDevice(udid, fcmToken)
+                        DeviceHelper.saveUpdateDevice(params)
                      }
                    })
                } else {

@@ -1,5 +1,5 @@
 import APIConstants from '../helpers/APIConstants';
-import Settings from '../helpers/Config';
+// import Settings from '../helpers/Config';
 import * as Utilities from "../helpers/Utilities";
 import Storage from '../helpers/Storage';
 export let Device = async (params) => {

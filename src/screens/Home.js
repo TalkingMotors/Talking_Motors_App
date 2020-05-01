@@ -28,6 +28,7 @@ import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 import Constants from "../helpers/Constants";
 import AndroidNotification from '../components/AndroidNotification';
+import IOSNotification from '../components/IOSNotification';
 export var SearchVehicleModalToggle;
 export default class Home extends React.Component {
     constructor(props) {
@@ -228,7 +229,12 @@ export default class Home extends React.Component {
 
 
                 </View>
-               <AndroidNotification/>
+                {
+                Platform.OS == "ios" ? <IOSNotification props={this.props} />
+                  :
+                 <AndroidNotification props={this.props} />
+                }
+              
                 {this.state.isTalkModal &&
                     <TalkModal parent={this.state.parent} navigation={this.props.navigation} TalkModalToggle={this.TalkModalToggle} />
                 }

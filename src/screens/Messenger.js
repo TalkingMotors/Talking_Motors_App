@@ -21,6 +21,7 @@ import Topbar from '../components/Topbar';
 import Constants from "../helpers/Constants";
 import * as Utilities from "../helpers/Utilities";
 import * as MessagesService from '../services/Messages';
+import * as VehicleService from '../services/Vehicle';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 
@@ -35,7 +36,10 @@ export default class Messenger extends React.Component {
             messages: [],
             userId: Storage.userData.userId,
             sendButtonVisible: false,
-            typeMessage: ''
+            typeMessage: '',
+            vehicleId: 0,
+            vrn: "",
+            userIds: {}
         }
     }
     UNSAFE_componentWillMount() {
@@ -45,6 +49,7 @@ export default class Messenger extends React.Component {
             conversationId: this.state.conversationId
         })
         this.getConverationDetail(this.state.conversationId);
+
     }
 
     getConverationDetail = (id) => {
@@ -55,6 +60,9 @@ export default class Messenger extends React.Component {
                         this.state.conversationDetail = respose.conversation
                         this.state.messages = respose.conversation.messages.reverse()
                         console.log("ikm",this.state.conversationDetail)
+                        this.state.vrn = this.state.conversationDetail.name
+                        //this.getVehicleDetailBy(this.state.vrn)
+                        //this.getUserIds(this.state.conversationDetail.members);
                         this.setState({
                             conversationDetail : this.state.conversationDetail,
                             messages: this.state.messages
@@ -67,6 +75,30 @@ export default class Messenger extends React.Component {
               console.log("get conversation error", e.message)
           }
     }
+    getVehicleDetailBy = async (vrn) => {
+        try{
+            var response = await VehicleService.getVehicleBy(vrn)
+            if (response && response.success) {
+               this.state.vehicleId = response.vehicle.id
+            }
+            
+        }
+        catch(e){
+            console.log("getVehicleDetailBy", e.message)
+        }
+        
+    }
+    getUserIds = (members) =>{
+        var userIds = []
+        members.forEach(member =>{
+            if(this.state.userId != member.user.userId){
+                userIds.push({ userId : member.user.userId})
+            }
+            
+        })
+        this.state.userIds = userIds;
+        console.log("userids", this.state.userIds)
+    }
     onChangeText = (key, value) => {
         if(Utilities.stringIsEmpty(value)) {
             this.setState({ [key]: value, sendButtonVisible:false })
@@ -76,7 +108,18 @@ export default class Messenger extends React.Component {
         
     }
     sendMessage = () =>{
+            var params = {
+                conversationId: this.state.conversationId,
+                message: this.state.typeMessage,
+                image: null
+              }
 
+              MessagesService.sendMessageToConversation(params).then(response => {
+                this.setState(prevState => ({
+                    messages: [...prevState.messages, response.conversationMessage],
+                    typeMessage: ""
+                  }));
+              })
     }
 
 
@@ -96,7 +139,7 @@ export default class Messenger extends React.Component {
                             renderItem={({ item, index }) => 
                             <View>
                             {
-                                item.user.userId == this.state.userId ?
+                                item.user.userId != this.state.userId ?
                                     <View style={styles.ReceivedMessageView}>
                                         <Text style={styles.ReceivedMessageTextTime}>
                                             {item.time}
@@ -143,7 +186,7 @@ export default class Messenger extends React.Component {
                         />
                         {
                     this.state.sendButtonVisible ? 
-                    <TouchableOpacity onPress={()=> {this.sendMessage}} style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity onPress={()=> {this.sendMessage()}} style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
                                       <Text>Send</Text>  
                                         </TouchableOpacity>
                                         : null

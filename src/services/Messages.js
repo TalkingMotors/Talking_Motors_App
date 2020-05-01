@@ -38,3 +38,41 @@ export let GetConversationDetail = async (id) => {
     }
 }
 
+export let sendMessageToConversation = async (params) => {
+    try {
+        if(Storage.networkStatus.isConnected){
+        let response = await fetch(APIConstants.SEND_MESSAGE_TO_CONVERSATION_ENDPOINT, {
+            method: 'POST',
+            headers: Utilities.setHeaders(),
+            body: JSON.stringify(params)
+        })
+        let result = response.json()
+        return result;
+    }else{
+        return null
+    }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+
+export let sendMessage = async (params) => {
+    try {
+        if(Storage.networkStatus.isConnected){
+        let response = await fetch(APIConstants.SEND_MESSAGE_TO_USER_ENDPOINT, {
+            method: 'POST',
+            headers: Utilities.setHeaders(),
+            body: JSON.stringify(params)
+        })
+        let result = response.json()
+        return result;
+    }else{
+        return null
+    }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+

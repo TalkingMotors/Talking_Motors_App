@@ -22,6 +22,7 @@ import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/
 import Topbar from '../components/Topbar';
 import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
+import Storage from '../helpers/Storage';
 export default class Detail extends React.Component {
     constructor(props) {
         super(props);
@@ -41,14 +42,19 @@ export default class Detail extends React.Component {
             parent: '',
             price: '',
             saleSwitch: false,
+            userId: Storage.userData.userId,
+            ownerId: 0,
+            vehicleId: 0
         }
     }
 
     UNSAFE_componentWillMount() {
         let vehicleData = this.props.navigation.state.params.item
+        console.log("ikm",vehicleData)
         let parent = this.props.navigation.state.params.parent
         this.setState({
             registerNo: vehicleData.registrationNumber,
+            vehicleId: vehicleData.id,
             make: vehicleData.make,
             model: vehicleData.model,
             year: vehicleData.buildYear,
@@ -64,6 +70,7 @@ export default class Detail extends React.Component {
             price: vehicleData.price,
             saleSwitch: vehicleData.forSale,
             parent: parent,
+            ownerId: vehicleData.userID
         })
     }
 
@@ -76,6 +83,19 @@ export default class Detail extends React.Component {
         this.props.navigation.navigate("EditVehicle", {
             item: data
         })
+    }
+    viewMessage = () => {
+        this.props.navigation.navigate("Message")
+    }
+    sendMessage =()=> {
+      var message =  {
+            vrm: this.state.registerNo,
+            userId: this.state.ownerId,
+            vehicleId: this.state.vehicleId,
+            message: "",
+            image: null
+          }
+        this.props.navigation.navigate("Messenger", {conversationId : 0, messageBody: message })
     }
     render() {
         return (
@@ -278,8 +298,10 @@ export default class Detail extends React.Component {
                                     onValueChange={this.toggleSwitch}
                                     value={this.state.saleSwitch} />
                             </View>
-                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
-                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
+                            {
+                                this.state.userId == this.state.ownerId ?
+                                <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.viewMessage()}>
 
                                     <Feather
                                         // onPress={() => this.props.navigation.navigation.goBack()}
@@ -287,6 +309,18 @@ export default class Detail extends React.Component {
                                     <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>VIEW MESSAGES</Text>
                                 </TouchableOpacity>
                             </LinearGradient>
+                            :
+                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.sendMessage()}>
+
+                                    <Feather
+                                        // onPress={() => this.props.navigation.navigation.goBack()}
+                                        name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} />
+                                    <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>SEND MESSAGES</Text>
+                                </TouchableOpacity>
+                            </LinearGradient>
+                            }
+                            
 
                             <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
                                 <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>

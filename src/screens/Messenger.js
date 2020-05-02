@@ -39,17 +39,19 @@ export default class Messenger extends React.Component {
             typeMessage: '',
             vehicleId: 0,
             vrn: "",
-            userIds: {}
+            userIds: {},
+            messageBody: {},
+            lastReadMessageId: 0
         }
     }
     UNSAFE_componentWillMount() {
         this.state.conversationId = this.props.navigation.state.params.conversationId
-        console.log("ikm",this.state.conversationId)
+        this.state.messageBody = this.props.navigation.state.params.messageBody
         this.setState({
             conversationId: this.state.conversationId
         })
         this.getConverationDetail(this.state.conversationId);
-
+        this.updateConversationStatus();
     }
 
     getConverationDetail = (id) => {
@@ -59,12 +61,12 @@ export default class Messenger extends React.Component {
                     if(respose.success){
                         this.state.conversationDetail = respose.conversation
                         this.state.messages = respose.conversation.messages.reverse()
-                        console.log("ikm",this.state.conversationDetail)
+                        this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId
                         this.state.vrn = this.state.conversationDetail.name
-                        //this.getVehicleDetailBy(this.state.vrn)
                         //this.getUserIds(this.state.conversationDetail.members);
                         this.setState({
                             conversationDetail : this.state.conversationDetail,
+                            lastReadMessageId: this.state.lastReadMessageId,
                             messages: this.state.messages
                         })
                     }
@@ -75,19 +77,16 @@ export default class Messenger extends React.Component {
               console.log("get conversation error", e.message)
           }
     }
-    getVehicleDetailBy = async (vrn) => {
-        try{
-            var response = await VehicleService.getVehicleBy(vrn)
-            if (response && response.success) {
-               this.state.vehicleId = response.vehicle.id
-            }
-            
+    updateConversationStatus = async () => {
+        var param = {
+            conversationId: this.state.conversationId,
+            messageId: 0
         }
-        catch(e){
-            console.log("getVehicleDetailBy", e.message)
-        }
-        
+       MessagesService.updateMessageStatusToRead(param).then(response => {
+           console.log("updateMessageStatusToRead",response)
+       })
     }
+    
     getUserIds = (members) =>{
         var userIds = []
         members.forEach(member =>{
@@ -107,7 +106,7 @@ export default class Messenger extends React.Component {
         }
         
     }
-    sendMessage = () =>{
+    sendMessageToConversation = () =>{
             var params = {
                 conversationId: this.state.conversationId,
                 message: this.state.typeMessage,
@@ -122,6 +121,17 @@ export default class Messenger extends React.Component {
               })
     }
 
+    sendMessageToOwner = () =>{
+        var params = this.state.messageBody
+        params.message = this.state.typeMessage
+
+          MessagesService.sendMessage(params).then(response => {
+            this.setState(prevState => ({
+                messages: [...prevState.messages, response.conversationMessage],
+                typeMessage: ""
+              }));
+          })
+}
 
     render() {
         return (
@@ -142,7 +152,7 @@ export default class Messenger extends React.Component {
                                 item.user.userId != this.state.userId ?
                                     <View style={styles.ReceivedMessageView}>
                                         <Text style={styles.ReceivedMessageTextTime}>
-                                            {item.time}
+                                            { Utilities.FormatDate(item.time)}
                                                         </Text>
                                         <Text style={styles.ReceivedMessageText}>
                                             {item.message}
@@ -152,12 +162,19 @@ export default class Messenger extends React.Component {
                                     <View style={styles.SendMessageView}>
                                         <View style={styles.SendMessageBox}>
                                             <Text style={styles.SendMessageTextTime}>
-                                            {item.time}
+                                            {Utilities.FormatDate(item.time)}
                                                         </Text>
                                             <Text style={styles.SendMessageText}>
                                             {item.message}
                                                         </Text>
+                                                        {
+                                                            item.allRead || item.id < this.state.lastReadMessageId
+                                                        }
+                                                        <FontAwesome name="check-double" size={20} />
                                         </View>
+                                        
+
+                                        
                                     </View>
                             }
                             </View>
@@ -186,7 +203,7 @@ export default class Messenger extends React.Component {
                         />
                         {
                     this.state.sendButtonVisible ? 
-                    <TouchableOpacity onPress={()=> {this.sendMessage()}} style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity onPress={()=> { this.state.conversationId > 0 ? this.sendMessageToConversation() : this.sendMessageToOwner()}} style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
                                       <Text>Send</Text>  
                                         </TouchableOpacity>
                                         : null

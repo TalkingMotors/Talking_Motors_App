@@ -149,7 +149,7 @@ export default class Message extends React.Component {
                                     {
                                         item.numberOfUnreadMessages > 0  ? 
                                         <Text style={{color:"red", fontSize:16, fontWeight:"bold"}}>
-                                            *
+                                          { item.numberOfUnreadMessages}
                                         </Text>
                                         :
                                         null

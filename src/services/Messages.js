@@ -76,3 +76,25 @@ export let sendMessage = async (params) => {
     }
 }
 
+export let updateMessageStatusToRead = async (params) => {
+    try {
+        console.log(APIConstants.UPDATE_USER_ENDPOINT);
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.UPDATE_LAST_READ_ID_ENDPOINT, {
+                method: 'PATCH',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify({
+                    params
+                })
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log("error", e.message)
+        return null
+    }
+}
+

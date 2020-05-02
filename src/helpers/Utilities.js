@@ -1,5 +1,6 @@
 import Storage from './Storage';
 import AsyncStorage from '@react-native-community/async-storage'
+import Moment from 'moment';
 export let stringIsEmpty = (str) => {
     return (!str || /^\s*$/.test(str));
 };
@@ -69,4 +70,16 @@ export let setHeaders = () => {
          }
     }
         
+}
+
+export let FormatDate = (dateTimeValue) => {
+    try {
+        if (!stringIsEmpty(dateTimeValue)) {
+          var formateDate =  Moment(dateTimeValue).format('DD MMM YY - HH:mm')
+        }
+            return formateDate;
+        }
+    catch (e) {
+        console.log("FormatDate", e)
+    }
 }

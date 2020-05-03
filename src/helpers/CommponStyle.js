@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet,Dimensions } from 'react-native';
 // export const Apptheme = '#ff6b00';
 // export const Apptheme = '#F97001';
 export const Apptheme = '#FE6801';
@@ -67,7 +67,18 @@ export default StyleSheet.create({
         padding: 2,
         paddingHorizontal:20,
         fontSize:14
-    }
+    },
+    menuLoaderView: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255, 0.7)',
+        // backgroundColor: 'red',
+        zIndex: 10000,
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 60
+    },
 })
 
 

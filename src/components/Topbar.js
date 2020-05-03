@@ -93,7 +93,7 @@ export default class Topbar extends React.Component {
             return (
                 <View style={styles.MainView}>
                     <Feather
-                        onPress={() => this.props.navigation.navigation.goBack()}
+                        onPress={() => this.props.navigation.navigation.navigate("Message")}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     {/* <Text style={styles.ScreenName}>{this.props.ParentPage}</Text> */}
                     <Image

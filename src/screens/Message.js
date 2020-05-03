@@ -6,6 +6,7 @@ import {
     FlatList,
     Image,
     StyleSheet,
+    ActivityIndicator,
     TouchableOpacity
 } from 'react-native';
 // import Feather from 'react-native-vector-icons/Feather';
@@ -19,71 +20,88 @@ import * as MessagesService from '../services/Messages';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 
-import { darkText, lightBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
+import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
+
 //import { FluidNavigator, Transition } from '../../lib';
 export default class Message extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            listUser: [
-                { id: 1, name: "H5GTT", count: "2 users joined", friends: "(You, Dean)" },
-                { id: 2, name: "ABCDE", count: "3 users joined", friends: "(You, Almas, Dean)" },
-                { id: 3, name: "XYZ", count: "2 users joined", friends: "(You, Maaz)" },
-                { id: 4, name: "John", count: "2 users joined", friends: "(You, Maaz, Dean)" },
-                { id: 5, name: "H5GTT", count: "2 users joined", friends: "(You, Dean)" },
-                { id: 1, name: "H5GTT", count: "2 users joined", friends: "(You, Dean)" },
-                { id: 2, name: "ABCDE", count: "3 users joined", friends: "(You, Almas, Dean)" },
-                { id: 3, name: "XYZ", count: "2 users joined", friends: "(You, Maaz)" },
-                { id: 4, name: "John", count: "2 users joined", friends: "(You, Maaz, Dean)" },
-                { id: 5, name: "H5GTT", count: "2 users joined", friends: "(You, Dean)" },
-            ],
-            myConversation : []
+            isLoad: true,
+            myConversation: []
         }
-        this.getMyConversations()
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            this.getMyConversations()
+
+        })
+
     }
-    getMyConversations = () =>{
-          try{
+    componentDidMount() {
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
+            this.setState({
+                isLoad: true,
+                myConversation: []
+            })
+        })
+    }
+    getMyConversations = () => {
+        try {
             MessagesService.MyConversations().then(respose => {
-                if(respose){
-                    if(respose.success){
+                if (respose) {
+                    if (respose.success) {
                         this.state.myConversation = respose.conversations.reverse()
+                        console.log("myConversation", this.state.myConversation);
                         this.setState({
-                            myConversation : this.state.myConversation
+                            myConversation: this.state.myConversation,
+                            isLoad: false
                         })
                     }
                 }
-             })
-          }
-          catch(e){
-              console.log("get conversation error", e.message)
-          }
+            })
+        }
+        catch (e) {
+            this.setState({
+                isLoad: false
+            })
+            console.log("get conversation error", e.message)
+        }
     }
     setMemberNames = (members) => {
-    try{
-        var memberNamesCSV = ""
-          members.forEach(member => {
-              if(member.user.userId === Storage.userData.userId){
-                memberNamesCSV =  "You" + memberNamesCSV
-              }else{
-                memberNamesCSV = `${memberNamesCSV}, ${member.user.nickname}`
-              }
-          });
-          return memberNamesCSV;
-    }
-    catch(e){
-        console.log("get conversation error", e.message)
-    }
+        try {
+            var memberNamesCSV = ""
+            members.forEach(member => {
+                if (member.user.userId === Storage.userData.userId) {
+                    memberNamesCSV = "You" + memberNamesCSV
+                } else {
+                    memberNamesCSV = `${memberNamesCSV}, ${member.user.nickname}`
+                }
+            });
+            return memberNamesCSV;
+        }
+        catch (e) {
+            console.log("get conversation error", e.message)
+        }
     }
 
-    viewMessageDetail = (id) => {
-        this.props.navigation.navigate("Messenger", {conversationId : id })
+    viewMessageDetail = (item) => {
+        console.log("item", item);
+        this.props.navigation.navigate("Messenger", { conversationId: item.id })
     }
 
     render() {
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Message" navigation={this.props} />
+
+                {this.state.isLoad &&
+                    <View style={styles.menuLoaderView}>
+                        <ActivityIndicator
+                            color="#ed0000"
+                            size="large"
+                        />
+                    </View>
+                }
                 <ScrollView style={{ paddingBottom: 0, }}>
                     <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
 
@@ -116,50 +134,50 @@ export default class Message extends React.Component {
 
                         <FlatList
                             data={this.state.myConversation}
-                            renderItem={({ item, index }) => 
-                            <TouchableOpacity onPress={()=> this.viewMessageDetail(item.id)} key={index} style={styles.ChatBoxView}>
-                            <View style={styles.UserImageView}>
-                                {
-                                   Utilities.stringIsEmpty(item.owner.thumbUrl) ?
-                                <Image
-                                    style={styles.UserImage}
-                                    source={require('../images/userImage.jpg')}
-                                />
-                                :
-                                <Image
-                                    style={styles.UserImage}
-                                    source={{ uri: item.owner.thumbUrl }}
-                                />
-                                }
-                                
-                            </View>
-                            <View >
-                                <Text style={styles.UserNameText}>
-                                    {item.name}
-                                </Text>
-                            </View>
-                            <View style={styles.UserDetailView}>
-                                <Text style={styles.UserCountText}>
-                                    {`${item.members.length} users joined `}
-                                    <Text style={styles.UserFriendsText}>
-                                        ({
-                                            this.setMemberNames(item.members)
-                                        })
-                                    </Text>
-                                    {
-                                        item.numberOfUnreadMessages > 0  ? 
-                                        <Text style={{color:"red", fontSize:16, fontWeight:"bold"}}>
-                                          { item.numberOfUnreadMessages}
+                            renderItem={({ item, index }) =>
+                                <TouchableOpacity onPress={() => this.viewMessageDetail(item)} key={index} style={styles.ChatBoxView}>
+                                    <View style={styles.UserImageView}>
+                                        {
+                                            Utilities.stringIsEmpty(item.owner.thumbUrl) ?
+                                                <Image
+                                                    style={styles.UserImage}
+                                                    source={require('../images/userImage.jpg')}
+                                                />
+                                                :
+                                                <Image
+                                                    style={styles.UserImage}
+                                                    source={{ uri: item.owner.thumbUrl }}
+                                                />
+                                        }
+
+                                    </View>
+                                    <View >
+                                        <Text style={styles.UserNameText}>
+                                            {item.name}
                                         </Text>
-                                        :
-                                        null
-                                    }
-                                    
-                                </Text>
-                            </View>
-                        </TouchableOpacity> 
-                        }
-                        keyExtractor={(item, index) => index.toString()}
+                                    </View>
+                                    <View style={styles.UserDetailView}>
+                                        <Text style={styles.UserCountText}>
+                                            {`${item.members.length} users joined `}
+                                            <Text style={styles.UserFriendsText}>
+                                                ({
+                                                    this.setMemberNames(item.members)
+                                                })
+                                    </Text>
+                                            {
+                                                item.numberOfUnreadMessages > 0 ?
+                                                    <Text style={{ color: "red", fontSize: 16, fontWeight: "bold" }}>
+                                                        {item.numberOfUnreadMessages}
+                                                    </Text>
+                                                    :
+                                                    null
+                                            }
+
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            }
+                            keyExtractor={(item, index) => index.toString()}
                         />
                     </View>
                 </ScrollView>
@@ -231,5 +249,8 @@ const styles = StyleSheet.create({
     },
     UserFriendsText: {
         color: "#777"
+    },
+    menuLoaderView: {
+        ...CommonStyle.menuLoaderView
     }
 })

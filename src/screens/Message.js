@@ -10,7 +10,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 // import Feather from 'react-native-vector-icons/Feather';
-// import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // import LinearGradient from 'react-native-linear-gradient';
@@ -104,34 +104,6 @@ export default class Message extends React.Component {
                 }
                 <ScrollView style={{ paddingBottom: 0, }}>
                     <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
-
-
-                        {/* {this.state.myConversation.map((conversation, index) => {
-                            return (
-                                <TouchableOpacity onPress={()=>this.props.navigation.navigate("Messenger")} key={index} style={styles.ChatBoxView}>
-                                    <View style={styles.UserImageView}>
-                                        <Image
-                                            style={styles.UserImage}
-                                            source={require('../images/userImage.jpg')}
-                                        />
-                                    </View>
-                                    <View style={styles.UserDetailView}>
-                                        <Text style={styles.UserNameText}>
-                                            {conversation.members.length}
-                                            users joined
-                                        </Text>
-
-                                        <Text style={styles.UserCountText}>
-                                            {conversation.count}
-                                            <Text style={styles.UserFriendsText}>
-                                                {conversation.friends} 
-                                            </Text>
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        })} */}
-
                         <FlatList
                             data={this.state.myConversation}
                             renderItem={({ item, index }) =>
@@ -139,10 +111,9 @@ export default class Message extends React.Component {
                                     <View style={styles.UserImageView}>
                                         {
                                             Utilities.stringIsEmpty(item.owner.thumbUrl) ?
-                                                <Image
-                                                    style={styles.UserImage}
-                                                    source={require('../images/userImage.jpg')}
-                                                />
+                                                <View style={styles.ImageIconView}>
+                                                    <FontAwesome name="user" size={40} color={Apptheme} />
+                                                </View>
                                                 :
                                                 <Image
                                                     style={styles.UserImage}
@@ -151,29 +122,33 @@ export default class Message extends React.Component {
                                         }
 
                                     </View>
-                                    <View >
+                                    <View style={{ width: '100%', marginTop: 15 }}>
                                         <Text style={styles.UserNameText}>
                                             {item.name}
                                         </Text>
-                                    </View>
-                                    <View style={styles.UserDetailView}>
-                                        <Text style={styles.UserCountText}>
-                                            {`${item.members.length} users joined `}
-                                            <Text style={styles.UserFriendsText}>
-                                                ({
-                                                    this.setMemberNames(item.members)
-                                                })
+
+                                        <View style={styles.UserDetailView}>
+                                            <Text style={styles.UserCountText}>
+                                                {`${item.members.length} users joined `}
+                                                <Text style={styles.UserFriendsText}>
+                                                    ({
+                                                        this.setMemberNames(item.members)
+                                                    })
                                     </Text>
+
+
+                                            </Text>
                                             {
-                                                item.numberOfUnreadMessages > 0 ?
-                                                    <Text style={{ color: "red", fontSize: 16, fontWeight: "bold" }}>
+                                                item.numberOfUnreadMessages > 0 &&
+                                                <View style={styles.MessageCountView}>
+                                                    <Text style={styles.MessageCountText}>
                                                         {item.numberOfUnreadMessages}
                                                     </Text>
-                                                    :
-                                                    null
+                                                </View>
+
                                             }
 
-                                        </Text>
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
                             }
@@ -222,7 +197,7 @@ const styles = StyleSheet.create({
     },
     ChatBoxView: {
         height: 75,
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     UserImageView: {
         width: '25%',
@@ -235,8 +210,8 @@ const styles = StyleSheet.create({
         borderRadius: 25
     },
     UserDetailView: {
-        width: '75%',
-        justifyContent: 'center',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
     },
     UserNameText: {
         fontSize: 16,
@@ -252,5 +227,32 @@ const styles = StyleSheet.create({
     },
     menuLoaderView: {
         ...CommonStyle.menuLoaderView
+    },
+    MessageCountView: {
+        marginLeft: 20,
+        minWidth: 20,
+        // width: 20,
+        height: 20,
+        padding: 2,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 25,
+        backgroundColor: Apptheme,
+        color: lightText,
+    },
+    MessageCountText: {
+        color: lightText,
+        textAlign: 'center',
+        fontSize: 12,
+        fontWeight: "bold"
+    },
+    ImageIconView: {
+        borderColor: "#d2d2d2",
+        borderWidth: 1,
+        height: '70%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '60%',
+        borderRadius: 50
     }
 })

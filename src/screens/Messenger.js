@@ -9,7 +9,9 @@ import {
     Image,
     TextInput,
     StatusBar,
+    Modal,
     Dimensions,
+    Keyboard,
     ActivityIndicator,
     StyleSheet,
     KeyboardAvoidingView,
@@ -17,9 +19,11 @@ import {
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Topbar from '../components/Topbar';
-
+import { TextField } from 'react-native-material-textfield';
 import Constants from "../helpers/Constants";
 import * as Utilities from "../helpers/Utilities";
 import * as MessagesService from '../services/Messages';
@@ -47,9 +51,19 @@ export default class Messenger extends React.Component {
             lastReadMessageId: 0,
             isLoad: true,
             senderName: "",
-            senderImageUrl: ""
+            senderImageUrl: "",
+            isPopup: false,
+            isKeyboard: false,
+            convoname: '',
+            isChangeConversationNamePopup: false,
+            isclearHostoryPopup: false,
+            isBlockUserPopup: false,
 
         }
+        this.MoreItemsModal = this.MoreItemsModal.bind(this);
+        this._keyboardDidShow = this._keyboardDidShow.bind(this);
+        this._keyboardDidHide = this._keyboardDidHide.bind(this);
+
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.componentDidAppear()
         })
@@ -62,6 +76,22 @@ export default class Messenger extends React.Component {
         })
         this.getConverationDetail(this.state.conversationId);
         //this.updateConversationStatus();
+    }
+    componentWillMount() {
+        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
+        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide)
+    }
+    _keyboardDidShow() {
+
+        this.setState({
+            isKeyboard: true
+        })
+    }
+
+    _keyboardDidHide() {
+        this.setState({
+            isKeyboard: false
+        })
     }
     componentDidMount() {
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
@@ -78,6 +108,7 @@ export default class Messenger extends React.Component {
                 messageBody: {},
                 lastReadMessageId: 0,
                 isLoad: true,
+
             })
         })
     }
@@ -86,13 +117,13 @@ export default class Messenger extends React.Component {
             members.forEach(member => {
                 if (member.user.userId !== this.state.userId) {
                     this.setState({
-                        senderName : member.user.nickname,
+                        senderName: member.user.nickname,
                         senderImageUrl: member.user.thumbUrl
                     })
-                    return 
-                } 
+                    return
+                }
             });
-            
+
         }
         catch (e) {
             console.log("get conversation error", e.message)
@@ -103,14 +134,14 @@ export default class Messenger extends React.Component {
         try {
             MessagesService.GetConversationDetail(id).then(respose => {
                 if (respose) {
-                    if (respose.success) {
+                     if (respose.success) {
                         this.state.conversationDetail = respose.conversation
                         //console.log("ikm",this.state.conversationDetail)
                         this.state.messages = respose.conversation.messages.reverse()
-                        if(this.state.messages.length > 0){
+                        if (this.state.messages.length > 0) {
                             this.updateConversationStatus(this.state.messages[0].id);
                         }
-                        
+
                         this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId
                         this.state.vrn = this.state.conversationDetail.name
                         this.setSenderProps(this.state.conversationDetail.members)
@@ -119,6 +150,7 @@ export default class Messenger extends React.Component {
                             conversationDetail: this.state.conversationDetail,
                             lastReadMessageId: this.state.lastReadMessageId,
                             messages: this.state.messages,
+                            convoname: this.state.conversationDetail.name,
                             isLoad: false
                         })
                     }
@@ -143,8 +175,8 @@ export default class Messenger extends React.Component {
         }
     }
     updateConversationStatus = async (messageId) => {
-        console.log("messageId",messageId)
-        console.log("conversationId",this.state.conversationId)
+        console.log("messageId", messageId)
+        console.log("conversationId", this.state.conversationId)
         var param = {
             conversationId: this.state.conversationId,
             messageId: messageId,
@@ -224,10 +256,69 @@ export default class Messenger extends React.Component {
 
     }
 
+    MoreItemsModal() {
+        this.setState({
+            isPopup: !this.state.isPopup
+        })
+    }
+    ConversationNamePopup = () => {
+
+        this.setState({
+            isPopup: false,
+            isChangeConversationNamePopup: !this.state.isChangeConversationNamePopup
+        })
+    }
+    clearHostoryPopup = () => {
+        this.setState({
+            isPopup: false,
+            isclearHostoryPopup: !this.state.isclearHostoryPopup
+        })
+    }
+    BlockUserPopup = () => {
+        this.setState({
+            isPopup: false,
+            isBlockUserPopup: !this.state.isBlockUserPopup
+        })
+        var param = {
+            userId: this.state.conversationDetail.owner.userId,
+        }
+        console.log("param", param);
+        MessagesService.BlockUser(param).then(response => {
+            console.log("response", response);
+        })
+        
+
+    }
+    clearChatHistoryService = () => {
+        this.setState({
+            isclearHostoryPopup: false,
+        })
+        var param = {
+            conversationId: this.state.conversationId,
+        }
+        console.log("param", param);
+        MessagesService.ClearChatHistory(param).then(response => {
+            console.log("response", response);
+        })
+    }
+
+    convonameUpdate() {
+        this.setState({
+            isChangeConversationNamePopup: false,
+        })
+        var param = {
+            id: this.state.conversationId,
+            name: this.state.convoname,
+        }
+        console.log("param", param);
+        MessagesService.updateConversationName(param).then(response => {
+            console.log("updateConversationName", response)
+        })
+    }
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Messenger" username={this.state.senderName} image={this.state.senderImageUrl} navigation={this.props} />
+                <Topbar MoreItemsModal={this.MoreItemsModal} ParentPage="Messenger" username={this.state.senderName} image={this.state.senderImageUrl} navigation={this.props} />
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -271,14 +362,11 @@ export default class Messenger extends React.Component {
                                                                 <Text style={styles.SendMessageText}>
                                                                     {item.message}
                                                                 </Text>
-                                                                {
-                                                                    item.allRad || item.id < this.state.lastReadMessageId ?
+                                                                {(item.allRead || item.id < this.state.lastReadMessageId) ?
                                                                     <FontAwesome5 name="check-double" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
                                                                     :
-                                                                    <FontAwesome5 name="check" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
-
+                                                                    <FontAwesome5 name="check" color={"#d2d2d2"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
                                                                 }
-                                                                
                                                             </View>
 
 
@@ -320,6 +408,179 @@ export default class Messenger extends React.Component {
 
 
                 </View>
+                {this.state.isPopup &&
+
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={this.state.isPopup}
+                        onRequestClose={() => {
+                            console.warn("Modal has been closed.");
+                            this.MoreItemsModal()
+                        }}
+
+                    >
+                        <TouchableOpacity onPress={() => this.MoreItemsModal()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
+                        </TouchableOpacity>
+                        <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 5, top: 50, height: 150, width: '70%', right: 0, position: 'absolute' }}>
+                            <ScrollView keyboardShouldPersistTaps='handled'>
+                                <View style={{ width: '100%', height: '100%' }}>
+
+                                    <TouchableOpacity onPress={() => this.ConversationNamePopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                        <FontAwesome style={{ paddingHorizontal: 15 }} name="edit" size={24} color={Apptheme} />
+                                        <Text>Edit conversation name</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={() => this.clearHostoryPopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                        <Feather style={{ paddingHorizontal: 15 }} name="delete" size={24} color={Apptheme} />
+                                        <Text>Clear chat history</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={() => this.BlockUserPopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                        <Entypo style={{ paddingHorizontal: 15 }} name="block" size={24} color={Apptheme} />
+                                        <Text>Block</Text>
+                                    </TouchableOpacity>
+                                </View >
+
+                            </ScrollView>
+                        </SafeAreaView>
+                    </Modal >
+                }
+
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isChangeConversationNamePopup}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.ConversationNamePopup()
+                    }}
+
+                >
+                    <TouchableOpacity onPress={() => this.ConversationNamePopup()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
+                    </TouchableOpacity>
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '30%', height: (this.state.isKeyboard) ? '50%' : '25%', width: '86%', marginHorizontal: '7%', }}>
+                        <ScrollView keyboardShouldPersistTaps='handled'>
+                            <View style={{ width: '100%', height: '100%' }}>
+                                <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={[styles.headerModalText, { paddingTop: 0 }]}>
+                                        Edit conversation name
+                            </Text>
+                                </View>
+                                <View style={styles.TextFieldView}>
+                                    <TextField
+                                        label='Conversation name'
+                                        fontSize={13}
+                                        keyboardType='default'
+                                        tintColor={Apptheme}
+                                        baseColor={Apptheme}
+                                        errorColor="red"
+                                        activeLineWidth={2}
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                        labelFontSize={13}
+                                        value={this.state.convoname}
+                                        onChangeText={val => {
+                                            this.onChangeText('convoname', val.trim())
+                                        }}
+                                    />
+                                </View>
+
+                            </View >
+
+                        </ScrollView>
+
+                        <View style={{ justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row', width: '100%', height: 45, position: 'absolute', bottom: 10 }}>
+                            <TouchableOpacity onPress={() => this.ConversationNamePopup()} style={styles.modalFooterButton}>
+                                <Text style={{ color: Apptheme }} >CANCEL</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.convonameUpdate()} style={styles.modalFooterButton}>
+                                <Text style={{ color: Apptheme }}  >OK</Text>
+                            </TouchableOpacity>
+
+                        </View>
+                    </SafeAreaView>
+                </Modal >
+
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isclearHostoryPopup}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.clearHostoryPopup()
+                    }}
+
+                >
+                    <TouchableOpacity onPress={() => this.clearHostoryPopup()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
+                    </TouchableOpacity>
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '30%', height: (this.state.isKeyboard) ? '50%' : '25%', width: '86%', marginHorizontal: '7%', }}>
+                        <ScrollView keyboardShouldPersistTaps='handled'>
+                            <View style={{ width: '100%', height: '100%' }}>
+                                <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={[styles.headerModalText, { paddingTop: 0 }]}>
+                                        Clear chat history
+                            </Text>
+                                </View>
+                                <View style={styles.TextFieldView}>
+                                    <Text>Are you sure you would like to clear this chat history?</Text>
+                                </View>
+
+                            </View >
+
+                        </ScrollView>
+
+                        <View style={{ justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row', width: '100%', height: 45, position: 'absolute', bottom: 10 }}>
+                            <TouchableOpacity onPress={() => this.clearHostoryPopup()} style={styles.modalFooterButton}>
+                                <Text style={{ color: Apptheme }} >CANCEL</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.clearChatHistoryService()} style={styles.modalFooterButton}>
+                                <Text style={{ color: Apptheme }}  >CLEAR CHAT history</Text>
+                            </TouchableOpacity>
+
+                        </View>
+                    </SafeAreaView>
+                </Modal >
+
+
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isBlockUserPopup}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.BlockUserPopup()
+                    }}
+
+                >
+                    <TouchableOpacity onPress={() => this.BlockUserPopup()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
+                    </TouchableOpacity>
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '30%', height: (this.state.isKeyboard) ? '50%' : '25%', width: '86%', marginHorizontal: '7%', }}>
+                        <ScrollView keyboardShouldPersistTaps='handled'>
+                            <View style={{ width: '100%', height: '100%' }}>
+                                <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={[styles.headerModalText, { paddingTop: 0 }]}>
+                                        Success
+                            </Text>
+                                </View>
+                                <View style={styles.TextFieldView}>
+                                    <Text>You have block this user</Text>
+                                </View>
+
+                            </View >
+
+                        </ScrollView>
+
+                        <View style={{ justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row', width: '100%', height: 45, position: 'absolute', bottom: 10 }}>
+                            <TouchableOpacity onPress={() => this.setState({ isBlockUserPopup: false })}
+                                style={styles.modalFooterButton}>
+                                <Text style={{ color: Apptheme }}  >OK</Text>
+                            </TouchableOpacity>
+
+                        </View>
+                    </SafeAreaView>
+                </Modal >
+
             </View>
         )
     }
@@ -383,5 +644,19 @@ const styles = StyleSheet.create({
     },
     menuLoaderView: {
         ...CommonStyle.menuLoaderView
-    }
+    },
+    headerModalText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 5,
+        color: '#000000'
+    },
+    TextFieldView: {
+        width: '92%',
+        marginHorizontal: '4%'
+    },
+    modalFooterButton: {
+        padding: 10,
+        marginHorizontal: 5
+    },
 })

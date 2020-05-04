@@ -97,4 +97,68 @@ export let updateMessageStatusToRead = async (params) => {
         return null
     }
 }
+export let updateConversationName = async (params) => {
+    try {
+        console.log(APIConstants.SET_CONVERSATION_NAME_ENDPOINT);
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.SET_CONVERSATION_NAME_ENDPOINT, {
+                method: 'PATCH',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify({
+                    params
+                })
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log("error", e.message)
+        return null
+    }
+}
+export let ClearChatHistory = async (params) => {
+    try {
+        console.log(APIConstants.CLEAR_CHAT_HISTORY_ENDPOINT);
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.CLEAR_CHAT_HISTORY_ENDPOINT, {
+                method: 'PATCH',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify({
+                    params
+                })
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log("error", e.message)
+        return null
+    }
+}
+
+export let BlockUser = async (params) => {
+    try {
+        console.log(APIConstants.BLOCK_USER_ENDPOINT);
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.BLOCK_USER_ENDPOINT, {
+                method: 'POST',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify({
+                    params
+                })
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log("error", e.message)
+        return null
+    }
+}
 

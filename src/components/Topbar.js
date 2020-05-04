@@ -87,7 +87,7 @@ export default class Topbar extends React.Component {
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
                     <Feather name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
-                    <FontAwesome name="user-times" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
+                    <FontAwesome onPress={() => this.props.BlockUser()} name="user-times" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                 </View>
             )
         }

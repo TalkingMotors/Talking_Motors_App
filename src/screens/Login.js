@@ -32,8 +32,8 @@ export default class Login extends React.Component {
         super(props)
         this.state = {
             secureTextEntry: true,
-            username: "",
-            password: "",
+            username: "maazmehtabuddin95@gmail.com",
+            password: "12345678",
             loginFail: false,
             loginFailMessage: "",
             isloader: false,

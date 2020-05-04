@@ -20,6 +20,7 @@ import Messenger from './src/screens/Messenger';
 import SearchResultVehicle from './src/screens/SearchResultVehicle';
 import EditVehicle from './src/screens/EditVehicle';
 import EditVehicleImage from './src/screens/EditVehicleImage';
+import BlockUser from './src/screens/BlockUser';
 
 const MyStackNavigator = createStackNavigator(
     {
@@ -40,6 +41,7 @@ const MyStackNavigator = createStackNavigator(
         SearchResultVehicle: { screen: SearchResultVehicle },
         EditVehicle: { screen: EditVehicle },
         EditVehicleImage: { screen: EditVehicleImage },
+        BlockUser: { screen: BlockUser },
     },
     {
         initialRouteName: 'Login',

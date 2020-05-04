@@ -9,11 +9,7 @@ import {
     ActivityIndicator,
     TouchableOpacity
 } from 'react-native';
-// import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-// import LinearGradient from 'react-native-linear-gradient';
 import Constants from "../helpers/Constants";
 import * as Utilities from "../helpers/Utilities";
 import * as MessagesService from '../services/Messages';
@@ -23,37 +19,38 @@ import Labels from "../languages/Labels";
 import Topbar from '../components/Topbar';
 import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
 
-//import { FluidNavigator, Transition } from '../../lib';
-export default class Message extends React.Component {
+export default class BlockUser extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             isLoad: true,
-            myConversation: []
+            List: []
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
-            this.getMyConversations()
+            this.GetBlockUser()
 
         })
 
     }
+
     componentDidMount() {
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
             this.setState({
                 isLoad: true,
-                myConversation: []
+                List: []
             })
         })
     }
-    getMyConversations = () => {
+
+    GetBlockUser = () => {
         try {
-            MessagesService.MyConversations().then(respose => {
+            MessagesService.GetBlockUser().then(respose => {
                 if (respose) {
                     if (respose.success) {
-                        this.state.myConversation = respose.conversations.reverse()
-                        console.log("myConversation", this.state.myConversation);
+                        this.state.List = respose.users
+                        console.log("List", this.state.List);
                         this.setState({
-                            myConversation: this.state.myConversation,
+                            List: this.state.List,
                             isLoad: false
                         })
                     }
@@ -64,39 +61,32 @@ export default class Message extends React.Component {
             this.setState({
                 isLoad: false
             })
-            console.log("get conversation error", e.message)
+            console.log(" GetBlockUser error", e.message)
         }
     }
-    setMemberNames = (members) => {
+    UnBlockUsers = (user) => {
         try {
-            var memberNamesCSV = ""
-            members.forEach(member => {
-                if (member.user.userId === Storage.userData.userId) {
-                    memberNamesCSV = "You" + memberNamesCSV
-                } else {
-                    memberNamesCSV = `${memberNamesCSV}, ${member.user.nickname}`
+            let params = {
+                userId: user.userId
+            }
+            MessagesService.UnBlockUsers(params).then(respose => {
+                console.log("respose", respose);
+                if (respose) {
+                    if (respose.success) {
+                        this.props.navigation.goBack();
+                    }
                 }
-            });
-            return memberNamesCSV;
+            })
         }
         catch (e) {
-            console.log("get conversation error", e.message)
+            console.log('UnBlockUsers Exception', e);
+            this.props.navigation.goBack();
         }
     }
-
-    viewMessageDetail = (item) => {
-        console.log("item", item);
-        this.props.navigation.navigate("Messenger", { conversationId: item.id })
-    }
-    BlockUser = () => {
-        
-        this.props.navigation.navigate("BlockUser")
-    }
-
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar BlockUser={this.BlockUser} ParentPage="Message" navigation={this.props} />
+                <Topbar ParentPage="Black User" navigation={this.props} />
 
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
@@ -109,50 +99,39 @@ export default class Message extends React.Component {
                 <ScrollView style={{ paddingBottom: 0, }}>
                     <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
                         <FlatList
-                            data={this.state.myConversation}
+                            data={this.state.List}
                             renderItem={({ item, index }) =>
-                                <TouchableOpacity onPress={() => this.viewMessageDetail(item)} key={index} style={styles.ChatBoxView}>
+                                <TouchableOpacity
+                                    onPress={() => this.UnBlockUsers(item)}
+                                    key={index} style={styles.ChatBoxView}>
                                     <View style={styles.UserImageView}>
                                         {
-                                            Utilities.stringIsEmpty(item.owner.thumbUrl) ?
+                                            Utilities.stringIsEmpty(item.imageUrl) ?
                                                 <View style={styles.ImageIconView}>
                                                     <FontAwesome name="user" size={40} color={Apptheme} />
                                                 </View>
                                                 :
                                                 <Image
                                                     style={styles.UserImage}
-                                                    source={{ uri: item.owner.thumbUrl }}
+                                                    source={{ uri: item.imageUrl }}
                                                 />
                                         }
 
                                     </View>
-                                    <View style={{ width: '100%', marginTop: 15 }}>
+                                    <View style={{ width: '50%', marginTop: 30 }}>
                                         <Text style={styles.UserNameText}>
                                             {item.name}
                                         </Text>
 
                                         <View style={styles.UserDetailView}>
-                                            <Text style={styles.UserCountText}>
-                                                {`${item.members.length} users joined `}
-                                                <Text style={styles.UserFriendsText}>
-                                                    ({
-                                                        this.setMemberNames(item.members)
-                                                    })
-                                    </Text>
 
 
-                                            </Text>
-                                            {
-                                                item.numberOfUnreadMessages > 0 &&
-                                                <View style={styles.MessageCountView}>
-                                                    <Text style={styles.MessageCountText}>
-                                                        {item.numberOfUnreadMessages}
-                                                    </Text>
-                                                </View>
-
-                                            }
 
                                         </View>
+                                    </View>
+                                    <View style={[styles.UserImageView,]}>
+                                        <FontAwesome name="unlock-alt" size={24} color={Apptheme} />
+                                        <Text style={{ fontSize: 12 }}>Unblock User</Text>
                                     </View>
                                 </TouchableOpacity>
                             }
@@ -160,6 +139,7 @@ export default class Message extends React.Component {
                         />
                     </View>
                 </ScrollView>
+
             </View>
         )
     }

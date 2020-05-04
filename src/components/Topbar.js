@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Apptheme, lightText, darkText, LinearColor } from '../helpers/CommponStyle';
+import * as Utilities from "../helpers/Utilities";
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 export default class Topbar extends React.Component {
@@ -20,6 +21,7 @@ export default class Topbar extends React.Component {
         this.state = {
             ParentPage: ''
         }
+        console.log("props", this.props)
     }
     render() {
         if (this.props.ParentPage == "Home") {
@@ -96,11 +98,17 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.navigate("Message")}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     {/* <Text style={styles.ScreenName}>{this.props.ParentPage}</Text> */}
-                    <Image
-                        style={{ width: 34, height: 34, borderRadius: 17, marginLeft: 15 }}
-                        source={require('../images/userImage.jpg')}
-                    />
-                    <Text style={styles.ScreenName}>Maaz</Text>
+                    { Utilities.stringIsEmpty(this.props.image) ?
+                        <FontAwesome name="user" size={40} color={Apptheme} />
+                         :
+                         <Image
+                         style={{ width: 34, height: 34, borderRadius: 17, marginLeft: 15 }}
+                         source={{ uri: this.props.image }}
+                     />
+                         
+                    }
+                   
+                    <Text style={styles.ScreenName}>{this.props.username}</Text>
                     <Feather name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                     <FontAwesome name="user-times" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                 </View>

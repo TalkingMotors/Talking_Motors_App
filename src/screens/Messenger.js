@@ -46,6 +46,8 @@ export default class Messenger extends React.Component {
             messageBody: {},
             lastReadMessageId: 0,
             isLoad: true,
+            senderName: "",
+            senderImageUrl: ""
 
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
@@ -59,7 +61,7 @@ export default class Messenger extends React.Component {
             conversationId: this.state.conversationId
         })
         this.getConverationDetail(this.state.conversationId);
-        this.updateConversationStatus();
+        //this.updateConversationStatus();
     }
     componentDidMount() {
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
@@ -79,15 +81,39 @@ export default class Messenger extends React.Component {
             })
         })
     }
+    setSenderProps = (members) => {
+        try {
+            members.forEach(member => {
+                if (member.user.userId !== this.state.userId) {
+                    this.setState({
+                        senderName : member.user.nickname,
+                        senderImageUrl: member.user.thumbUrl
+                    })
+                    return 
+                } 
+            });
+            
+        }
+        catch (e) {
+            console.log("get conversation error", e.message)
+            return null
+        }
+    }
     getConverationDetail = (id) => {
         try {
             MessagesService.GetConversationDetail(id).then(respose => {
                 if (respose) {
                     if (respose.success) {
                         this.state.conversationDetail = respose.conversation
+                        //console.log("ikm",this.state.conversationDetail)
                         this.state.messages = respose.conversation.messages.reverse()
+                        if(this.state.messages.length > 0){
+                            this.updateConversationStatus(this.state.messages[0].id);
+                        }
+                        
                         this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId
                         this.state.vrn = this.state.conversationDetail.name
+                        this.setSenderProps(this.state.conversationDetail.members)
                         //this.getUserIds(this.state.conversationDetail.members);
                         this.setState({
                             conversationDetail: this.state.conversationDetail,
@@ -116,10 +142,12 @@ export default class Messenger extends React.Component {
             console.log("get conversation error", e.message)
         }
     }
-    updateConversationStatus = async () => {
+    updateConversationStatus = async (messageId) => {
+        console.log("messageId",messageId)
+        console.log("conversationId",this.state.conversationId)
         var param = {
             conversationId: this.state.conversationId,
-            messageId: 0,
+            messageId: messageId,
 
         }
         MessagesService.updateMessageStatusToRead(param).then(response => {
@@ -199,7 +227,7 @@ export default class Messenger extends React.Component {
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Messenger" username={"Maaz"} image={image} navigation={this.props} />
+                <Topbar ParentPage="Messenger" username={this.state.senderName} image={this.state.senderImageUrl} navigation={this.props} />
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -244,9 +272,13 @@ export default class Messenger extends React.Component {
                                                                     {item.message}
                                                                 </Text>
                                                                 {
-                                                                    item.allRad || item.id < this.state.lastReadMessageId
+                                                                    item.allRad || item.id < this.state.lastReadMessageId ?
+                                                                    <FontAwesome5 name="check-double" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
+                                                                    :
+                                                                    <FontAwesome5 name="check" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
+
                                                                 }
-                                                                <FontAwesome5 name="check-double" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
+                                                                
                                                             </View>
 
 

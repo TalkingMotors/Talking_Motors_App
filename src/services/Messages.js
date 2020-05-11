@@ -5,7 +5,8 @@ import Storage from '../helpers/Storage';
 export let MyConversations = async () => {
     try {
         if (Storage.networkStatus.isConnected) {
-            let response = await fetch(APIConstants.GET_MY_CONVERSATIONS_ENDPOINT, {
+
+            let response = await fetch(APIConstants.GET_MY_CONVERSATIONS_ENDPOINT + '?inviteStatuses=1&inviteStatuses=3&inviteStatuses=5&numberOfResults=-11', {
                 method: 'GET',
                 headers: Utilities.setHeaders()
             })
@@ -78,13 +79,16 @@ export let sendMessage = async (params) => {
 
 export let updateMessageStatusToRead = async (params) => {
     try {
-        console.log(APIConstants.UPDATE_LAST_READ_ID_ENDPOINT);
+        console.log(JSON.stringify({
+            params
+        }));
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UPDATE_LAST_READ_ID_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
                 body: JSON.stringify({
-                    params
+                    conversationId: params.conversationId,
+                    messageId: params.messageId
                 })
             })
             let result = response.json()
@@ -105,7 +109,8 @@ export let updateConversationName = async (params) => {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
                 body: JSON.stringify({
-                    params
+                    id: params.id,
+                    name: params.name
                 })
             })
             let result = response.json()
@@ -126,7 +131,7 @@ export let ClearChatHistory = async (params) => {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
                 body: JSON.stringify({
-                    params
+                    conversationId: params.conversationId
                 })
             })
             let result = response.json()

@@ -136,10 +136,14 @@ export default class Messenger extends React.Component {
                 if (respose) {
                      if (respose.success) {
                         this.state.conversationDetail = respose.conversation
-                        //console.log("ikm",this.state.conversationDetail)
-                        this.state.messages = respose.conversation.messages.reverse()
-                        if (this.state.messages.length > 0) {
-                            this.updateConversationStatus(this.state.messages[0].id);
+                        console.log("ikm-messages",this.state.conversationDetail)
+                        //this.state.messages = respose.conversation.messages.reverse()
+                        this.state.messages = respose.conversation.messages.sort(function (a, b) {
+                            return a.time.localeCompare(b.time);
+                        });
+                        console.log("ikm-messages",this.state.messages)
+                        if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
+                            this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
                         }
 
                         this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId
@@ -299,6 +303,9 @@ export default class Messenger extends React.Component {
         console.log("param", param);
         MessagesService.ClearChatHistory(param).then(response => {
             console.log("response", response);
+            this.setState({
+                messages: {}
+            })
         })
     }
 
@@ -313,6 +320,9 @@ export default class Messenger extends React.Component {
         console.log("param", param);
         MessagesService.updateConversationName(param).then(response => {
             console.log("updateConversationName", response)
+            this.setState({
+                senderName : this.state.convoname
+            })
         })
     }
     render() {

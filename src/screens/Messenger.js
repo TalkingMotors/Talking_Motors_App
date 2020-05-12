@@ -21,6 +21,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
+import { GiftedChat } from 'react-native-gifted-chat'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Topbar from '../components/Topbar';
 import { TextField } from 'react-native-material-textfield';
@@ -111,6 +112,32 @@ export default class Messenger extends React.Component {
 
             })
         })
+
+        // this.setState({
+        //     messages: [
+        //       {
+        //         _id: 1,
+        //         text: 'Hello developer',
+        //         createdAt: new Date(),
+        //         user: {
+        //           _id: 1,
+        //           name: 'React Native',
+        //           avatar: 'https://placeimg.com/140/140/any',
+        //         },
+        //       },
+        //       {
+        //         _id: 2,
+        //         text: 'Hello engineer',
+        //         createdAt: new Date(),
+        //         user: {
+        //           _id: 2,
+        //           name: 'React Native',
+        //           avatar: 'https://placeimg.com/140/140/any',
+        //         },
+        //       },
+        //     ],
+        //     isLoad: false,
+        //   })
     }
     setSenderProps = (members) => {
         try {
@@ -137,6 +164,15 @@ export default class Messenger extends React.Component {
                      if (respose.success) {
                         this.state.conversationDetail = respose.conversation
                         console.log("ikm-messages",this.state.conversationDetail)
+                        //var obj = JSON.parse(jsonObj)[0];
+                        
+                        // respose.conversation.messages.forEach(element => {
+                        //     element._id = element.id;
+                        //     element.text = element.message;
+                        //     element.createdAt = element.time
+                        //     element.user._id = element.user.userId
+                        //     element.user.avatar = element.user.thumbUrl
+                        // });
                         //this.state.messages = respose.conversation.messages.reverse()
                         this.state.messages = respose.conversation.messages.sort(function (a, b) {
                             return a.time.localeCompare(b.time);
@@ -337,6 +373,7 @@ export default class Messenger extends React.Component {
                         />
                     </View>
                 }
+               
                 <ScrollView style={{ paddingBottom: 0, }}>
                     <KeyboardAvoidingView
                         keyboardVerticalOffset="80"
@@ -344,7 +381,15 @@ export default class Messenger extends React.Component {
                         <ScrollView>
                             <View style={styles.MessengerView}>
                                 <View style={styles.MessengerViewList}>
-                                    <FlatList
+                                    {/* <View style={{width:"100%", height:500}}>
+                                <GiftedChat
+                                    messages={this.state.messages}
+                                        onSend={ messages => this.state.conversationId > 0 ? this.sendMessageToConversation(messages) : this.sendMessageToOwner(messages) }
+                                        user={{
+                                            _id: this.state.userId,
+                                          }}
+      /></View> */}
+                                     <FlatList
                                         data={this.state.messages}
                                         renderItem={({ item, index }) =>
                                             <View >
@@ -387,7 +432,7 @@ export default class Messenger extends React.Component {
                                         }
 
                                         keyExtractor={(item, index) => index.toString()}
-                                    />
+                                    /> 
 
                                 </View>
                             </View>

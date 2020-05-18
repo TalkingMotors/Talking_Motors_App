@@ -32,8 +32,10 @@ export default class Login extends React.Component {
         super(props)
         this.state = {
             secureTextEntry: true,
-            username: "maazmehtabuddin95@gmail.com",
-            password: "12345678",
+            // username: "maazmehtabuddin95@gmail.com",
+            // password: "12345678",
+            username: "Manawar@talkingmotorsapp.com",
+            password: "infobank",
             loginFail: false,
             loginFailMessage: "",
             isloader: false,
@@ -235,7 +237,7 @@ export default class Login extends React.Component {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity onPress={() => this.Login.bind(this)} style={styles.ForgetPasswordView}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate("ChangePassword")} style={styles.ForgetPasswordView}>
                             <Text style={styles.ForgetPasswordText}>
                                 Forgot Password?
                         </Text>
@@ -259,7 +261,7 @@ export default class Login extends React.Component {
                             </TouchableOpacity>
 
                             <Text style={styles.TextView}>
-                                You can use the App without an account,but you
+                                You can use the App without an account, but you
                                 need to register to message users or list a car.
                         </Text>
 

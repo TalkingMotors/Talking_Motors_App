@@ -26,6 +26,7 @@ export default class Dashboard extends React.Component {
         super(props);
         this.state = {
             list: [],
+            emptyList:''
 
         }
 
@@ -36,7 +37,8 @@ export default class Dashboard extends React.Component {
     }
     myVehicle = async () => {
         var response = await VehicleService.myVehicle()
-        if (!Utilities.stringIsEmpty(response.vehicles)) {
+        console.log("response",response);
+        if (!Utilities.stringIsEmpty(response.vehicles) || response.success ) {
             if (response.vehicles.length > 0) {
                 this.setState({
                     list: response.vehicles
@@ -48,7 +50,7 @@ export default class Dashboard extends React.Component {
                 })
             }
         }
-        else {
+        else if(!response.success) {
             alert("invalid operation");
         }
     }
@@ -124,9 +126,14 @@ export default class Dashboard extends React.Component {
 
        
     }
-    
+    flatListEmptyMessage = () => {
+        if (this.state.list.length == 0 ) {
+            return (<Text style={styles.noRecordFoundText}>{this.state.emptyList}</Text>)
+        }
+    }
     render() {
         console.log("list", this.state.list);
+        console.log("emptyList", this.state.emptyList);
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Dashboard" navigation={this.props.navigation} />
@@ -142,6 +149,7 @@ export default class Dashboard extends React.Component {
                         keyExtractor={(item, index) => index.toString()}
                         showsVerticalScrollIndicator={false}
                         shouldItemUpdate={this.state.loadMore}
+
                         renderItem={({ item, index }) =>
                             (
                                 <View key={index}>
@@ -171,8 +179,9 @@ export default class Dashboard extends React.Component {
                                     </LinearGradient>
                                 </View>
                             )}
-
+ ListEmptyComponent={this.flatListEmptyMessage}
                     />
+                    
                 </ScrollView>
             </View>
         )
@@ -251,5 +260,9 @@ const styles = StyleSheet.create({
     BoxIcon: {
         textAlign: 'center',
         paddingBottom: 5
+    },
+    noRecordFoundText :{ 
+        textAlign:'center',
+        fontSize:14
     }
 })

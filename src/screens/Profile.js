@@ -152,6 +152,7 @@ export default class Profile extends React.Component {
                     <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>{ this.state.displayName }</Text>
 
                     <TouchableOpacity
+                    onPress={()=>this.props.navigation.navigate("ChangePassword")}
                         style={styles.ChangePasswordView}>
                         <FontAwesome name="edit" style={{ paddingHorizontal: 5 }} color={linkText} size={16} />
                         <Text style={styles.ChangePasswordText}>

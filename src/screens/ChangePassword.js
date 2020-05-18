@@ -15,11 +15,21 @@ import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommponStyle, { Apptheme, linkText, lightText, darkText, LinearColor, lightBg, darkBg } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
+import Storage from '../helpers/Storage';
 export default class ChangePassword extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: 'Maazmehtabuddin95@gmail.com'
+            email: ''
+        }
+      
+    }
+    componentWillMount(){
+        if(Object.keys(Storage.userData).length > 0) {
+            console.log("Storage.userData",Storage.userData);
+            this.setState({
+                email:Storage.userData.email
+            })
         }
     }
     render() {
@@ -67,7 +77,7 @@ export default class ChangePassword extends React.Component {
                     </View>
 
                     <TouchableOpacity
-                        onPress={this.props.navigation.navigate("ResetPassword")}
+                        onPress={()=>this.props.navigation.navigate("ResetPassword")}
                         style={styles.ChangePasswordView}>
                         {/* <FontAwesome name="edit" style={{ paddingHorizontal: 5 }} color={linkText} size={16} /> */}
                         <Text style={styles.ChangePasswordText}>

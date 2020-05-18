@@ -19,7 +19,15 @@ export default class ResetPassword extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: 'Maazmehtabuddin95@gmail.com'
+            email: ''
+        }
+    }
+    componentWillMount(){
+        if(Object.keys(Storage.userData).length > 0) {
+            console.log("Storage.userData",Storage.userData);
+            this.setState({
+                email:Storage.userData.email
+            })
         }
     }
     render() {

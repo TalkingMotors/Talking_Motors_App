@@ -40,7 +40,11 @@ export default class ContentContainer extends React.Component {
                         Wellcome  {'\n'} {Storage.userData.name}
                     </Text>
                 </LinearGradient>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Home')} style={styles.SideMenuItemView}>
+                <TouchableOpacity onPress={() => {
+                    this.props.navigation.navigate('Home')
+                    this.props.navigation.closeDrawer()
+                }
+            } style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <FontAwesome name='home' style={styles.SideMenuIcon} />
                     </View>
@@ -124,20 +128,23 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => { 
-                    Utilities.asyncStorage_RemoveKey(Constants.USER_DATA)
-                    Utilities.asyncStorage_RemoveKey(Constants.JWT_TOKEN)
-                    Storage.userData = {}
-                    this.props.navigation.navigate('Login')}
+                {(Object.keys(Storage.userData).length > 0) &&
+                    <TouchableOpacity onPress={() => {
+                        Utilities.asyncStorage_RemoveKey(Constants.USER_DATA)
+                        Utilities.asyncStorage_RemoveKey(Constants.JWT_TOKEN)
+                        Storage.userData = {}
+                        this.props.navigation.navigate('Login')
+                    }
                     } style={styles.SideMenuItemView}>
-                    <View style={styles.IconView}>
-                        <FontAwesome name='user' style={styles.SideMenuIcon}
-                        />
-                    </View>
-                    <Text style={styles.SideMenuText}>
-                        Logout
+                        <View style={styles.IconView}>
+                            <FontAwesome name='user' style={styles.SideMenuIcon}
+                            />
+                        </View>
+                        <Text style={styles.SideMenuText}>
+                            Logout
                     </Text>
-                </TouchableOpacity>
+                    </TouchableOpacity>
+                }
             </View>
 
         );

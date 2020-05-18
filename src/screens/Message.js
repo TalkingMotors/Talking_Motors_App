@@ -58,6 +58,11 @@ export default class Message extends React.Component {
                         })
                     }
                 }
+                else{
+                    this.setState({
+                         isLoad: false
+                    })
+                }
             })
         }
         catch (e) {

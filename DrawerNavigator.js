@@ -26,6 +26,7 @@ import SearchResultVehicle from './src/screens/SearchResultVehicle';
 import EditVehicle from './src/screens/EditVehicle';
 import EditVehicleImage from './src/screens/EditVehicleImage';
 import BlockUser from './src/screens/BlockUser';
+import Setting from './src/screens/Setting';
 
 const MyDrawerNavigator = createDrawerNavigator({
     Home: { screen: StackNavigator },
@@ -46,6 +47,7 @@ const MyDrawerNavigator = createDrawerNavigator({
     EditVehicleImage: { screen: EditVehicleImage, },
    EditVehicle: { screen: EditVehicle, },
    BlockUser: { screen: BlockUser, },
+   Setting: { screen: Setting, },
 },
     {
         initialRouteName: 'Home',

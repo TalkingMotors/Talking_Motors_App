@@ -117,7 +117,7 @@ export default class ContentContainer extends React.Component {
                 </TouchableOpacity> */}
 
                 <TouchableOpacity 
-                // onPress={() => this.props.navigation.navigate('Search')}
+                onPress={() => this.props.navigation.navigate('Setting')}
                  style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <Feather name='settings' style={styles.SideMenuIcon}
@@ -128,7 +128,7 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                {(Object.keys(Storage.userData).length > 0) &&
+                {(Object.keys(Storage.userData).length > 0) ?
                     <TouchableOpacity onPress={() => {
                         Utilities.asyncStorage_RemoveKey(Constants.USER_DATA)
                         Utilities.asyncStorage_RemoveKey(Constants.JWT_TOKEN)
@@ -142,6 +142,19 @@ export default class ContentContainer extends React.Component {
                         </View>
                         <Text style={styles.SideMenuText}>
                             Logout
+                    </Text>
+                    </TouchableOpacity>
+                    :
+                    <TouchableOpacity onPress={() => {
+                         this.props.navigation.navigate('Login')
+                    }
+                    } style={styles.SideMenuItemView}>
+                        <View style={styles.IconView}>
+                            <FontAwesome name='user' style={styles.SideMenuIcon}
+                            />
+                        </View>
+                        <Text style={styles.SideMenuText}>
+                            Login
                     </Text>
                     </TouchableOpacity>
                 }

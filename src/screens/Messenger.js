@@ -13,6 +13,7 @@ import {
     Dimensions,
     Keyboard,
     ActivityIndicator,
+    ImageBackground,
     StyleSheet,
     KeyboardAvoidingView,
     TouchableOpacity
@@ -373,12 +374,14 @@ export default class Messenger extends React.Component {
                         />
                     </View>
                 }
-               
-                <ScrollView style={{ paddingBottom: 0, }}>
+                <View >
+                <ScrollView style={{ marginBottom: 0 }}>
                     <KeyboardAvoidingView
                         keyboardVerticalOffset="80"
-                        enabled>
+                        enabled
+                        >
                         <ScrollView>
+                            <ImageBackground style={{width:'100%'}} source={require('../images/tmmesbackan.png')} >
                             <View style={styles.MessengerView}>
                                 <View style={styles.MessengerViewList}>
                                     {/* <View style={{width:"100%", height:500}}>
@@ -436,10 +439,13 @@ export default class Messenger extends React.Component {
 
                                 </View>
                             </View>
+                            </ImageBackground>
                         </ScrollView>
                     </KeyboardAvoidingView>
                 </ScrollView>
-                <View style={{ flexDirection: 'row', width: '100%', height: 60 }}>
+              
+                </View>
+                <View style={{ flexDirection: 'row', width: '100%', height: 55, }}>
                     <TouchableOpacity style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
                         <FontAwesome name="camera" size={22} color={Apptheme} />
                     </TouchableOpacity>
@@ -650,13 +656,13 @@ const styles = StyleSheet.create({
     },
     MessengerView: {
         width: '100%',
-        height: screen_height - 120,
+        height: screen_height - 130,
         justifyContent: 'flex-end'
     },
     MessengerViewList: {
         width: '96%',
         marginHorizontal: '2%',
-        marginVertical: 10,
+        // marginVertical: 10,
 
     },
     SendMessageView: {

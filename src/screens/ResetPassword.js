@@ -15,6 +15,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommponStyle, { Apptheme, linkText, lightText, darkText, LinearColor, lightBg, darkBg } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
+import Storage from '../helpers/Storage';
 export default class ResetPassword extends React.Component {
     constructor(props) {
         super(props);

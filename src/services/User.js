@@ -103,4 +103,24 @@ export let changeProfilePhoto = async (image) => {
 }
 
 
+export let ForgetPasswordCode = async (params) => {
+    try {
+        if(Storage.networkStatus.isConnected){
+            console.log("params",params);
+        let response = await fetch(APIConstants.FORGOTTEN_PASSWORD_ENDPOINT, {
+            method: 'POST',
+            // headers: Utilities.setHeaders(),
+            body: JSON.stringify(params)
+        })
+
+        let result = response.json()
+        return result;
+    }else{
+        return null
+    }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
 

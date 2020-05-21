@@ -16,22 +16,57 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommponStyle, { Apptheme, linkText, lightText, darkText, LinearColor, lightBg, darkBg } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
 import Storage from '../helpers/Storage';
+import * as UserService from '../services/User';
+import * as Utilities from "../helpers/Utilities";
 export default class ChangePassword extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: ''
+            email: '',
+            errorEmail: false,
+            errorEmailMessage: ''
         }
-      
+
     }
-    componentWillMount(){
-        if(Object.keys(Storage.userData).length > 0) {
-            console.log("Storage.userData",Storage.userData);
+    componentWillMount() {
+        if (Object.keys(Storage.userData).length > 0) {
             this.setState({
-                email:Storage.userData.email
+                email: Storage.userData.email
             })
         }
     }
+
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value, loginFail: false })
+    }
+
+    navigateToResetPassword = async () => {
+        try {
+            if (Utilities.stringIsEmpty(this.state.email)) {
+                this.setState({
+                    errorEmail: true,
+                    errorEmailMessage: "Enter your email."
+                })
+                return
+            }
+            if (Utilities.emailRegex.test(this.state.email) == false) {
+             this.setState({
+                    errorEmail: true,
+                    errorEmailMessage: "Enter correct email address."
+                })
+                return
+            }
+            let params = { "email": this.state.email }
+            let response = await UserService.ForgetPasswordCode(params)
+            if (response.success) {
+                this.props.navigation.navigate("ResetPassword")
+            }
+        }
+        catch (e) {
+            console.log("navigateToResetPassword Exception", e);
+        }
+    }
+
     render() {
         return (
             <View style={styles.ParentView}>
@@ -71,13 +106,29 @@ export default class ChangePassword extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
-                            editable={false}
+                            onChangeText={val => {
+                                this.onChangeText('email', val.trim())
+                                this.setState({
+                                    errorEmailMessage: '',
+                                    errorEmail: false
+                                })
+
+                            }}
                             value={this.state.email}
                         />
-                    </View>
 
+                    </View>
+                    {this.state.errorEmail &&
+                        <View style={styles.errorView}>
+                            <Text style={styles.errorViewText}>
+                                {this.state.errorEmailMessage}
+                            </Text>
+                        </View>
+                    }
                     <TouchableOpacity
-                        onPress={()=>this.props.navigation.navigate("ResetPassword")}
+                        onPress={() =>
+                            this.navigateToResetPassword()
+                        }
                         style={styles.ChangePasswordView}>
                         {/* <FontAwesome name="edit" style={{ paddingHorizontal: 5 }} color={linkText} size={16} /> */}
                         <Text style={styles.ChangePasswordText}>
@@ -159,5 +210,11 @@ const styles = StyleSheet.create({
         color: linkText,
         fontSize: 14,
         paddingBottom: 2
+    },
+    errorView: {
+        ...CommponStyle.errorView
+    },
+    errorViewText: {
+        ...CommponStyle.errorViewText
     },
 })

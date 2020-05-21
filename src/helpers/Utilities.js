@@ -83,3 +83,5 @@ export let FormatDate = (dateTimeValue) => {
         console.log("FormatDate", e)
     }
 }
+
+export const emailRegex = RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);

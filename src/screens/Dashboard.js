@@ -21,6 +21,7 @@ import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
 import * as VehicleService from '../services/Vehicle';
 import VehicleImage from '../components/VehicleImage';
+const moment = require('moment-timezone');
 export default class Dashboard extends React.Component {
     constructor(props) {
         super(props);
@@ -29,17 +30,49 @@ export default class Dashboard extends React.Component {
             emptyList:''
 
         }
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            this.myVehicle();
+
+        })
 
     }
 
     componentWillMount() {
         this.myVehicle();
     }
+
+    PremiumPackgedDateChecked(premiumDate){
+        var seconds=0
+        if (!Utilities.stringIsEmpty(premiumDate)) {
+            var dateNow = moment.tz('Europe/London').format('ll LTS');
+            var momentdate = moment(premiumDate, "YYYY/MM/DD H:mm:ss").format('ll LTS');
+             seconds = Math.floor((moment(momentdate) - moment(dateNow)) / 1000);
+            if(seconds < 0){
+                seconds = 0
+            }
+           
+            // var minutes = Math.floor(seconds / 60);
+            // var hours = Math.floor(minutes / 60);
+            // var days = Math.floor(hours / 24);
+            // hours = hours = hours - (days * 24);
+            // minutes = minutes - (days * 24 * 60) - (hours * 60);
+            // seconds = seconds - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
+            // console.log("days",days);
+            // console.log("hours",hours);
+            // console.log("minutes",minutes);
+            // console.log("seconds",seconds);
+        }
+        return seconds;
+    }
+
     myVehicle = async () => {
         var response = await VehicleService.myVehicle()
-        console.log("response",response);
         if (!Utilities.stringIsEmpty(response.vehicles) || response.success ) {
             if (response.vehicles.length > 0) {
+                for (var i = 0; i < response.vehicles.length; i++) {
+                  
+                    response.vehicles[i].PremiumDate = this.PremiumPackgedDateChecked(response.vehicles[i].premiumListingExpires)
+                }
                 this.setState({
                     list: response.vehicles
                 })
@@ -160,6 +193,9 @@ export default class Dashboard extends React.Component {
                                             onPress={this.detail.bind(this, item, index)}
                                             style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
                                             <View style={{ width: '35%', alignItems: 'center', justifyContent: 'center' }}>
+                                                {item.PremiumDate > 0 && 
+                                                    <Text style={{zIndex:2,position:'absolute',top:13,color:'#fefefe',fontSize:10,right:70,borderRadius:3,backgroundColor:Apptheme,padding:2,rotation:-40}}>Premium</Text>
+                                                }
                                                 <VehicleImage param={item.images} />
                                             </View>
                                             <View style={{ width: '65%', justifyContent: 'center' }}>

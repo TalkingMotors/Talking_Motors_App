@@ -23,6 +23,25 @@ export let VehicleLookup = async () => {
         return null
     }
 }
+export let VehicleLookupAllFeatures = async () => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.VEHICLE_LOOKUPS_FEATURES_ENDPOINT  )
+            let response = await fetch(APIConstants. VEHICLE_LOOKUPS_FEATURES_ENDPOINT , {
+                method: 'GET',
+                crossDomain: true,
+                headers:Utilities.setHeaders()
+              })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
 
 
 export let SearchVehicleTypes = async (param) => {

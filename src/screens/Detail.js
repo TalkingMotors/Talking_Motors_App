@@ -23,6 +23,10 @@ import Topbar from '../components/Topbar';
 import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
 import Storage from '../helpers/Storage';
+import Slider from './Slider';
+import * as VehicleLooks from '../services/SearchVehicleType';
+import * as VehicleService from '../services/Vehicle';
+export var GetSpecificVehicle;
 export default class Detail extends React.Component {
     constructor(props) {
         super(props);
@@ -44,13 +48,50 @@ export default class Detail extends React.Component {
             saleSwitch: false,
             userId: Storage.userData.userId,
             ownerId: 0,
-            vehicleId: 0
+            vehicleId: 0,
+            PremiumDate:0,
+            features:[],
+            allfeatures:[],
+        }
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            this.GetSpecificVehicle(this.props.navigation.state.params.item.id)
+
+        })
+    }
+    
+    GetSpecificVehicle = GetSpecificVehicle = async (id) => {
+        var response = await VehicleService.GetSpecificVehicle(id)
+        var vehicleData=response.vehicle
+        if(response.success){
+            this.setState({
+                registerNo: vehicleData.registrationNumber,
+                vehicleId: vehicleData.id,
+                make: vehicleData.make,
+                model: vehicleData.model,
+                year: vehicleData.buildYear,
+                transmission: vehicleData.transmissionType,
+                engine: vehicleData.engineSize + " " + vehicleData.fuelType,
+                doors: vehicleData.doorCount,
+                seats: vehicleData.seatCount,
+                bodyType: vehicleData.bodyType,
+                color: vehicleData.colour,
+                // image: vehicleData.user.imageUrl,
+                // image: vehicleData.images[0],
+                image: vehicleData.images,
+                descrption: vehicleData.description,
+                price: vehicleData.price,
+                saleSwitch: vehicleData.forSale,
+                // parent: parent,
+                ownerId: vehicleData.userID,
+                // PremiumDate:vehicleData.PremiumDate,
+                features:vehicleData.features,
+             })
         }
     }
 
     UNSAFE_componentWillMount() {
         let vehicleData = this.props.navigation.state.params.item
-        console.log("ikm",vehicleData)
+        console.log("vehicleData",vehicleData);
         let parent = this.props.navigation.state.params.parent
         this.setState({
             registerNo: vehicleData.registrationNumber,
@@ -65,23 +106,43 @@ export default class Detail extends React.Component {
             bodyType: vehicleData.bodyType,
             color: vehicleData.colour,
             // image: vehicleData.user.imageUrl,
-            image: vehicleData.images[0],
+            // image: vehicleData.images[0],
+            image: vehicleData.images,
             descrption: vehicleData.description,
             price: vehicleData.price,
             saleSwitch: vehicleData.forSale,
             parent: parent,
-            ownerId: vehicleData.userID
-        })
+            ownerId: vehicleData.userID,
+            PremiumDate:vehicleData.PremiumDate,
+            features:vehicleData.features,
+         })
+         this.VehicleLookupAllFeatures();
+        
     }
-
-    toggleSwitch = (value) => {
-        this.setState({ saleSwitch: value })
+   
+    VehicleLookupAllFeatures = async () => {
+        var response = await VehicleLooks.VehicleLookupAllFeatures()
+       var allfeatures=response.features
+        for(var i =0 ; i <allfeatures.length ; i ++){
+            allfeatures[i].checkBox =false
+            for(var j=0 ; j<this.state.features.length ; j ++){
+                if(allfeatures[i].id == this.state.features[j].id){
+                    allfeatures[i].checkBox=true
+                }
+            }
+        }
+        this.setState({
+            allfeatures: allfeatures,
+        
+        })
+    
     }
 
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;
         this.props.navigation.navigate("EditVehicle", {
-            item: data
+            item: data,
+            allfeatures:this.state.allfeatures
         })
     }
     viewMessage = () => {
@@ -103,14 +164,22 @@ export default class Detail extends React.Component {
                 <Topbar ParentPage="Detail" EditVehicle={this.EditVehicle} parent={this.state.parent} navigation={this.props} />
                 <ScrollView style={{ paddingBottom: 20 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
-                        {!Utilities.stringIsEmpty(this.state.image) ?
-                            <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
+                        {!Utilities.stringIsEmpty(this.state.image[0]) ?
+                         <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
+                             {(this.state.image.length > 1)?
+                <View>
+
+                                        <Text style={{ zIndex: 2, position: 'absolute', top: 22, color: '#fefefe', fontSize: 14, rotation: -40, left: 4, borderRadius: 3, backgroundColor: Apptheme, paddingVertical: 2, paddingHorizontal: 5, }}>Premium</Text>
+                                        <Slider Image={this.state.image} />
+                                    </View>
+                            :
                                 <Image
                                     resizeMode='cover'
                                     style={{ width: '100%', height: '100%' }}
-                                    source={{ uri: this.state.image.url }}
+                                    source={{ uri: this.state.image[0].url }}
                                 />
-                            </Transition>
+                             }
+                                </Transition>
                             :
                             <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: lightBg }}>
                                 <FontAwesome name="car" size={150} color={Apptheme} />
@@ -281,17 +350,37 @@ export default class Detail extends React.Component {
 
                     {this.state.parent == "talk" &&
                         <View>
+
+                        <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ color: Apptheme, fontSize: 16 }}>FEATURES</Text>
+                        </View>
+                                {this.state.features.length >0 &&
+                                 <View style={{ width: '100%', paddingHorizontal: 20 }}>
+                                     {this.state.features.map((item,index)=>{
+                                         return (
+                                             <Text style={{textAlign:'center'}}>
+                                                 {item.name}
+                                             </Text>
+                                         )
+                                     })}
+                                 
+                             </View>
+                                
+                                
+                                }
                             <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
                                 <Text style={{ color: Apptheme, fontSize: 16 }}>MORE DESCRPTION</Text>
                             </View>
 
                             <View style={{ width: '100%', paddingHorizontal: 20 }}>
-                                <Text>
+                            <Text style={{textAlign:'center'}}>
                                     {this.state.descrption}
                                 </Text>
                             </View>
 
-                            <View style={[styles.ButtonView, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
+                           
+
+                            <View style={[styles.ButtonView, {marginTop:20, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
                                 <Text >For Sale? </Text>
                                 <Switch
                                     thumbColor={Apptheme}
@@ -320,14 +409,14 @@ export default class Detail extends React.Component {
                                 </TouchableOpacity>
                             </LinearGradient>
                             }
-                            
-
-                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
-                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("Message")}>
+                        {this.state.PremiumDate == 0 &&
+                         <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("ListingType")}>
                                     {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
                                     <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>UPGRADE TO PREMIUM</Text>
                                 </TouchableOpacity>
                             </LinearGradient>
+    }
                         </View>
                     }
 

@@ -12,6 +12,8 @@ import {
     Dimensions,
     Switch,
     Keyboard,
+    Modal,
+    CheckBox,
     TouchableOpacity
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -21,12 +23,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import Topbar from '../components/Topbar';
 import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
-
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Utilities from "../helpers/Utilities";
 import * as UserService from '../services/User';
 import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
 import * as VehicleService from '../services/Vehicle';
+import {GetSpecificVehicle} from './Detail';
 export default class EditVehicle extends React.Component {
 
     constructor(props) {
@@ -38,14 +41,22 @@ export default class EditVehicle extends React.Component {
             description: '',
             saleSwitch: false,
             image: '',
+            allImages:[],
             allData:'',
-            isLoader:false
+            isLoader:false,
+            PremiumDate:0,
+            allfeatures: [],
+            features: [],
+            isModal:false,
         }
+        
     }
 
     UNSAFE_componentWillMount() {
         try{
         let params = this.props.navigation.state.params.item
+        var sortedImage=params.images.sort(function(a, b){return a.position - b.position});
+        let allfeatures = this.props.navigation.state.params.allfeatures
         this.setState({
             allData:params,
             description: params.description,
@@ -53,12 +64,17 @@ export default class EditVehicle extends React.Component {
             price: (params.price > 0) ? params.price : "",
             saleSwitch: !params.sold,
             mileage: (!Utilities.stringIsEmpty(params.userMileage) ? params.userMileage : ""),
-            image: params.images[0],
+            image: sortedImage[0],
+            features:params.features,
+            PremiumDate:params.PremiumDate,
+            allImages:params.images,
+            allfeatures:allfeatures
         })
     }
     catch(e){
         console.log("componentWillMount",e)
     }
+   
     }
     onChangeText = (key, value) => {
         this.setState({ [key]: value, })
@@ -68,7 +84,7 @@ export default class EditVehicle extends React.Component {
     }
 
     navigateToVehicleImage() {
-        this.props.navigation.navigate('EditVehicleImage', { item: this.state.image, data: this.props.navigation.state.params.item });
+        this.props.navigation.navigate('EditVehicleImage', {PremiumDate:this.state.PremiumDate, allImages:this.state.allImages,item: this.state.image, data: this.props.navigation.state.params.item });
     }
 
     confirmChange = async () => {
@@ -76,13 +92,17 @@ export default class EditVehicle extends React.Component {
             this.setState({
                 isLoader:true
             })
-            this.state.allData.userMileage=this.state.mileage;
-            this.state.allData.postcode=this.state.postCode;
-            this.state.allData.price=this.state.price;
-            this.state.allData.description=this.state.description;
-            this.state.allData.sold=this.state.saleSwitch;
-            var response = await VehicleService.UpdateVehicle(this.state.allData)
+            let param = {
+                id: this.state.allData.id,
+                userMileage: this.state.mileage,
+                postcode: this.state.postCode,
+                description: this.state.description,
+                price: this.state.price,
+                sold: this.state.saleSwitch
+            }
+             var response = await VehicleService.UpdateVehicle(param)
             if(response){
+                GetSpecificVehicle(this.state.allData.id)
                 this.setState({
                     isLoader:false
                 })
@@ -95,6 +115,44 @@ export default class EditVehicle extends React.Component {
             })
             console.log("confirmChange EditVehicle", e);
         }
+    }
+
+    ToggleModal = () => {
+        this.setState({
+            isModal: !this.state.isModal
+        })
+
+    }
+
+    checkBoxChange(item,checked,index){
+        item.checkBox=checked;
+        this.state.allfeatures.splice(index, 1, item);
+        this.setState({
+            allfeatures:this.state.allfeatures
+        })
+   }
+
+    confirmFeatueUpdate =async () => {
+        var selectedFeatures = []
+        this.ToggleModal()
+        this.setState({
+            isLoader:true
+        })
+        for (var i = 0; i < this.state.allfeatures.length; i++) {
+            if (this.state.allfeatures[i].checkBox) {
+                selectedFeatures.push(this.state.allfeatures[i].id)
+            }
+        }
+        this.state.allData.features = selectedFeatures;
+         var response = await VehicleService.UpdateVehicle(this.state.allData)
+         if(response){
+            GetSpecificVehicle(this.state.allData.id)
+            this.setState({
+                isLoader:false
+            })
+            this.props.navigation.goBack();
+
+    }
     }
     render() {
         return (
@@ -188,12 +246,22 @@ export default class EditVehicle extends React.Component {
                                 value={this.state.saleSwitch} />
                         </View>
 
-
+                            {this.state.PremiumDate > 0 && 
+                             <View style={styles.LoginButtonView}>
+                             <TouchableOpacity style={styles.GradientButtonView} onPress={() => this.ToggleModal()} >
+                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
+                                     <Text style={styles.ButtonInnerText}>
+                                         EDIT FEATURES {this.state.features.length >0 ? `(${this.state.features.length})`:""}
+                                 </Text>
+                                 </LinearGradient>
+                             </TouchableOpacity>
+                         </View>
+                            } 
                         <View style={styles.LoginButtonView}>
                             <TouchableOpacity style={styles.GradientButtonView} onPress={() => this.navigateToVehicleImage()} >
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
-                                        EDIT PHOTO
+                                        EDIT PHOTO {this.state.allImages.length > 1 ? `(${this.state.allImages.length})`:""}
                                 </Text>
                                 </LinearGradient>
                             </TouchableOpacity>
@@ -211,6 +279,76 @@ export default class EditVehicle extends React.Component {
                     </View>
 
                 </ScrollView>
+
+                <Modal
+                animationType="fade"
+                transparent={true}
+                visible={this.state.isModal}
+                onRequestClose={() => {
+                    console.warn("Modal has been closed.");
+                    this.ToggleModal()
+                }}
+
+            >
+                <TouchableOpacity onPress={() => this.ToggleModal()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
+                </TouchableOpacity>
+                <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '10%', height: '80%', width: '86%', marginHorizontal: '7%', }}>
+                    <View style={{ width: '100%', height: '100%' }}>
+                        <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={[styles.headerModalText, { paddingTop: 0,fontSize:18,fontWeight:'bold' }]}>
+                                Features
+                            </Text>
+                        </View>
+                        <View style={{height:'78%'}}>
+                        <ScrollView keyboardShouldPersistTaps='handled'>
+                            <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
+                             {this.state.allfeatures.map((item, index) => {
+                                 if(item.checkBox){
+                                    return (
+                                        <TouchableOpacity
+                                        key={index}
+                                         onPress={() => this.checkBoxChange(item,false,index)} 
+                                         style={{ flexDirection:'row',width: '100%', marginVertical: 10, marginHorizontal: 1 }} key={index}>
+                                            <Text style={{ paddingHorizontal: 10, color: "#333", fontSize: 14 }}>{item.name}</Text>
+                                            <TouchableOpacity  onPress={() => this.checkBoxChange(item,true,index)}  style={{justifyContent:'center',backgroundColor:Apptheme,alignItems:'center',width:15,height:15,position:'absolute',right:25}}>
+                                           <Feather onPress={() => this.checkBoxChange(item,true,index)} name="check" size={14} color={'#fff'}/>
+                                            </TouchableOpacity>
+                                         </TouchableOpacity>
+                                    )
+                                        }
+                                     
+                                        else{
+                                            return (
+                                            <TouchableOpacity
+                                            key={index}
+                                             onPress={() => this.checkBoxChange(item,true,index)} 
+                                             style={{ flexDirection:'row',width: '100%', marginVertical: 10, marginHorizontal: 1 }} key={index}>
+                                                <Text style={{ paddingHorizontal: 10, color: "#333", fontSize: 14 }}>{item.name}</Text>
+                                                <TouchableOpacity onPress={() => this.checkBoxChange(item,true,index)}  style={{justifyContent:'center',alignItems:'center',width:15,height:15,position:'absolute',right:25,borderColor:'#d2d2d2',borderWidth:1}}>
+                                               </TouchableOpacity>
+                                             </TouchableOpacity>
+                                        )
+                                        }
+                                })}
+                            </View>
+                        </ScrollView>
+                        </View>
+                        <View style={styles.TextFieldView}>
+                        <View style={styles.LoginButtonView}>
+                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.confirmFeatueUpdate()  }} >
+                                <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
+                                    <Text style={styles.ButtonInnerText}>
+                                       SAVE
+                                </Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>     
+                        </View>     
+                    </View >
+
+
+                </SafeAreaView>
+            </Modal >
             </View>
         )
 

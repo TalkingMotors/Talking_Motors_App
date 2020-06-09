@@ -25,7 +25,7 @@ import * as Utilities from "../helpers/Utilities";
 import * as UserService from '../services/User';
 import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
-
+import SplashScreen from 'react-native-splash-screen'
 export default class Login extends React.Component {
 
     constructor(props) {
@@ -34,8 +34,10 @@ export default class Login extends React.Component {
             secureTextEntry: true,
             // username: "maazmehtabuddin95@gmail.com",
             // password: "12345678",
-            username: "Manawar@talkingmotorsapp.com",
-            password: "infobank",
+            // username: "Manawar@talkingmotorsapp.com",
+            // password: "infobank",
+            username: "",
+            password: "",
             loginFail: false,
             loginFailMessage: "",
             isloader: false,
@@ -46,12 +48,14 @@ export default class Login extends React.Component {
         }
 
         if (Object.keys(Storage.userData).length > 0) {
-            this.props.navigation.navigate("Home")
+             this.props.navigation.navigate("Home")
         } else {
             Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(response => {
                 if (response) {
                     Storage.userData = JSON.parse(response);
                     this.props.navigation.navigate("Home")
+                    SplashScreen.hide();
+                    
                 }
             })
 
@@ -60,10 +64,18 @@ export default class Login extends React.Component {
     componentDidMount = () => {
         this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
             if (Object.keys(Storage.userData).length > 0) {
+                
+                SplashScreen.hide();
                 this.props.navigation.navigate("Home")
+             
+            }
+            else{
+               
+                SplashScreen.hide();
             }
         }
         );
+        // SplashScreen.hide();
     }
     onChangeText = (key, value) => {
         this.setState({ [key]: value, loginFail: false })

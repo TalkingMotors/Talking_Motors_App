@@ -9,8 +9,6 @@ import Storage from '../helpers/Storage';
 export let getVehicleBy = async (vrn) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.GET_VEHICLE_BY_VRM_ENDPOINT + vrn)
-            console.log("Bearer " + Storage.jwt_Token);
             let response = await fetch(APIConstants.GET_VEHICLE_BY_VRM_ENDPOINT + vrn, {
                 method: 'GET',
                 crossDomain: true,
@@ -48,13 +46,15 @@ export let myVehicle = async () => {
 }
 
 
-export let RemoveVehicleImage = async () => {
+export let RemoveVehicleImage = async (params) => {
     try {
-        if (Storage.networkStatus.isConnected) {
+       if (Storage.networkStatus.isConnected) {
             console.log(APIConstants.REMOVE_VEHICLE_IMAGE_ENDPOINT)
             let response = await fetch(APIConstants.REMOVE_VEHICLE_IMAGE_ENDPOINT, {
-                method: 'GET',
+                method: 'DELETE',
                 crossDomain: true,
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
             })
             let result = response.json()
             return result;
@@ -87,7 +87,7 @@ export let InsertVehicleImage = async (params) => {
 }
 export let UpdateVehicle = async (params) => {
     try {
-        if (Storage.networkStatus.isConnected) {
+       if (Storage.networkStatus.isConnected) {
             console.log(APIConstants.VEHICLE_ENDPOINT)
             let response = await fetch(APIConstants.VEHICLE_ENDPOINT, {
                 method: 'PATCH',
@@ -105,6 +105,25 @@ export let UpdateVehicle = async (params) => {
     }
 }
 
+export let GetSpecificVehicle = async (id) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.VEHICLE_ENDPOINT)
+           let response = await fetch(APIConstants.VEHICLE_ENDPOINT + id, {
+                method: 'GET',
+                headers: Utilities.setHeaders(),
+                // body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
 
 
 

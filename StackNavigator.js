@@ -22,6 +22,7 @@ import EditVehicle from './src/screens/EditVehicle';
 import EditVehicleImage from './src/screens/EditVehicleImage';
 import BlockUser from './src/screens/BlockUser';
 import Setting from './src/screens/Setting';
+import ForgotPassword from './src/screens/ForgotPassword';
 
 const MyStackNavigator = createStackNavigator(
     {
@@ -44,6 +45,7 @@ const MyStackNavigator = createStackNavigator(
         EditVehicleImage: { screen: EditVehicleImage },
         BlockUser: { screen: BlockUser },
         Setting: { screen: Setting },
+        ForgotPassword: { screen: ForgotPassword },
     },
     {
         initialRouteName: 'Login',

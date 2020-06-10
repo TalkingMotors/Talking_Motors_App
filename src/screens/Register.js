@@ -9,6 +9,8 @@ import {
     Image,
     StatusBar,
     ActivityIndicator,
+    Alert,
+    Modal,
     Dimensions,
     Keyboard,
     TouchableOpacity
@@ -18,9 +20,9 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import Topbar from '../components/Topbar';
-import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
+import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText ,GreenBg} from '../helpers/CommponStyle';
 import { TextField } from 'react-native-material-textfield';
-
+import SplashScreen from 'react-native-splash-screen'
 import * as Utilities from "../helpers/Utilities";
 import * as UserService from '../services/User';
 import Constants from "../helpers/Constants";
@@ -49,8 +51,15 @@ export default class Register extends React.Component {
             errorPassword: false,
             errorConfirmPassoword: false,
             isLoader: false,
+            isModal: false,
         }
+        SplashScreen.hide()
 
+    }
+    ToggleModal = () => {
+        this.setState({
+            isModal: !this.state.isModal
+        })
     }
 
     onChangeText = (key, value) => {
@@ -58,47 +67,56 @@ export default class Register extends React.Component {
     }
     register = () => {
         try {
+            Keyboard.dismiss()
             if (Utilities.stringIsEmpty(this.state.name)) {
                 this.setState({
-                    errorName:true
+                    errorName: true
                 })
                 return
             }
             if (Utilities.stringIsEmpty(this.state.nickName)) {
                 this.setState({
-                    errorUserName:true
+                    errorUserName: true
                 })
                 return
             }
-           
+
             if (Utilities.stringIsEmpty(this.state.email)) {
                 this.setState({
-                    errorEmaill:true
+                    errorEmaill: true
                 })
                 return
             }
+            else if (Utilities.emailRegex.test(this.state.email) == false) {
+                this.setState({
+                    errorEmaill: true,
+                    errorMessage: "Enter a valid E-mail."
+                })
+                return 
+            }
+          
             if (Utilities.stringIsEmpty(this.state.telephone)) {
                 this.setState({
-                    errorPhone:true
+                    errorPhone: true
                 })
                 return
             }
             if (Utilities.stringIsEmpty(this.state.password)) {
                 this.setState({
-                    errorPassword:true
+                    errorPassword: true
                 })
                 return
             }
             else if (Utilities.stringIsEmpty(this.state.confirmPassword)) {
                 this.setState({
-                    errorConfirmPassoword:true
+                    errorConfirmPassoword: true
                 })
                 return
             }
             else if (this.state.password != this.state.confirmPassword) {
                 this.setState({
-                    passwordMisMatched:true,
-                    errorMessage:"Password Mis Mathed."
+                    passwordMisMatched: true,
+                    errorMessage: "Password mismatch."
                 })
                 return
             }
@@ -106,8 +124,10 @@ export default class Register extends React.Component {
             this.setState({
                 isloader: true
             })
+            console.log("params",params);
             UserService.register(params).then(response => {
                 if (response) {
+                    console.log("response",response);
                     if (response.success) {
                         Storage.userData = response.user;
                         Storage.jwt_Token = response.token;
@@ -116,7 +136,8 @@ export default class Register extends React.Component {
                         this.setState({
                             isloader: false
                         })
-                        this.props.navigation.navigate("Home")
+                        this.ToggleModal()
+                        // this.props.navigation.navigate("Home")
                     }
                     else {
                         this.setState({
@@ -161,6 +182,18 @@ export default class Register extends React.Component {
                             />
                         </LinearGradient>
                     </View>
+                    {
+                        this.state.loginFail &&
+                        <View style={styles.TextFieldView}>
+                            <View style={styles.LoginView}>
+                                <Text style={styles.errorViewText}>
+                                    {
+                                        this.state.loginFailMessage
+                                    }
+                                </Text>
+                            </View>
+                        </View>
+                    }
                     <View style={styles.TextFieldView}>
                         <TextField
                             label='Enter Name'
@@ -174,12 +207,12 @@ export default class Register extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.name}
-                            onChangeText={val => { 
+                            onChangeText={val => {
                                 this.onChangeText('name', val)
                                 this.setState({
-                                    errorName:false
+                                    errorName: false
                                 })
-                             }}
+                            }}
                         />
                         {this.state.errorName &&
                             <View style={styles.errorView}>
@@ -201,10 +234,10 @@ export default class Register extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.nickName}
-                            onChangeText={val => { 
+                            onChangeText={val => {
                                 this.onChangeText('nickName', val)
                                 this.setState({
-                                    errorUserName:false
+                                    errorUserName: false
                                 })
                             }}
                         />
@@ -215,7 +248,7 @@ export default class Register extends React.Component {
                                 </Text>
                             </View>
                         }
-                          <TextField
+                        <TextField
                             label='Enter Email'
                             fontSize={13}
                             keyboardType='email-address'
@@ -227,14 +260,14 @@ export default class Register extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.email}
-                            onChangeText={val => { 
+                            onChangeText={val => {
                                 this.onChangeText('email', val)
                                 this.setState({
-                                    errorEmaill:false
+                                    errorEmaill: false
                                 })
-                             }}
+                            }}
                         />
-                        
+
                         {this.state.errorEmaill &&
                             <View style={styles.errorView}>
                                 <Text style={styles.errorViewText}>
@@ -254,12 +287,12 @@ export default class Register extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.telephone}
-                            onChangeText={val => { 
+                            onChangeText={val => {
                                 this.onChangeText('telephone', val)
                                 this.setState({
-                                    errorPhone:false
+                                    errorPhone: false
                                 })
-                             }}
+                            }}
                         />
 
                         {this.state.errorPhone &&
@@ -270,7 +303,7 @@ export default class Register extends React.Component {
                             </View>
                         }
 
-                      
+
                         <View>
                             <TextField
                                 label='Enter Password'
@@ -329,22 +362,22 @@ export default class Register extends React.Component {
                             labelFontSize={13}
                             secureTextEntry={this.state.secureTextEntry}
                             value={this.state.confirmPassword}
-                            onChangeText={val => { 
+                            onChangeText={val => {
                                 this.onChangeText('confirmPassword', val)
                                 this.setState({
-                                    errorConfirmPassoword:false,
-                                    passwordMisMatched:false
+                                    errorConfirmPassoword: false,
+                                    passwordMisMatched: false
                                 })
-                         }}
+                            }}
                         />
-                         {this.state.errorConfirmPassoword &&
+                        {this.state.errorConfirmPassoword &&
                             <View style={styles.errorView}>
                                 <Text style={styles.errorViewText}>
                                     {this.state.errorMessage}
                                 </Text>
                             </View>
                         }
-                         {this.state.passwordMisMatched &&
+                        {this.state.passwordMisMatched &&
                             <View style={styles.errorView}>
                                 <Text style={styles.errorViewText}>
                                     {this.state.errorMessage}
@@ -363,6 +396,58 @@ export default class Register extends React.Component {
                         </View>
                     </View>
                 </ScrollView>
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isModal}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.ToggleModal()
+                    }}
+
+                >
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '30%', height: '40%', width: '86%', marginHorizontal: '7%', }}>
+                        <View style={{ width: '100%', height: '100%' }}>
+                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0, fontSize: 20, fontWeight: 'bold' }]}>
+                                    Registration complete
+                            </Text>
+                            </View>
+                            <View style={{ height: '78%',  }}>
+                                <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
+                                    <View style={{alignItems:'center'}}>
+                                   <FontAwesome name="check-circle" size={76} style={{paddingVertical:15}} color={GreenBg} />
+                                   <Text style={{fontSize:16,color:"black"}}>
+                                        Welcome to Talking Motors
+                                    </Text>
+                                    </View>
+
+                                    <View style={{marginTop:20,flexDirection:'row',justifyContent:"flex-end"}}>
+                                    <TouchableOpacity
+                                    onPress={()=>{
+                                        this.ToggleModal()
+                                        this.props.navigation.replace("Home")
+                                    }} style={{padding:10,marginHorizontal:5}}>
+                                        <Text style={{color:Apptheme,}}>
+                                            CONTINUE
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={()=>{
+                                        this.ToggleModal()
+                                        this.props.navigation.replace("ListVehicle")
+                                    }} style={{padding:10,marginHorizontal:5}}>
+                                    <Text style={{color:Apptheme,}}>
+                                            ADD A VEHICLE
+                                        </Text>
+                                    </TouchableOpacity>
+                                    </View>
+
+                                   
+                                </View>
+                            </View>
+                         </View >
+                  </SafeAreaView>
+                </Modal>
             </View>
         )
     }

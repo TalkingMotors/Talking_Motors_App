@@ -35,7 +35,7 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.screenProps.openDraw()}
                         name="menu" color={lightText} size={22} style={styles.Icons} />
                     {/* <Text style={styles.ScreenName}>{this.props.ParentPage}</Text> */}
-                    <View style={{justifyContent:'center',alignItems:'center',width:'75%'}}>
+                    <View style={{justifyContent:'center',alignItems:'center',width:'75%',backgroundColor:"green"}}>
                      <Image
                         resizeMode="contain"
                         style={{ height: 50, width: 50 }}

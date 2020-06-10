@@ -15,6 +15,7 @@ import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/
 import * as Utilities from "../helpers/Utilities";
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Storage from '../helpers/Storage';
 export default class Topbar extends React.Component {
     constructor(props) {
         super(props);
@@ -36,7 +37,6 @@ export default class Topbar extends React.Component {
                     <Feather
                         onPress={() => this.props.navigation.screenProps.openDraw()}
                         name="menu" color={lightText} size={22} style={styles.Icons} />
-                    {/* <Text style={styles.ScreenName}>{this.props.ParentPage}</Text> */}
                     <View style={{ justifyContent: 'center', alignItems: 'center', width: '75%' }}>
                         <Image
                             resizeMode="contain"
@@ -45,7 +45,10 @@ export default class Topbar extends React.Component {
                         />
                     </View>
                     <FontAwesome onPress={() => this.props.Dashboard()} name="dashboard" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
-                </View>
+                    {Object.keys(Storage.userData).length > 0 &&
+                        <FontAwesome onPress={() => this.props.Profile()} name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 60 }]} />
+                    }
+                    </View>
             )
         }
 

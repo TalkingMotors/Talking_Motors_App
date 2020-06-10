@@ -8,6 +8,7 @@ import {
     Image,
     TextInput,
     StatusBar,
+    Modal,
     StyleSheet,
     ImageBackground,
     TouchableOpacity
@@ -41,13 +42,20 @@ export default class Home extends React.Component {
             Text3: darkText,
             Text4: lightText,
             Text5: darkText,
-            parent:''
+            parent:'',
+            isTalkModal:false,
+            isModal:false
         }
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
         this.navigateToVehicleType = this.navigateToVehicleType.bind(this)
         Utilities.asyncStorage_GetKey(Constants.JWT_TOKEN).then(response => {
              Storage.jwt_Token = JSON.parse(response)
+        })
+    }
+    ToggleModal = () => {
+        this.setState({
+            isModal: !this.state.isModal
         })
     }
     componentDidMount = () => {
@@ -80,6 +88,15 @@ export default class Home extends React.Component {
         }
     }
 
+    navigateToProfile = () => {
+        if (Object.keys(Storage.userData).length > 0) {
+        this.props.navigation.navigate("Profile")
+        }
+        else{
+            this.props.navigation.navigate("Login")
+        }
+    }
+
     TalkModalToggle = (parent) => {
         this.setState({
             isTalkModal: !this.state.isTalkModal,
@@ -101,7 +118,8 @@ export default class Home extends React.Component {
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar Dashboard={this.navigateToDashboard} ParentPage="Home" navigation={this.props} />
+                <Topbar Dashboard={this.navigateToDashboard} Profile={this.navigateToProfile} ParentPage="Home" navigation={this.props} />
+              
                 <View style={styles.BoxView}>
                     <View style={styles.BoxParent}>
                         <TouchableHighlight
@@ -109,7 +127,14 @@ export default class Home extends React.Component {
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text1: Apptheme })}
                             onPressOut={() => this.setState({ Text1: darkText })}
-                            onPress={() => { this.props.navigation.navigate("ListVehicle") }}
+                            onPress={() => { 
+                                if (Object.keys(Storage.userData).length > 0) {
+                                    this.props.navigation.navigate("ListVehicle");
+                                }
+                                else {
+                                    this.ToggleModal();
+                                }
+                            }}
                             style={styles.ButtonView}>
                             <View style={styles.BoxTitleView}>
                                 <Text style={[styles.BoxTitleText, { color: this.state.Text1 }]}>
@@ -241,6 +266,55 @@ export default class Home extends React.Component {
                 {this.state.isSearchVehicleModal &&
                     <SearchVehicleModal navigateToVehicleType={this.navigateToVehicleType} TalkModalToggle={this.TalkModalToggle} SearchVehicleModalToggle={this.SearchVehicleModalToggle} />
                 }
+
+                    <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isModal}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.ToggleModal()
+                    }}
+
+                >
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '40%', height: '20%', width: '86%', marginHorizontal: '7%', }}>
+                        <View style={{ width: '100%', height: '100%' }}>
+                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center',  }}>
+                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0,paddingLeft:10, fontSize: 20, fontWeight: 'bold' }]}>
+                                    Add a vehicle
+                            </Text>
+                            </View>
+                            <View style={{ height: '78%',  }}>
+                                <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
+                                    
+                                    <Text style={{fontSize:14,color:"black",paddingHorizontal:10}}>
+                                        You need to be logged in tp add a vehicle.
+                                    </Text>
+                                    <View style={{marginTop:20,flexDirection:'row',justifyContent:"flex-end"}}>
+                                    <TouchableOpacity
+                                    onPress={()=>{
+                                        this.ToggleModal()
+                                    }} style={{padding:10,marginHorizontal:5}}>
+                                        <Text style={{color:Apptheme,}}>
+                                            CANCEL
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={()=>{
+                                        this.ToggleModal()
+                                        this.props.navigation.replace("Login")
+                                    }} style={{padding:10,marginHorizontal:5}}>
+                                    <Text style={{color:Apptheme,}}>
+                                          LOGIN
+                                        </Text>
+                                    </TouchableOpacity>
+                                    </View>
+
+                                   
+                                </View>
+                            </View>
+                         </View >
+                  </SafeAreaView>
+                </Modal>
             </View>
         )
     }

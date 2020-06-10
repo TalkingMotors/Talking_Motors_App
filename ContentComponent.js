@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     Image,
     TouchableHighlight,
-    StyleSheet
+    StyleSheet,
+    Modal,
 
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -23,21 +24,44 @@ import Storage from './src/helpers/Storage';
 export default class ContentContainer extends React.Component {
     constructor(props) {
         super(props);
+        this.state={
+            isModal:false
+        }
 
     }
+    ToggleModal = () => {
+        this.setState({
+            isModal: !this.state.isModal
+        })
+    }
+    navigatetoComponent = (pageName) => {
+        if(Object.keys(Storage.userData).length>0){
+
+            this.props.navigation.navigate(pageName)
+        }
+        else{
+            this.ToggleModal()
+            // this.props.navigation.navigate("Login")
+        }
+    }
     render() {
-        return (
+       return (
             <View style={styles.ParentView}>
                 <LinearGradient colors={LinearColor} style={styles.SidebarProfileView}>
                     <View style={styles.userProfileView}>
-                        {/* <FontAwesome name='user' color="gray" size={40} /> */}
-                        <Image
-                                style={{ borderRadius: 55, width: '100%', height: '100%' }}
-                                source={{ uri: Storage.userData.thumbUrl }}
-                            />
+                       
+                        {!Utilities.stringIsEmpty(Storage.userData.thumbUrl)?
+                         <Image
+                         style={{ borderRadius: 55, width: '100%', height: '100%' }}
+                         source={{ uri: Storage.userData.thumbUrl }}
+                     />
+                        :
+                          <FontAwesome name='user' color="gray" size={40} /> 
+                        }
+                       
                     </View>
                     <Text style={styles.userEmail}>
-                        Wellcome  {'\n'} {Storage.userData.name}
+                        Welcome  {'\n'} {Storage.userData.name}
                     </Text>
                 </LinearGradient>
                 <TouchableOpacity onPress={() => {
@@ -52,7 +76,7 @@ export default class ContentContainer extends React.Component {
                         Home
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Profile')} style={styles.SideMenuItemView}>
+                <TouchableOpacity onPress={() => this.navigatetoComponent('Profile')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <FontAwesome name='address-card' style={styles.SideMenuIcon}
                         />
@@ -62,7 +86,7 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Dashboard')} style={styles.SideMenuItemView}>
+                <TouchableOpacity onPress={() => this.navigatetoComponent('Dashboard')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <FontAwesome name='dashboard' style={styles.SideMenuIcon}
                         />
@@ -86,7 +110,7 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('ListingType')} style={styles.SideMenuItemView}>
+                <TouchableOpacity onPress={() => this.navigatetoComponent('ListingType')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <FontAwesome name='tags' style={styles.SideMenuIcon}
                         />
@@ -96,7 +120,7 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Message')} style={styles.SideMenuItemView}>
+                <TouchableOpacity onPress={() => this.navigatetoComponent('Message')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <Feather name='message-square' style={styles.SideMenuIcon}
                         />
@@ -158,6 +182,56 @@ export default class ContentContainer extends React.Component {
                     </Text>
                     </TouchableOpacity>
                 }
+
+<Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isModal}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.ToggleModal()
+                    }}
+
+                >
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '40%', height: '25%', width: '86%', marginHorizontal: '7%', }}>
+                        <View style={{ width: '100%', height: '100%' }}>
+                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center',  }}>
+                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0,paddingLeft:10, fontSize: 20, fontWeight: 'bold' }]}>
+                                   Login
+                            </Text>
+                            </View>
+                            <View style={{ height: '78%',  }}>
+                                <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
+                                    
+                                    <Text style={{fontSize:14,color:"black",paddingHorizontal:10}}>
+                                      This option in only available to authenticated users. Press 'Login' below
+                                      to authenticate and continue with this option
+                                    </Text>
+                                    <View style={{marginTop:20,flexDirection:'row',justifyContent:"flex-end"}}>
+                                    <TouchableOpacity
+                                    onPress={()=>{
+                                        this.ToggleModal()
+                                    }} style={{padding:10,marginHorizontal:5}}>
+                                        <Text style={{color:Apptheme,}}>
+                                            CANCEL
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={()=>{
+                                        this.ToggleModal()
+                                        this.props.navigation.navigate("Login")
+                                    }} style={{padding:10,marginHorizontal:5}}>
+                                    <Text style={{color:Apptheme,}}>
+                                          LOGIN
+                                        </Text>
+                                    </TouchableOpacity>
+                                    </View>
+
+                                   
+                                </View>
+                            </View>
+                         </View >
+                  </SafeAreaView>
+                </Modal>
             </View>
 
         );

@@ -36,6 +36,8 @@ export default class Login extends React.Component {
             // password: "12345678",
             // username: "Manawar@talkingmotorsapp.com",
             // password: "infobank",
+            // username: "Ikm_kbq@hotmail.com",
+            // password: "123456789",
             username: "",
             password: "",
             loginFail: false,
@@ -46,6 +48,19 @@ export default class Login extends React.Component {
             errorPassword: false,
             errorPasswordMessage: '',
         }
+        this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
+            if (Object.keys(Storage.userData).length > 0) {
+                
+                SplashScreen.hide();
+                this.props.navigation.navigate("Home")
+             
+            }
+            else{
+               
+                SplashScreen.hide();
+            }
+        }
+        );
 
         if (Object.keys(Storage.userData).length > 0) {
              this.props.navigation.navigate("Home")
@@ -249,7 +264,7 @@ export default class Login extends React.Component {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate("ChangePassword")} style={styles.ForgetPasswordView}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate("ForgotPassword")} style={styles.ForgetPasswordView}>
                             <Text style={styles.ForgetPasswordText}>
                                 Forgot Password?
                         </Text>

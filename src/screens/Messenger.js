@@ -60,8 +60,8 @@ export default class Messenger extends React.Component {
             isChangeConversationNamePopup: false,
             isclearHostoryPopup: false,
             isBlockUserPopup: false,
-
-        }
+            members : {}
+         }
         this.MoreItemsModal = this.MoreItemsModal.bind(this);
         this._keyboardDidShow = this._keyboardDidShow.bind(this);
         this._keyboardDidHide = this._keyboardDidHide.bind(this);
@@ -178,6 +178,22 @@ export default class Messenger extends React.Component {
                         this.state.messages = respose.conversation.messages.sort(function (a, b) {
                             return a.time.localeCompare(b.time);
                         });
+                        var previousDate = ""
+                            this.state.messages.forEach(element => {
+                            if(Utilities.stringIsEmpty(previousDate)) {
+                                element.dateSeprator = Utilities.FormatDate(element.time)
+                                previousDate = Utilities.FormatDate(element.time)
+                            }else if(previousDate != Utilities.FormatDate(element.time))  {
+                                element.dateSeprator = Utilities.FormatDate(element.time)
+                                previousDate = Utilities.FormatDate(element.time)
+                            } else{
+                                element.dateSeprator = ""
+                            }   
+                            
+                            element.time = Utilities.FormatTime(element.time).toLowerCase()
+                            
+                        });
+
                         console.log("ikm-messages",this.state.messages)
                         if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
                             this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
@@ -192,7 +208,9 @@ export default class Messenger extends React.Component {
                             lastReadMessageId: this.state.lastReadMessageId,
                             messages: this.state.messages,
                             convoname: this.state.conversationDetail.name,
-                            isLoad: false
+                            senderName: this.state.conversationDetail.name,
+                            isLoad: false,
+                            members:this.state.conversationDetail.members
                         })
                     }
                     else {
@@ -365,7 +383,7 @@ export default class Messenger extends React.Component {
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar MoreItemsModal={this.MoreItemsModal} ParentPage="Messenger" username={this.state.senderName} image={this.state.senderImageUrl} navigation={this.props} />
+                <Topbar MoreItemsModal={this.MoreItemsModal} ParentPage="Messenger" username={this.state.senderName} image={this.state.senderImageUrl} navigation={this.props} members = {this.state.members} />
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -402,9 +420,18 @@ export default class Messenger extends React.Component {
                                                             <View style={{ borderWidth: 1, alignItems: 'center', borderColor: "#d2d2d2", justifyContent: 'center', backgroundColor: lightBg, width: 50, height: 50, borderRadius: 50, }}>
                                                                 {this.senderImage(item)}
                                                             </View>
+                                                            {
+                                                                item.dateSeprator != "" ?
+                                                                <View>
+                                                                        <Text>{item.dateSeprator}</Text>    
+                                                                </View>:
+                                                                null
+                                                            }
+                                                            
                                                             <View style={styles.ReceivedMessageView}>
+                                                                <Text>{ item.user.name } </Text>
                                                                 <Text style={styles.ReceivedMessageTextTime}>
-                                                                    {Utilities.FormatDate(item.time)}
+                                                                {item.time}
                                                                 </Text>
                                                                 <Text style={styles.ReceivedMessageText}>
                                                                     {item.message}
@@ -414,8 +441,15 @@ export default class Messenger extends React.Component {
                                                         :
                                                         <View style={styles.SendMessageView}>
                                                             <View style={styles.SendMessageBox}>
+                                                            {
+                                                                item.dateSeprator != "" ?
+                                                                <View>
+                                                                        <Text>{item.dateSeprator}</Text>    
+                                                                </View>:
+                                                                null
+                                                            }
                                                                 <Text style={styles.SendMessageTextTime}>
-                                                                    {Utilities.FormatDate(item.time)}
+                                                                    {item.time}
                                                                 </Text>
                                                                 <Text style={styles.SendMessageText}>
                                                                     {item.message}

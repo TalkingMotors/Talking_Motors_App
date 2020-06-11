@@ -15,7 +15,7 @@ export const LinearColor = ['#FE6801', '#FD6B00', '#E96B15']
 export const LinearColorBlue = ['#1f2F98', '#5E72EB']
 export const LinearColorPink = ['#Ea4492', '#ff9a9e']
 // export const LinearColorPink = ['#fecfef', '#ff9a9e']
-export const LinearColorGreen = ['#68b2a0', '#56C596']
+export const LinearColorGreen = ['#A5DD00', '#A5DD00']
 
 
 export default StyleSheet.create({

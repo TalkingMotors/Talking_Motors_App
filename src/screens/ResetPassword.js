@@ -79,7 +79,7 @@ onChangeText = (key, value) => {
             else if (this.state.Password != this.state.ConformPassword) {
                 this.setState({
                     passwordMisMatched: true,
-                    errorMessage: "Password mismatch."
+                    errorMessage: "Passwords don't macth"
                 })
                 return
             }

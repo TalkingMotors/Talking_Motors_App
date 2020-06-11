@@ -11,6 +11,7 @@ import {
     StatusBar,
     StyleSheet,
     Switch,
+    Modal,
     TouchableOpacity
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -18,7 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
+import { Apptheme, lightText, darkText, LinearColor, lightBg,LinearColorGreen ,GreenBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
@@ -49,49 +50,64 @@ export default class Detail extends React.Component {
             userId: Storage.userData.userId,
             ownerId: 0,
             vehicleId: 0,
-            PremiumDate:0,
-            features:[],
-            allfeatures:[],
+            PremiumDate: 0,
+            features: [],
+            allfeatures: [],
+            vehicleData: '',
+            isModal: false
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.GetSpecificVehicle(this.props.navigation.state.params.item.id)
 
         })
     }
-    
+    ToggleModal = () => {
+        this.setState({
+            isModal: !this.state.isModal
+        })
+    }
     GetSpecificVehicle = GetSpecificVehicle = async (id) => {
-        var response = await VehicleService.GetSpecificVehicle(id)
-        var vehicleData=response.vehicle
-        if(response.success){
-            this.setState({
-                registerNo: vehicleData.registrationNumber,
-                vehicleId: vehicleData.id,
-                make: vehicleData.make,
-                model: vehicleData.model,
-                year: vehicleData.buildYear,
-                transmission: vehicleData.transmissionType,
-                engine: vehicleData.engineSize + " " + vehicleData.fuelType,
-                doors: vehicleData.doorCount,
-                seats: vehicleData.seatCount,
-                bodyType: vehicleData.bodyType,
-                color: vehicleData.colour,
-                // image: vehicleData.user.imageUrl,
-                // image: vehicleData.images[0],
-                image: vehicleData.images,
-                descrption: vehicleData.description,
-                price: vehicleData.price,
-                saleSwitch: vehicleData.forSale,
-                // parent: parent,
-                ownerId: vehicleData.userID,
-                // PremiumDate:vehicleData.PremiumDate,
-                features:vehicleData.features,
-             })
+        try {
+            var response = await VehicleService.GetSpecificVehicle(id)
+            var vehicleData = response.vehicle
+            if (response.success) {
+                this.setState({
+                    registerNo: vehicleData.registrationNumber,
+                    vehicleId: vehicleData.id,
+                    make: vehicleData.make,
+                    model: vehicleData.model,
+                    year: vehicleData.buildYear,
+                    transmission: vehicleData.transmissionType,
+                    engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
+                    doors: vehicleData.doorCount,
+                    seats: vehicleData.seatCount,
+                    bodyType: vehicleData.bodyType,
+                    color: vehicleData.colour,
+                    // image: vehicleData.user.imageUrl,
+                    // image: vehicleData.images[0],
+                    image: vehicleData.images,
+                    descrption: vehicleData.description,
+                    price: vehicleData.price,
+                    saleSwitch: vehicleData.forSale,
+                    // parent: parent,
+                    ownerId: vehicleData.userID,
+                    // PremiumDate:vehicleData.PremiumDate,
+                    features: vehicleData.features,
+                    vehicleData: vehicleData
+                }, () => {
+                    console.log('this.state', this.state);
+                })
+
+            }
+        }
+        catch (e) {
+            console.log("Exception GetSpecificVehicle", e)
         }
     }
 
     UNSAFE_componentWillMount() {
         let vehicleData = this.props.navigation.state.params.item
-        console.log("vehicleData",vehicleData);
+        console.log("vehicleData", vehicleData);
         let parent = this.props.navigation.state.params.parent
         this.setState({
             registerNo: vehicleData.registrationNumber,
@@ -100,7 +116,7 @@ export default class Detail extends React.Component {
             model: vehicleData.model,
             year: vehicleData.buildYear,
             transmission: vehicleData.transmissionType,
-            engine: vehicleData.engineSize + " " + vehicleData.fuelType,
+            engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
             doors: vehicleData.doorCount,
             seats: vehicleData.seatCount,
             bodyType: vehicleData.bodyType,
@@ -113,73 +129,86 @@ export default class Detail extends React.Component {
             saleSwitch: vehicleData.forSale,
             parent: parent,
             ownerId: vehicleData.userID,
-            PremiumDate:vehicleData.PremiumDate,
-            features:vehicleData.features,
-         })
-         this.VehicleLookupAllFeatures();
-        
+            PremiumDate: vehicleData.PremiumDate,
+            features: vehicleData.features,
+            vehicleData: vehicleData
+        })
+        this.VehicleLookupAllFeatures();
+
     }
-   
+
     VehicleLookupAllFeatures = async () => {
         var response = await VehicleLooks.VehicleLookupAllFeatures()
-       var allfeatures=response.features
-        for(var i =0 ; i <allfeatures.length ; i ++){
-            allfeatures[i].checkBox =false
-            for(var j=0 ; j<this.state.features.length ; j ++){
-                if(allfeatures[i].id == this.state.features[j].id){
-                    allfeatures[i].checkBox=true
+        var allfeatures = response.features
+        for (var i = 0; i < allfeatures.length; i++) {
+            allfeatures[i].checkBox = false
+            for (var j = 0; j < this.state.features.length; j++) {
+                if (allfeatures[i].id == this.state.features[j].id) {
+                    allfeatures[i].checkBox = true
                 }
             }
         }
         this.setState({
             allfeatures: allfeatures,
-        
+
         })
-    
+
     }
 
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;
         this.props.navigation.navigate("EditVehicle", {
             item: data,
-            allfeatures:this.state.allfeatures
+            allfeatures: this.state.allfeatures
         })
     }
     viewMessage = () => {
         this.props.navigation.navigate("Message")
     }
-    sendMessage =()=> {
-      var message =  {
+    sendMessage = () => {
+        try{
+            if(Object.keys(Storage.userData).length>0){
+
+           
+        var message = {
             vrm: this.state.registerNo,
             userId: this.state.ownerId,
             vehicleId: this.state.vehicleId,
             message: "",
             image: null
-          }
-        this.props.navigation.navigate("Messenger", {conversationId : 0, messageBody: message })
+        }
+        this.props.navigation.navigate("Messenger", { conversationId: 0, messageBody: message })
+    }
+    else{
+        this.ToggleModal();
+    }
+    }
+    catch(e){
+        console.log("Exception",e)
+    }
     }
     render() {
-        return (
+         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Detail" EditVehicle={this.EditVehicle} parent={this.state.parent} navigation={this.props} />
+                <Topbar vehicleData={this.state.vehicleData} ParentPage="Detail" EditVehicle={this.EditVehicle} parent={this.state.parent} navigation={this.props} />
                 <ScrollView style={{ paddingBottom: 20 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
                         {!Utilities.stringIsEmpty(this.state.image[0]) ?
-                         <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
-                             {(this.state.image.length > 1)?
-                <View>
+                            <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
+                                {(this.state.image.length > 1) ?
+                                    <View>
 
                                         <Text style={{ zIndex: 2, position: 'absolute', top: 22, color: '#fefefe', fontSize: 14, rotation: -40, left: 4, borderRadius: 3, backgroundColor: Apptheme, paddingVertical: 2, paddingHorizontal: 5, }}>Premium</Text>
                                         <Slider Image={this.state.image} />
                                     </View>
-                            :
-                                <Image
-                                    resizeMode='cover'
-                                    style={{ width: '100%', height: '100%' }}
-                                    source={{ uri: this.state.image[0].url }}
-                                />
-                             }
-                                </Transition>
+                                    :
+                                    <Image
+                                        resizeMode='cover'
+                                        style={{ width: '100%', height: '100%' }}
+                                        source={{ uri: this.state.image[0].url }}
+                                    />
+                                }
+                            </Transition>
                             :
                             <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: lightBg }}>
                                 <FontAwesome name="car" size={150} color={Apptheme} />
@@ -192,7 +221,7 @@ export default class Detail extends React.Component {
                             {this.props.navigation.state.params.item.title}
                         </Text>
                     </View>
-                    {this.state.price != "" &&
+                    {!Utilities.stringIsEmpty(this.state.price) &&
                         <View>
                             <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5 }}>
                                 £{this.state.price.toFixed(2)}
@@ -348,48 +377,70 @@ export default class Detail extends React.Component {
                     </View>
 
 
-                    {this.state.parent == "talk" &&
+                    {this.state.parent == "talk" && !Utilities.stringIsEmpty(this.state.features) &&
                         <View>
 
-                        <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ color: Apptheme, fontSize: 16 }}>FEATURES</Text>
-                        </View>
-                                {this.state.features.length >0 &&
-                                 <View style={{ width: '100%', paddingHorizontal: 20 }}>
-                                     {this.state.features.map((item,index)=>{
-                                         return (
-                                             <Text style={{textAlign:'center'}}>
-                                                 {item.name}
-                                             </Text>
-                                         )
-                                     })}
-                                 
-                             </View>
-                                
-                                
-                                }
                             <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
-                                <Text style={{ color: Apptheme, fontSize: 16 }}>MORE DESCRPTION</Text>
+                                <Text style={{ color: Apptheme, fontSize: 16 }}>FEATURES</Text>
                             </View>
+                            {this.state.features.length > 0 &&
+                                <View style={{ width: '100%', paddingHorizontal: 20 }}>
+                                    {this.state.features.map((item, index) => {
+                                        return (
+                                            <Text style={{ textAlign: 'center' }}>
+                                                {item.name}
+                                            </Text>
+                                        )
+                                    })}
 
-                            <View style={{ width: '100%', paddingHorizontal: 20 }}>
-                            <Text style={{textAlign:'center'}}>
-                                    {this.state.descrption}
-                                </Text>
-                            </View>
+                                </View>
+                            }
+                        </View>
+                    }
 
-                           
+                    <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ color: Apptheme, fontSize: 16 }}>MORE DESCRPTION</Text>
+                    </View>
 
-                            <View style={[styles.ButtonView, {marginTop:20, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
-                                <Text >For Sale? </Text>
-                                <Switch
-                                    thumbColor={Apptheme}
-                                    onValueChange={this.toggleSwitch}
-                                    value={this.state.saleSwitch} />
-                            </View>
-                            {
-                                this.state.userId == this.state.ownerId ?
-                                <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                    <View style={{ width: '100%', paddingHorizontal: 20 }}>
+                        <Text style={{ textAlign: 'center' }}>
+                            {this.state.descrption}
+                        </Text>
+                    </View>
+
+
+
+                    <View style={[styles.ButtonView, { marginTop: 20, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
+                        <Text >For Sale: </Text>
+                        {((this.state.userId == this.state.ownerId )|| !Utilities.stringIsEmpty(this.state.userId)) ?
+                            <Switch
+                                thumbColor={Apptheme}
+                                onValueChange={this.toggleSwitch}
+                                value={this.state.saleSwitch} />
+                            :
+                            <Text>{(this.state.saleSwitch) ? "Yes" : "No"}</Text>
+                        }
+                    </View>
+                        {( (this.state.userId != this.state.ownerId ) || Utilities.stringIsEmpty(this.state.userId)) &&
+                        <View>
+                    <LinearGradient colors={LinearColorGreen} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("ListingType")}>
+                                {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
+                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>CHECK DVLA MOT & MILEAGE</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+
+                        <LinearGradient colors={LinearColorGreen} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("ListingType")}>
+                                {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
+                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>CHECK DVLA & FINANCE DETAILS</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                        </View>
+                        }
+                    {
+                        this.state.userId == this.state.ownerId ?
+                            <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
                                 <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.viewMessage()}>
 
                                     <Feather
@@ -408,20 +459,88 @@ export default class Detail extends React.Component {
                                     <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>SEND MESSAGES</Text>
                                 </TouchableOpacity>
                             </LinearGradient>
-                            }
-                        {this.state.PremiumDate == 0 &&
-                         <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
-                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("ListingType")}>
-                                    {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
-                                    <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>UPGRADE TO PREMIUM</Text>
-                                </TouchableOpacity>
-                            </LinearGradient>
-    }
-                        </View>
                     }
+                    {this.state.PremiumDate == 0 &&
+                        <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("ListingType")}>
+                                {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
+                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>UPGRADE TO PREMIUM</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    }
+                    {((this.state.userId != this.state.ownerId) || Utilities.stringIsEmpty(this.state.userId)) &&
+
+                        <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() =>
+                                this.props.navigation.navigate("UsersVehicle", {
+                                    userId: this.state.vehicleData,
+                                })}
+                            >
+                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>VIEW OTHER VEHICLES FROM THIS USER</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    }
+                   
+ 
+
 
 
                 </ScrollView>
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isModal}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.ToggleModal()
+                    }}
+                >
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '30%', height: '25%', width: '86%', marginHorizontal: '7%', }}>
+                        <View style={{ width: '100%', height: '100%' }}>
+                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', }}>
+                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0, paddingLeft: 10, fontSize: 20, fontWeight: 'bold' }]}>
+                                    Login to your account
+                            </Text>
+                            </View>
+                            <View style={{ height: '78%', }}>
+                                <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
+
+                                    <Text style={{ fontSize: 14, color: "black", paddingHorizontal: 10 }}>
+                                       You must be logged in to message this user Please login or register now
+                                    </Text>
+                                    <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: "flex-end" }}>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                this.ToggleModal()
+                                                this.props.navigation.replace("Login")
+                                            }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                            <Text style={{ color: Apptheme, }}>
+                                                Login
+                                        </Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => {
+                                            this.ToggleModal()
+                                            this.props.navigation.replace("Register")
+                                        }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                            <Text style={{ color: Apptheme, }}>
+                                                Register
+                                        </Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => {
+                                            this.ToggleModal()
+                                        }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                            <Text style={{ color: Apptheme, }}>
+                                                Cancel
+                                        </Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+
+                                </View>
+                            </View>
+                        </View >
+                    </SafeAreaView>
+                </Modal>
             </View>
         )
     }

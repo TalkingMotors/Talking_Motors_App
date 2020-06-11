@@ -27,6 +27,8 @@ import EditVehicle from './src/screens/EditVehicle';
 import EditVehicleImage from './src/screens/EditVehicleImage';
 import BlockUser from './src/screens/BlockUser';
 import Setting from './src/screens/Setting';
+import UsersVehicle from './src/screens/UsersVehicle';
+import Favourites from './src/screens/Favourites';
 
 const MyDrawerNavigator = createDrawerNavigator({
     Home: { screen: StackNavigator },
@@ -48,6 +50,8 @@ const MyDrawerNavigator = createDrawerNavigator({
    EditVehicle: { screen: EditVehicle, },
    BlockUser: { screen: BlockUser, },
    Setting: { screen: Setting, },
+   UsersVehicle: { screen: UsersVehicle, },
+   Favourites: { screen: Favourites, },
 },
     {
         initialRouteName: 'Home',

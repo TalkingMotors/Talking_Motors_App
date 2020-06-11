@@ -127,7 +127,7 @@ export default class ChangePassword extends React.Component {
                     }
                     <TouchableOpacity
                         onPress={() =>
-                            this.navigateToResetPassword()
+                            this.props.navigation.navigate("ResetPassword")
                         }
                         style={styles.ChangePasswordView}>
                         {/* <FontAwesome name="edit" style={{ paddingHorizontal: 5 }} color={linkText} size={16} /> */}

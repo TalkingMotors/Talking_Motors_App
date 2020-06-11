@@ -2,7 +2,60 @@ import APIConstants from '../helpers/APIConstants';
 import * as Utilities from "../helpers/Utilities";
 import Storage from '../helpers/Storage';
 
-
+export let getVehicleData = async (vrn) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.VEHICLE_DATA_ENDPOINT + vrn, {
+                method: 'GET',
+                crossDomain: true,
+                headers: Utilities.setHeaders()
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let usersVehicle = async (userId) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.GET_USER_VEHICLES_BY_USER_ID_ENDPOINT + userId, {
+                method: 'GET',
+                crossDomain: true,
+                headers: Utilities.setHeaders()
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let searchRegisterNo = async (vrn) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.SEARCH_BY_REGISTRATION_NUMBER_ENDPOINT + vrn, {
+                method: 'GET',
+                crossDomain: true,
+                headers: Utilities.setHeaders()
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
 
 
 

@@ -12,6 +12,7 @@ import { TextField } from 'react-native-material-textfield';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Utilities from "../helpers/Utilities";
 import * as VehicleService from '../services/Vehicle';
+import Storage from '../helpers/Storage';
 export default class Talk extends Component {
     constructor(props) {
         super(props);
@@ -53,17 +54,36 @@ export default class Talk extends Component {
     }
     searchVehicleBy = async () => {
         let { registerNo } = this.state
+        var response;
         if (!Utilities.stringIsEmpty(registerNo)) {
-            var response = await VehicleService.getVehicleBy(registerNo)
-            if (!Utilities.stringIsEmpty(response.vehicle) && response.vehicle.registrationNumber.toLowerCase() == registerNo.toLowerCase()) {
-                this.TalkModalToggle();
-                this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+            if (Object.keys(Storage.userData).length > 0) {
+
+                response = await VehicleService.getVehicleBy(registerNo)
+                if (!Utilities.stringIsEmpty(response.vehicle) && response.vehicle.registrationNumber.toLowerCase() == registerNo.toLowerCase()) {
+                    this.TalkModalToggle();
+                    this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+                }
+                else {
+                    this.TalkModalToggle();
+                    alert("this register no is not valid ");
+                }
             }
             else {
-                this.TalkModalToggle();
-                alert("this register no is not valid ");
+               
+               
+                response = await VehicleService.searchRegisterNo(registerNo)
+                console.log("response",response);
+                if (!Utilities.stringIsEmpty(response.vehicle) && response.success ) {
+                    this.TalkModalToggle();
+                       this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+                }
+                else {
+                    this.TalkModalToggle();
+                    alert("this register no is not valid ");
+                }
+
             }
-        }
+         }
   }
     render() {
          return (

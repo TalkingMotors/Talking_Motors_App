@@ -76,15 +76,18 @@ export default class ContentContainer extends React.Component {
                         Home
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.navigatetoComponent('Profile')} style={styles.SideMenuItemView}>
-                    <View style={styles.IconView}>
-                        <FontAwesome name='address-card' style={styles.SideMenuIcon}
-                        />
-                    </View>
-                    <Text style={styles.SideMenuText}>
-                        Profile
+               {Object.keys(Storage.userData).length > 0 &&
+
+                   <TouchableOpacity onPress={() => this.navigatetoComponent('Profile')} style={styles.SideMenuItemView}>
+                       <View style={styles.IconView}>
+                           <FontAwesome name='address-card' style={styles.SideMenuIcon}
+                           />
+                       </View>
+                       <Text style={styles.SideMenuText}>
+                           Profile
                     </Text>
-                </TouchableOpacity>
+                   </TouchableOpacity>
+               }
 
                 <TouchableOpacity onPress={() => this.navigatetoComponent('Dashboard')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
@@ -130,7 +133,7 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                {/* <TouchableOpacity onPress={() => this.props.navigation.navigate('Search')} style={styles.SideMenuItemView}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Favourites')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <FontAwesome name='star' style={styles.SideMenuIcon}
                         />
@@ -138,7 +141,7 @@ export default class ContentContainer extends React.Component {
                     <Text style={styles.SideMenuText}>
                         Favourites
                     </Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
 
                 <TouchableOpacity 
                 onPress={() => this.props.navigation.navigate('Setting')}
@@ -183,55 +186,55 @@ export default class ContentContainer extends React.Component {
                     </TouchableOpacity>
                 }
 
-<Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={this.state.isModal}
-                    onRequestClose={() => {
-                        console.warn("Modal has been closed.");
-                        this.ToggleModal()
-                    }}
+               <Modal
+                   animationType="fade"
+                   transparent={true}
+                   visible={this.state.isModal}
+                   onRequestClose={() => {
+                       console.warn("Modal has been closed.");
+                       this.ToggleModal()
+                   }}
 
-                >
-                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '40%', height: '25%', width: '86%', marginHorizontal: '7%', }}>
-                        <View style={{ width: '100%', height: '100%' }}>
-                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center',  }}>
-                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0,paddingLeft:10, fontSize: 20, fontWeight: 'bold' }]}>
+               >
+                   <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '40%', height: '25%', width: '86%', marginHorizontal: '7%', }}>
+                       <View style={{ width: '100%', height: '100%' }}>
+                           <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', }}>
+                               <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0, paddingLeft: 10, fontSize: 20, fontWeight: 'bold' }]}>
                                    Login
                             </Text>
-                            </View>
-                            <View style={{ height: '78%',  }}>
-                                <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
-                                    
-                                    <Text style={{fontSize:14,color:"black",paddingHorizontal:10}}>
-                                      This option in only available to authenticated users. Press 'Login' below
-                                      to authenticate and continue with this option
-                                    </Text>
-                                    <View style={{marginTop:20,flexDirection:'row',justifyContent:"flex-end"}}>
-                                    <TouchableOpacity
-                                    onPress={()=>{
-                                        this.ToggleModal()
-                                    }} style={{padding:10,marginHorizontal:5}}>
-                                        <Text style={{color:Apptheme,}}>
-                                            CANCEL
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={()=>{
-                                        this.ToggleModal()
-                                        this.props.navigation.navigate("Login")
-                                    }} style={{padding:10,marginHorizontal:5}}>
-                                    <Text style={{color:Apptheme,}}>
-                                          LOGIN
-                                        </Text>
-                                    </TouchableOpacity>
-                                    </View>
+                           </View>
+                           <View style={{ height: '78%', }}>
+                               <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
 
-                                   
-                                </View>
-                            </View>
-                         </View >
-                  </SafeAreaView>
-                </Modal>
+                                   <Text style={{ fontSize: 14, color: "black", paddingHorizontal: 10 }}>
+                                       This option in only available to authenticated users. Press 'Login' below
+                                       to authenticate and continue with this option
+                                    </Text>
+                                   <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: "flex-end" }}>
+                                       <TouchableOpacity
+                                           onPress={() => {
+                                               this.ToggleModal()
+                                           }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                           <Text style={{ color: Apptheme, }}>
+                                               CANCEL
+                                        </Text>
+                                       </TouchableOpacity>
+                                       <TouchableOpacity onPress={() => {
+                                           this.ToggleModal()
+                                           this.props.navigation.navigate("Login")
+                                       }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                           <Text style={{ color: Apptheme, }}>
+                                               LOGIN
+                                        </Text>
+                                       </TouchableOpacity>
+                                   </View>
+
+
+                               </View>
+                           </View>
+                       </View >
+                   </SafeAreaView>
+               </Modal>
             </View>
 
         );

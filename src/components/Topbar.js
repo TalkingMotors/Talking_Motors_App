@@ -23,6 +23,7 @@ export default class Topbar extends React.Component {
             ParentPage: ''
         }
         console.log("props", this.props)
+        console.log(" Storage.userData",  Storage.userData)
     }
     render() {
         if (this.props.ParentPage == "Home") {
@@ -44,7 +45,11 @@ export default class Topbar extends React.Component {
                             source={require('../images/header-logo.png')}
                         />
                     </View>
+                    {(Object.keys(Storage.userData).length > 0)?
                     <FontAwesome onPress={() => this.props.Dashboard()} name="dashboard" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    :
+                    <FontAwesome onPress={() => this.props.navigation.navigation.navigate("Login")} name="sign-in" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                        }
                     {Object.keys(Storage.userData).length > 0 &&
                         <FontAwesome onPress={() => this.props.Profile()} name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 60 }]} />
                     }
@@ -73,8 +78,9 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
-                    {this.props.parent == "talk" &&
-                        <FontAwesome
+                    {this.props.parent == "talk" && this.props.vehicleData.userID == Storage.userData.userID &&
+                       
+                       <FontAwesome
                             onPress={() => this.props.EditVehicle()}
                             name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                     }

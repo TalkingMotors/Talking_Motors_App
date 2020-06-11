@@ -75,7 +75,19 @@ export let setHeaders = () => {
 export let FormatDate = (dateTimeValue) => {
     try {
         if (!stringIsEmpty(dateTimeValue)) {
-          var formateDate =  Moment(dateTimeValue).format('DD MMM YY - HH:mm')
+          var formateDate =  Moment(dateTimeValue).format('dddd DD MMM YYYY')
+        }
+            return formateDate;
+        }
+    catch (e) {
+        console.log("FormatDate", e)
+    }
+}
+
+export let FormatTime = (dateTimeValue) => {
+    try {
+        if (!stringIsEmpty(dateTimeValue)) {
+          var formateDate =  Moment(dateTimeValue).format('HH:mm A')
         }
             return formateDate;
         }

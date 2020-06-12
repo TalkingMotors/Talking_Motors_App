@@ -288,7 +288,7 @@ export default class Login extends React.Component {
                             </TouchableOpacity>
 
                             <Text style={styles.TextView}>
-                                You can use the App without an account, but you
+                                You can use the app without an account, but you
                                 need to register to message users or list a car.
                         </Text>
 

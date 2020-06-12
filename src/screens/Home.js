@@ -51,6 +51,7 @@ export default class Home extends React.Component {
         this.navigateToVehicleType = this.navigateToVehicleType.bind(this)
         Utilities.asyncStorage_GetKey(Constants.JWT_TOKEN).then(response => {
              Storage.jwt_Token = JSON.parse(response)
+             console.log("Token", Storage.jwt_Token)
         })
     }
     ToggleModal = () => {
@@ -288,7 +289,7 @@ export default class Home extends React.Component {
                                 <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
                                     
                                     <Text style={{fontSize:14,color:"black",paddingHorizontal:10}}>
-                                        You need to be logged in tp add a vehicle.
+                                        You need to be logged in to add a vehicle.
                                     </Text>
                                     <View style={{marginTop:20,flexDirection:'row',justifyContent:"flex-end"}}>
                                     <TouchableOpacity

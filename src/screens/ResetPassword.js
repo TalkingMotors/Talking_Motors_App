@@ -156,7 +156,7 @@ onChangeText = (key, value) => {
 
                     <View>
                         <Text style={{ textAlign: 'center', color: darkText, paddingHorizontal: 10 }}>
-                            Please check you email inbox for the code to enter below.
+                            Please check your email inbox for the code to enter below.
                         </Text>
 
                         <Text style={{ paddingTop: 15, textAlign: 'center', color: darkText, paddingHorizontal: 10 }}>

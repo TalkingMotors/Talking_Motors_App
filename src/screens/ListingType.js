@@ -65,7 +65,7 @@ export default class ListingType extends React.Component {
                             A PREMIUM listing gives you these great features designedto help sell your vehicle more quickly.
                         </Text>
 
-                        <View style={{ marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ marginTop: 10, justifyContent: 'center', alignItems: 'center' }}>
                             <Text style={{ color: "#333" }}>
                                 -10 photos
                             </Text>
@@ -85,7 +85,7 @@ export default class ListingType extends React.Component {
                                 Increase your chances of selling your vehicle for just
                             </Text>
                             <Text style={{ paddingHorizontal: 10 }}>
-                                $4.99 now for a monts's PREMIUM listing!
+                                $4.99 now for a months's PREMIUM listing!
                             </Text>
                         </View>
                         <View style={{ width: '94%', marginHorizontal: '3%', justifyContent: 'center' }}>

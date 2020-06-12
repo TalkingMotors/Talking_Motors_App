@@ -2,6 +2,28 @@ import APIConstants from '../helpers/APIConstants';
 import * as Utilities from "../helpers/Utilities";
 import Storage from '../helpers/Storage';
 
+export let favorites = async () => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.FAVOURITE_VEHICLE_ENDPOINT)
+            let response = await fetch(APIConstants.FAVOURITE_VEHICLE_ENDPOINT, {
+                method: 'GET',
+                crossDomain: true,
+                headers: Utilities.setHeaders()
+            })
+            let result = response.json()
+            console.log("result",result);
+            return result;
+        } else {
+            return null
+        }
+    }
+     catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+
 export let getVehicleData = async (vrn) => {
     try {
         if (Storage.networkStatus.isConnected) {
@@ -177,6 +199,45 @@ export let GetSpecificVehicle = async (id) => {
         return null
     }
 }
+export let removeFavourite = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.REMOVE_FAVOURITE_VEHICLE_ENDPOINT)
+           let response = await fetch(APIConstants.REMOVE_FAVOURITE_VEHICLE_ENDPOINT , {
+                method: 'DELETE',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let addFavourite = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.ADD_FAVOURITE_VEHICLE_ENDPOINT)
+           let response = await fetch(APIConstants.ADD_FAVOURITE_VEHICLE_ENDPOINT , {
+                method: 'POST',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+
 
 
 

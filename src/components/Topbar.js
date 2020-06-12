@@ -22,9 +22,26 @@ export default class Topbar extends React.Component {
         this.state = {
             ParentPage: ''
         }
-        console.log("props", this.props)
-        console.log(" Storage.userData",  Storage.userData)
+        // console.log("props", this.props)
+        // console.log(" Storage.userData",  Storage.userData)
+
+        
     }
+    
+    favIcon =()=>{
+        if(this.props.isFavourite != undefined){
+            if(this.props.isFavourite){
+                return <FontAwesome onPress={() => this.props.RemoveFavourite()} name="star" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
+                      
+            }
+            else{
+               return <FontAwesome name="star-o" onPress={() => this.props.AddFavourite()} color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
+              
+            }
+        }
+    }
+
+          
     render() {
         if (this.props.ParentPage == "Home") {
             return (
@@ -84,6 +101,7 @@ export default class Topbar extends React.Component {
                             onPress={() => this.props.EditVehicle()}
                             name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                     }
+                        {this.favIcon()}
                     <Feather name="share-2" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )

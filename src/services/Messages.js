@@ -152,9 +152,7 @@ export let BlockUser = async (params) => {
             let response = await fetch(APIConstants.BLOCK_USER_ENDPOINT, {
                 method: 'POST',
                 headers: Utilities.setHeaders(),
-                body: JSON.stringify({
-                    params
-                })
+                body: JSON.stringify(params)
             })
             let result = response.json()
             return result;
@@ -191,9 +189,7 @@ export let UnBlockUsers = async (params) => {
             let response = await fetch(APIConstants.UNBLOCK_USER_ENDPOINT, {
                 method: 'DELETE',
                 headers: Utilities.setHeaders(),
-                body: JSON.stringify({
-                    params
-                })
+                body: JSON.stringify(params)
             })
             let result = response.json()
             return result;

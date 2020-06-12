@@ -114,13 +114,13 @@ export default class ForgotPassword extends React.Component {
 
                     <View>
                         <Text style={{ textAlign: 'center', color: darkText, paddingHorizontal: 10 }}>
-                            If you have forgotteb your password just enter your email below
+                            If you have forgotten your password just enter your email below
                             and we will send a link with a code to reset it.
                         </Text>
 
                         <Text style={{ paddingTop: 15, textAlign: 'center', color: darkText, paddingHorizontal: 10 }}>
                             In the next step, you will have a limited time in which
-                            to enterthe code and a newpassword to reset it.
+                            to enter the code and a new password to reset it.
                         </Text>
                     </View>
 

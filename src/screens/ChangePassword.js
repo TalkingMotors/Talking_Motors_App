@@ -90,7 +90,7 @@ export default class ChangePassword extends React.Component {
 
                         <Text style={{ paddingTop: 15, textAlign: 'center', color: darkText, paddingHorizontal: 10 }}>
                             In the next step, you will have a limited time in which
-                            to enterthe code and a newpassword to reset it.
+                            to enter the code and a new password to reset it.
                         </Text>
                     </View>
 

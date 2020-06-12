@@ -26,7 +26,7 @@ export default class VehicleType extends React.Component {
         super(props);
         this.state = {
             ModalTitle: '',
-            switchValue: false,
+            switchValue: true,
             isModal: false,
             ModalProps: {},
             postcode: '',
@@ -108,7 +108,6 @@ export default class VehicleType extends React.Component {
 
     BodyTypeList = async () => {
         var response = await VehicleLooks.VehicleLookup()
-        console.log("response", response);
         this.setState({
             makes: response.makes,
             models: response.models,
@@ -125,8 +124,6 @@ export default class VehicleType extends React.Component {
             roadFundLicenseBands: response.roadFundLicenseBands,
             roadFundLicenseStatuses: response.roadFundLicenseStatuses,
             gearbox: response.transmissionTypes,
-        }, () => {
-            console.log("this.state", this.state);
         })
     }
 
@@ -449,6 +446,7 @@ export default class VehicleType extends React.Component {
                 filterparam[key] = value
             }
         });
+        console.log("filterparam",filterparam);
         var response = await VehicleLooks.SearchVehicleTypes(filterparam)
         console.log("response", response);
         this.props.navigation.navigate("SearchResultVehicle",
@@ -456,6 +454,10 @@ export default class VehicleType extends React.Component {
         listVehicle:response.vehicles,
         resultcount:response.numberOfResults,
         })
+    }
+
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value, loginFail: false })
     }
     render() {
         return (
@@ -494,6 +496,11 @@ export default class VehicleType extends React.Component {
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     labelFontSize={13}
+                                    value={this.state.postcode}
+                                    onChangeText={val => {
+                                        this.onChangeText('postcode', val)
+                                      
+                                    }}
 
                                 />
                             </View>

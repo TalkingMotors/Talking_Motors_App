@@ -7,6 +7,7 @@ import {
     Image,
     StyleSheet,
     ActivityIndicator,
+    Dimensions,
     TouchableOpacity
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -15,9 +16,9 @@ import * as Utilities from "../helpers/Utilities";
 import * as MessagesService from '../services/Messages';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
-
 import Topbar from '../components/Topbar';
 import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
+var screenheight= Dimensions.get('window').height;
 
 export default class BlockUser extends React.Component {
     constructor(props) {
@@ -46,7 +47,9 @@ export default class BlockUser extends React.Component {
         try {
             MessagesService.GetBlockUser().then(respose => {
                 if (respose) {
+                    console.log("respose",respose);
                     if (respose.success) {
+                        if (respose.users.length > 0) {
                         this.state.List = respose.users
                         console.log("List", this.state.List);
                         this.setState({
@@ -54,7 +57,14 @@ export default class BlockUser extends React.Component {
                             isLoad: false
                         })
                     }
+                    else{
+                        this.setState({
+                            emptyList: "No blocked users to display",
+                            isLoad: false
+                        })
+                    }
                 }
+            }
             })
         }
         catch (e) {
@@ -69,11 +79,13 @@ export default class BlockUser extends React.Component {
             let params = {
                 userId: user.userId
             }
+            console.log("params",params)
             MessagesService.UnBlockUsers(params).then(respose => {
                 console.log("respose", respose);
                 if (respose) {
                     if (respose.success) {
-                        this.props.navigation.goBack();
+                        this.GetBlockUser();
+                        // this.props.navigation.goBack();
                     }
                 }
             })
@@ -83,10 +95,21 @@ export default class BlockUser extends React.Component {
             this.props.navigation.goBack();
         }
     }
+
+    flatListEmptyMessage = () => {
+        if (this.state.List.length == 0 ) {
+            return (
+            <View style={{justifyContent:'center',alignItems:'center',height:screenheight-120,width:'100%',}}>
+                 <FontAwesome name="user" size={60} color={Apptheme} />
+                    <Text style={{fontSize:24,color:Apptheme,fontWeight:'bold'}}>BLOCKED USERS</Text>
+                 <Text style={styles.noRecordFoundText}>No blocked users to display</Text>
+            </View>
+      ) }
+    }
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Black User" navigation={this.props} />
+                <Topbar ParentPage="Blocked User" navigation={this.props} />
 
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
@@ -96,8 +119,8 @@ export default class BlockUser extends React.Component {
                         />
                     </View>
                 }
-                <ScrollView style={{ paddingBottom: 0, }}>
-                    <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
+                <ScrollView >
+                    <View style={{ width: '96%',height:screenheight, marginHorizontal: '2%', marginVertical: 10 }}>
                         <FlatList
                             data={this.state.List}
                             renderItem={({ item, index }) =>
@@ -135,7 +158,8 @@ export default class BlockUser extends React.Component {
                                     </View>
                                 </TouchableOpacity>
                             }
-                            keyExtractor={(item, index) => index.toString()}
+                           
+                            ListEmptyComponent={this.flatListEmptyMessage}
                         />
                     </View>
                 </ScrollView>
@@ -150,6 +174,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: lightBg,
+      
         // paddingBottom: 50
         // backgroundColor: 'lightgray',
 
@@ -182,6 +207,8 @@ const styles = StyleSheet.create({
     ChatBoxView: {
         height: 75,
         flexDirection: 'row',
+        borderBottomWidth:1,
+        borderBottomColor:"#d2d2d2"
     },
     UserImageView: {
         width: '25%',
@@ -229,6 +256,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 12,
         fontWeight: "bold"
+    },
+    noRecordFoundText :{ 
+        textAlign:'center',
+        fontSize:14,
+        paddingTop:5,
     },
     ImageIconView: {
         borderColor: "#d2d2d2",

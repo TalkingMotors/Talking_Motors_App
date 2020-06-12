@@ -11,6 +11,8 @@ import {
     StatusBar,
     StyleSheet,
     Switch,
+    Dimensions,
+    ActivityIndicator,
     Modal,
     TouchableOpacity
 } from 'react-native';
@@ -54,8 +56,12 @@ export default class Detail extends React.Component {
             features: [],
             allfeatures: [],
             vehicleData: '',
-            isModal: false
+            isModal: false,
+            isFavourite:undefined,
+            isLoader:false,
         }
+        this.AddFavourite=this.AddFavourite.bind(this);
+        this.RemoveFavourite=this.RemoveFavourite.bind(this);
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.GetSpecificVehicle(this.props.navigation.state.params.item.id)
 
@@ -66,37 +72,47 @@ export default class Detail extends React.Component {
             isModal: !this.state.isModal
         })
     }
+
+    stateupdate = (vehicleData) => {
+        try {
+            this.setState({
+                registerNo: vehicleData.registrationNumber,
+                vehicleId: vehicleData.id,
+                make: vehicleData.make,
+                model: vehicleData.model,
+                year: vehicleData.buildYear,
+                transmission: vehicleData.transmissionType,
+                engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
+                doors: vehicleData.doorCount,
+                seats: vehicleData.seatCount,
+                bodyType: vehicleData.bodyType,
+                color: vehicleData.colour,
+                image: vehicleData.images,
+                descrption: vehicleData.description,
+                price: vehicleData.price,
+                saleSwitch: vehicleData.forSale,
+                ownerId: vehicleData.userID,
+                PremiumDate: vehicleData.PremiumDate,
+                features: vehicleData.features,
+                vehicleData: vehicleData,
+                isLoader:false
+            }, () => {
+                console.log('this.state', this.state);
+                this.favIcon();
+            })
+        }
+        catch (e) {
+            console.log("stateupdate", e);
+        }
+    }
+
+
     GetSpecificVehicle = GetSpecificVehicle = async (id) => {
         try {
             var response = await VehicleService.GetSpecificVehicle(id)
             var vehicleData = response.vehicle
             if (response.success) {
-                this.setState({
-                    registerNo: vehicleData.registrationNumber,
-                    vehicleId: vehicleData.id,
-                    make: vehicleData.make,
-                    model: vehicleData.model,
-                    year: vehicleData.buildYear,
-                    transmission: vehicleData.transmissionType,
-                    engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
-                    doors: vehicleData.doorCount,
-                    seats: vehicleData.seatCount,
-                    bodyType: vehicleData.bodyType,
-                    color: vehicleData.colour,
-                    // image: vehicleData.user.imageUrl,
-                    // image: vehicleData.images[0],
-                    image: vehicleData.images,
-                    descrption: vehicleData.description,
-                    price: vehicleData.price,
-                    saleSwitch: vehicleData.forSale,
-                    // parent: parent,
-                    ownerId: vehicleData.userID,
-                    // PremiumDate:vehicleData.PremiumDate,
-                    features: vehicleData.features,
-                    vehicleData: vehicleData
-                }, () => {
-                    console.log('this.state', this.state);
-                })
+              this.stateupdate(vehicleData);
 
             }
         }
@@ -109,30 +125,32 @@ export default class Detail extends React.Component {
         let vehicleData = this.props.navigation.state.params.item
         console.log("vehicleData", vehicleData);
         let parent = this.props.navigation.state.params.parent
+        this.stateupdate(vehicleData);
         this.setState({
-            registerNo: vehicleData.registrationNumber,
-            vehicleId: vehicleData.id,
-            make: vehicleData.make,
-            model: vehicleData.model,
-            year: vehicleData.buildYear,
-            transmission: vehicleData.transmissionType,
-            engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
-            doors: vehicleData.doorCount,
-            seats: vehicleData.seatCount,
-            bodyType: vehicleData.bodyType,
-            color: vehicleData.colour,
-            // image: vehicleData.user.imageUrl,
-            // image: vehicleData.images[0],
-            image: vehicleData.images,
-            descrption: vehicleData.description,
-            price: vehicleData.price,
-            saleSwitch: vehicleData.forSale,
             parent: parent,
-            ownerId: vehicleData.userID,
-            PremiumDate: vehicleData.PremiumDate,
-            features: vehicleData.features,
-            vehicleData: vehicleData
         })
+        // this.setState({
+        //     registerNo: vehicleData.registrationNumber,
+        //     vehicleId: vehicleData.id,
+        //     make: vehicleData.make,
+        //     model: vehicleData.model,
+        //     year: vehicleData.buildYear,
+        //     transmission: vehicleData.transmissionType,
+        //     engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
+        //     doors: vehicleData.doorCount,
+        //     seats: vehicleData.seatCount,
+        //     bodyType: vehicleData.bodyType,
+        //     color: vehicleData.colour,
+        //     image: vehicleData.images,
+        //     descrption: vehicleData.description,
+        //     price: vehicleData.price,
+        //     saleSwitch: vehicleData.forSale,
+        //     parent: parent,
+        //     ownerId: vehicleData.userID,
+        //     PremiumDate: vehicleData.PremiumDate,
+        //     features: vehicleData.features,
+        //     vehicleData: vehicleData
+        // })
         this.VehicleLookupAllFeatures();
 
     }
@@ -187,10 +205,84 @@ export default class Detail extends React.Component {
         console.log("Exception",e)
     }
     }
+
+    RemoveFavourite = async ()=>{
+        try{
+            this.setState({
+                isLoader:true
+            })
+            let params={
+                vehicleId:this.state.vehicleData.id
+            }
+            console.log("params",params);
+            var response = await VehicleService.removeFavourite(params)
+            if(response.success){
+                this.stateupdate(response.vehicle);
+            }
+        }
+        catch(e){
+            
+            console.log("Exception",e)
+        }
+    }
+   AddFavourite = async ()=>{
+        try{
+            this.setState({
+                isLoader:true
+            })
+            let params={
+                vehicleId:this.state.vehicleData.id
+            }
+            console.log("params",params);
+            var response = await VehicleService.addFavourite(params)
+            if(response.success){
+                this.stateupdate(response.vehicle);
+            }
+        }
+        catch(e){
+            
+            console.log("Exception",e)
+        }
+    }
+
+    favIcon =()=>{
+      if(Object.keys(Storage.userData).length > 0){
+            if(Storage.userData.userId != this.state.vehicleData.userID){
+                if(this.state.vehicleData.favourited){
+                    console.log("if true");
+                    this.setState({
+                        isFavourite:true
+                    })
+                }
+                else{
+                    console.log("else false");
+                    this.setState({
+                        isFavourite:false
+                    })
+                }
+            }
+        }
+    }
     render() {
          return (
             <View style={styles.ParentView}>
-                <Topbar vehicleData={this.state.vehicleData} ParentPage="Detail" EditVehicle={this.EditVehicle} parent={this.state.parent} navigation={this.props} />
+                <Topbar 
+                 RemoveFavourite={this.RemoveFavourite} 
+                 AddFavourite={this.AddFavourite} 
+                 vehicleData={this.state.vehicleData} 
+                 isFavourite={this.state.isFavourite} 
+                 ParentPage="Detail" 
+                 EditVehicle={this.EditVehicle} 
+                 parent={this.state.parent} 
+                 navigation={this.props} />
+                   {this.state.isloader &&
+                    <View style={styles.menuLoaderView}>
+                        <ActivityIndicator
+                            color="#ed0000"
+                            size="large"
+                        />
+                    </View>
+                }
                 <ScrollView style={{ paddingBottom: 20 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
                         {!Utilities.stringIsEmpty(this.state.image[0]) ?
@@ -295,7 +387,7 @@ export default class Detail extends React.Component {
                             </View>
                             <View style={{ width: '80%', justifyContent: 'center', }}>
                                 <Text style={styles.TextHead}>
-                                    Trasnmission
+                                    Transmission
                             </Text>
                                 <Text style={styles.TextTail}>
                                     {this.state.transmission}
@@ -412,7 +504,7 @@ export default class Detail extends React.Component {
 
                     <View style={[styles.ButtonView, { marginTop: 20, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
                         <Text >For Sale: </Text>
-                        {((this.state.userId == this.state.ownerId )|| !Utilities.stringIsEmpty(this.state.userId)) ?
+                        {(this.state.userId == this.state.ownerId )?
                             <Switch
                                 thumbColor={Apptheme}
                                 onValueChange={this.toggleSwitch}
@@ -579,5 +671,16 @@ const styles = StyleSheet.create({
     TextTail: {
         color: "#777",
         fontSize: 14
-    }
+    },
+    menuLoaderView: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255, 0.7)',
+        // backgroundColor: 'red',
+        zIndex: 10000,
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 60
+    },
 })

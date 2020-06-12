@@ -32,7 +32,7 @@ import * as MessagesService from '../services/Messages';
 import * as VehicleService from '../services/Vehicle';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
-import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
+import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText, GreenBg } from '../helpers/CommponStyle';
 
 const image = require('../images/userImage.jpg')
 const screen_height = Dimensions.get('window').height
@@ -392,63 +392,67 @@ export default class Messenger extends React.Component {
                         />
                     </View>
                 }
-                <View >
                 <ScrollView style={{ marginBottom: 0 }}>
+                <View >
                     <KeyboardAvoidingView
-                        keyboardVerticalOffset="80"
+                        keyboardVerticalOffset="200"
+                        behavior={"padding"}
                         enabled
                         >
                         <ScrollView>
                             <ImageBackground style={{width:'100%'}} source={require('../images/tmmesbackan.png')} >
                             <View style={styles.MessengerView}>
                                 <View style={styles.MessengerViewList}>
-                                    {/* <View style={{width:"100%", height:500}}>
-                                <GiftedChat
-                                    messages={this.state.messages}
-                                        onSend={ messages => this.state.conversationId > 0 ? this.sendMessageToConversation(messages) : this.sendMessageToOwner(messages) }
-                                        user={{
-                                            _id: this.state.userId,
-                                          }}
-      /></View> */}
+                                   
                                      <FlatList
                                         data={this.state.messages}
                                         renderItem={({ item, index }) =>
                                             <View >
                                                 {
                                                     item.user.userId != this.state.userId ?
-                                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                            <View style={{ borderWidth: 1, alignItems: 'center', borderColor: "#d2d2d2", justifyContent: 'center', backgroundColor: lightBg, width: 50, height: 50, borderRadius: 50, }}>
-                                                                {this.senderImage(item)}
-                                                            </View>
+                                                       <View>
                                                             {
                                                                 item.dateSeprator != "" ?
-                                                                <View>
-                                                                        <Text>{item.dateSeprator}</Text>    
+                                                                <View style={{alignItems:'center'}}>
+                                                                        <Text style={styles.TimingText}>{item.dateSeprator}</Text>    
                                                                 </View>:
                                                                 null
                                                             }
+                                                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                            
+                                                            <View style={{ borderWidth: 1, alignItems: 'center', borderColor: "#d2d2d2", justifyContent: 'center', backgroundColor: lightBg, width: 50, height: 50, borderRadius: 50, }}>
+                                                                {this.senderImage(item)}
+                                                            </View>
+                                                           
                                                             
                                                             <View style={styles.ReceivedMessageView}>
-                                                                <Text>{ item.user.name } </Text>
+                                                                <Text style={{paddingHorizontal:5,paddingVertical:4}}>
+
+                                                                <Text style={{color:GreenBg,fontSize:14,fontWeight:'bold'}}>{ item.user.name } </Text>
                                                                 <Text style={styles.ReceivedMessageTextTime}>
                                                                 {item.time}
+                                                                </Text>
                                                                 </Text>
                                                                 <Text style={styles.ReceivedMessageText}>
                                                                     {item.message}
                                                                 </Text>
                                                             </View>
                                                         </View>
+                                                        </View>
+
                                                         :
-                                                        <View style={styles.SendMessageView}>
-                                                            <View style={styles.SendMessageBox}>
+                                                        <View >
+                                                           
                                                             {
                                                                 item.dateSeprator != "" ?
-                                                                <View>
-                                                                        <Text>{item.dateSeprator}</Text>    
+                                                                <View style={{alignItems:'center',}}>
+                                                                        <Text style={styles.TimingText}>{item.dateSeprator}</Text>    
                                                                 </View>:
                                                                 null
                                                             }
-                                                                <Text style={styles.SendMessageTextTime}>
+                                                          <View style={styles.SendMessageView}>
+                                                          <View style={styles.SendMessageBox}>
+                                                         <Text style={styles.SendMessageTextTime}>
                                                                     {item.time}
                                                                 </Text>
                                                                 <Text style={styles.SendMessageText}>
@@ -460,10 +464,8 @@ export default class Messenger extends React.Component {
                                                                     <FontAwesome5 name="check" color={"#d2d2d2"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
                                                                 }
                                                             </View>
-
-
-
-                                                        </View>
+                                                            </View>
+                                                      </View>
                                                 }
                                             </View>
                                         }
@@ -476,9 +478,9 @@ export default class Messenger extends React.Component {
                             </ImageBackground>
                         </ScrollView>
                     </KeyboardAvoidingView>
-                </ScrollView>
               
                 </View>
+                </ScrollView>
                 <View style={{ flexDirection: 'row', width: '100%', height: 55, }}>
                     <TouchableOpacity style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
                         <FontAwesome name="camera" size={22} color={Apptheme} />
@@ -702,40 +704,57 @@ const styles = StyleSheet.create({
     SendMessageView: {
         // width: '100%',
         alignSelf: 'flex-end',
-        alignItems: 'flex-end'
+        alignItems: 'flex-start',
+      
+       
     },
     SendMessageBox: {
         marginVertical: 5,
         backgroundColor: Apptheme,
+        minWidth:100,
         width: '80%',
         borderRadius: 10,
-        paddingVertical: 5
+        paddingVertical: 10,
+        paddingRight:10,
+        paddingLeft:10
+        
+        // paddingLeft:30,
+        // alignItems:'flex-start',
 
     },
     SendMessageTextTime: {
-        paddingHorizontal: 10,
-        color: lightText
+
+        // textAlign:'left',
+        color: lightText,
+        fontSize:12,
     },
     SendMessageText: {
-        paddingHorizontal: 10,
-        color: lightText
+        paddingHorizontal: 1,
+        color: lightText,
+        fontSize:16,
+        paddingRight:10
     },
     ReceivedMessageView: {
-        backgroundColor: '#d2d2d2',
+        backgroundColor: '#eee',
+        // opacity:0.8,
         // width: '80%',
         alignSelf: 'flex-start',
         marginHorizontal: '2%',
         borderRadius: 10,
         marginVertical: 5,
-        paddingVertical: 5
+        paddingVertical: 5,
+        paddingHorizontal:10
     },
     ReceivedMessageTextTime: {
-        paddingHorizontal: 10,
-        color: darkText
+        alignItems:'flex-end',
+        color: darkText,
+        
+        fontSize:12
     },
     ReceivedMessageText: {
         paddingHorizontal: 10,
-        color: darkText
+        color: darkText,
+        fontSize:16
     },
     menuLoaderView: {
         ...CommonStyle.menuLoaderView
@@ -754,4 +773,7 @@ const styles = StyleSheet.create({
         padding: 10,
         marginHorizontal: 5
     },
+    TimingText:{
+      color:Apptheme,fontWeight:'bold',padding:5
+    }
 })

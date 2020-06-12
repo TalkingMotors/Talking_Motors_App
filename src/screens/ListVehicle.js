@@ -7,7 +7,8 @@ import {
     Button,
     TouchableOpacity,
     Image,
-    StyleSheet
+    StyleSheet,
+    Alert
 
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -40,7 +41,19 @@ export default class ListVehicle extends React.Component {
                 this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
             }
             else {
-                alert("this register no is not valid ");
+                Alert.alert(
+                    "Vehicle not found",
+                    "this vehicle has not been found in the DVLA database.",
+                    [
+                      {
+                        text: "OK",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel"
+                      },
+                     
+                    ],
+                    { cancelable: false }
+                  );
             }
         }
   }
@@ -60,7 +73,7 @@ export default class ListVehicle extends React.Component {
                                 List your vehicle to chat with friends,
                         </Text>
                             <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                family and other car enthusiats.
+                                family and other car enthusiasts.
                         </Text>
                             <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center' }}>
                                 Simple and reliable messaging service to keep in touch and share information

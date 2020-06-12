@@ -72,7 +72,7 @@ export default class SearchVehicle extends Component {
                             </Text>
                             </View>
                             <Text style={{ paddingHorizontal: 15, }}>
-                                How would you like to search for a vehicle yo buy?
+                                How would you like to search for a vehicle to buy?
                         </Text>
                             <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
 

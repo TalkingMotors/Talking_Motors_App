@@ -4,6 +4,7 @@ import {
     SafeAreaView,
     Keyboard,
     KeyboardAvoidingView,
+    Alert ,
     Modal, ImageBackground
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -65,21 +66,42 @@ export default class Talk extends Component {
                 }
                 else {
                     this.TalkModalToggle();
-                    alert("this register no is not valid ");
+                    Alert.alert(
+                        "Vehicle not found",
+                        "this vehicle has not been found in the DVLA database.",
+                        [
+                          {
+                            text: "CLOSE",
+                            onPress: () => console.log("Cancel Pressed"),
+                            style: "cancel"
+                          },
+                         
+                        ],
+                        { cancelable: false }
+                      );
                 }
             }
             else {
-               
-               
-                response = await VehicleService.searchRegisterNo(registerNo)
-                console.log("response",response);
+                 response = await VehicleService.searchRegisterNo(registerNo)
                 if (!Utilities.stringIsEmpty(response.vehicle) && response.success ) {
                     this.TalkModalToggle();
                        this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
                 }
                 else {
                     this.TalkModalToggle();
-                    alert("this register no is not valid ");
+                    Alert.alert(
+                        "Vehicle not found",
+                        "this vehicle has not been found in the DVLA database.",
+                        [
+                          {
+                            text: "CLOSE",
+                            onPress: () => console.log("Cancel Pressed"),
+                            style: "cancel"
+                          },
+                         
+                        ],
+                        { cancelable: false }
+                      );
                 }
 
             }
@@ -108,7 +130,7 @@ export default class Talk extends Component {
                             </Text>
                             </View>
                             <Text style={{ paddingHorizontal: 15, }}>
-                                Just enter the registration number of the car you are interested im, and clock 'Search' below
+                                Just enter the registration number of the car you are interested in, and clock 'Search' below
                         </Text>
 
                             <View style={styles.TextFieldView}>

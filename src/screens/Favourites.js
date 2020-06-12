@@ -35,14 +35,23 @@ export default class UsersVehicle extends React.Component {
 
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
-            this.myVehicle();
+            this.myfavourite();
 
         })
 
     }
 
     componentWillMount() {
-        this.myVehicle();
+        // this.myfavourite();
+    }
+
+    componentDidMount() {
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
+            this.setState({
+                isLoader: true,
+                list: []
+            })
+        })
     }
 
     PremiumPackgedDateChecked(premiumDate){
@@ -69,12 +78,12 @@ export default class UsersVehicle extends React.Component {
         return seconds;
     }
 
-    myVehicle = async () => {
+    myfavourite = async () => {
         try{
-        let id=0;
-        id=this.props.navigation.state.params.userId.userID
-        var response = await VehicleService.usersVehicle(id)
-         if (!Utilities.stringIsEmpty(response.vehicles) || response.success ) {
+            
+            var response = await VehicleService.favorites()
+            console.log("response",response);
+            if (!Utilities.stringIsEmpty(response.vehicles) || response.success) {
             if (response.vehicles.length > 0) {
                 for (var i = 0; i < response.vehicles.length; i++) {
                   

@@ -29,7 +29,7 @@ const APIService = {
     GET_VEHICLE_BY_VRM_ENDPOINT: API_Path.BASE_URL + "vehicle/get-vehicle-by-vrm/",   //"vehicle/get-vehicle-by-vrm/{vrm}",
     VEHICLE_ENDPOINT: API_Path.BASE_URL + "vehicle/",
     INSERT_VEHICLE_IMAGE_ENDPOINT: API_Path.BASE_URL + "vehicle/insert-vehicle-image",
-    FAVOURITE_VEHICLE_ENDPOINT: "vehicle/favourites",
+    FAVOURITE_VEHICLE_ENDPOINT: API_Path.BASE_URL +"vehicle/favourites",
     REMOVE_FAVOURITE_VEHICLE_ENDPOINT: API_Path.BASE_URL + "vehicle/remove-favourite",
     ADD_FAVOURITE_VEHICLE_ENDPOINT: API_Path.BASE_URL + "vehicle/add-favourite",
     SEND_MESSAGE_TO_USER_ENDPOINT: API_Path.BASE_URL + "messages/send-message-to-user",

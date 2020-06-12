@@ -395,10 +395,9 @@ export default class Messenger extends React.Component {
                 <ScrollView style={{ marginBottom: 0 }}>
                 <View >
                     <KeyboardAvoidingView
-                        keyboardVerticalOffset="200"
-                        behavior={"padding"}
-                        enabled
-                        >
+                          keyboardVerticalOffset="80"
+                          enabled>
+                        
                         <ScrollView>
                             <ImageBackground style={{width:'100%'}} source={require('../images/tmmesbackan.png')} >
                             <View style={styles.MessengerView}>

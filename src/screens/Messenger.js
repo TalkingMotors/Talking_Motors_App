@@ -380,10 +380,23 @@ export default class Messenger extends React.Component {
             })
         })
     }
+
+    navigateToUser =()=>{
+         this.props.navigation.navigate("Users",{
+            members:this.state.members
+        })
+    }
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar MoreItemsModal={this.MoreItemsModal} ParentPage="Messenger" username={this.state.senderName} image={this.state.senderImageUrl} navigation={this.props} members = {this.state.members} />
+                <Topbar 
+                navigateToUser={this.navigateToUser} 
+                MoreItemsModal={this.MoreItemsModal}
+                ParentPage="Messenger" 
+                username={this.state.senderName} 
+                image={this.state.senderImageUrl} 
+                navigation={this.props} 
+                members = {this.state.members} />
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator

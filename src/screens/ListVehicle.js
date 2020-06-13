@@ -8,6 +8,9 @@ import {
     TouchableOpacity,
     Image,
     StyleSheet,
+    Dimensions,
+    ActivityIndicator,
+    Linking,
     Alert
 
 } from 'react-native';
@@ -21,11 +24,14 @@ import {
 } from 'react-native-material-textfield';
 import * as VehicleService from '../services/Vehicle';
 import * as Utilities from "../helpers/Utilities";
+import Storage from '../helpers/Storage';
 export default class ListVehicle extends React.Component {
     constructor(props) {
         super(props);
-        this.state={
-            registerNo:''
+        this.state = {
+            registerNo: '',
+            newVehicle: '',
+            isLoader: false,
         }
     }
 
@@ -33,35 +39,102 @@ export default class ListVehicle extends React.Component {
         this.setState({ [key]: value, })
     }
 
+    emailLinking = () => {
+        Linking.openURL(`mailto:support@talkingmotorsapp.com?subject=SendMail&body=${this.state.registerNo.toUpperCase()}`)
+    }
+
     searchVehicleBy = async () => {
         let { registerNo } = this.state
+        this.setState({
+            isloader: true
+        })
         if (!Utilities.stringIsEmpty(registerNo)) {
             var response = await VehicleService.getVehicleBy(registerNo)
             if (!Utilities.stringIsEmpty(response.vehicle) && response.vehicle.registrationNumber.toLowerCase() == registerNo.toLowerCase()) {
-                this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
+                if (response.vehicle.userID == Storage.userData.userId) {
+                    this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
+                    this.setState({
+                        isloader: false
+                    })
+                }
+                else if (response.vehicle.userID != Storage.userData.userId) {
+                    this.setState({
+                        isloader: false
+                    })
+                    Alert.alert(
+                        "This Vehicle is already registered",
+                        "A vehicle with this registration is already on the system. \n\nIf you think this is an error, or you have recently purchased this vehicle please get in touch with us below.",
+
+                        [
+                            {
+                                text: "CLOSE",
+                                onPress: () => console.log("Cancel Pressed"),
+                                style: "cancel"
+                            },
+                            {
+                                text: "CONTACT US",
+                                onPress: () => this.emailLinking(),
+                                style: "cancel"
+                            },
+
+                        ],
+                        { cancelable: false }
+                    );
+                }
+
             }
             else {
-                Alert.alert(
-                    "Vehicle not found",
-                    "this vehicle has not been found in the DVLA database.",
-                    [
-                      {
-                        text: "OK",
-                        onPress: () => console.log("Cancel Pressed"),
-                        style: "cancel"
-                      },
-                     
-                    ],
-                    { cancelable: false }
-                  );
+                var response = await VehicleService.getVehicleData(registerNo)
+                console.log("response", response);
+                if (Utilities.stringIsEmpty(!response.vehicleData.makeId)) {
+                    this.setState({
+                        newVehicle: response.vehicleData,
+                        isLoader: false
+                    })
+                }
+                else {
+                    this.setState({
+                        isloader: false
+                    })
+                    Alert.alert(
+                        "Vehicle not found",
+                        "this vehicle has not been found in the DVLA database.",
+                        [
+                            {
+                                text: "OK",
+                                onPress: () => console.log("Cancel Pressed"),
+                                style: "cancel"
+                            },
+
+                        ],
+                        { cancelable: false }
+                    );
+                }
+
             }
+            this.setState({
+                isloader: false
+            })
         }
-  }
+        this.setState({
+            isloader: false
+        })
+    }
     render() {
+        console.log("this.state.registerNo",this.state.registerNo);
         return (
-            <View >
+            <View style={styles.ParentView}>
                 <Topbar ParentPage="List Vehicle" navigation={this.props} />
-                <View style={styles.ParentView}>
+                {this.state.isloader &&
+                    <View style={styles.menuLoaderView}>
+                        <ActivityIndicator
+                            color="#ed0000"
+                            size="large"
+                        />
+                    </View>
+                }
+              
+                    <ScrollView style={{width:'100%'}}>
                     <View style={{ width: '100%', height: 200, justifyContent: 'center', alignItems: 'center' }}>
                         <Image
                             style={{ width: '100%', height: 200 }}
@@ -80,36 +153,101 @@ export default class ListVehicle extends React.Component {
                         </Text>
                         </View>
                     </View>
-
-                    <View style={styles.TextFieldView}>
-                        <TextField
-                            autoFocus={true}
-                            label='Registration Number'
-                            fontSize={13}
-                            keyboardType='default'
-                            tintColor={Apptheme}
-                            baseColor={Apptheme}
-                            errorColor="red"
-                            activeLineWidth={2}
-                            autoCapitalize="characters"
-                            autoCorrect={false}
-                            labelFontSize={13}
-                            value={this.state.registerNo}
-                            onChangeText={val => {
-                                this.onChangeText('registerNo', val.trim())
-                            }}
-                        />
-                    </View>
-                    <View style={{width:'94%',marginHorizontal:'3%',justifyContent:'center',alignItems:'center'}}>
-                        <TouchableOpacity  style={styles.GradientButtonView} onPress={() => { this.searchVehicleBy()}}>
-                            <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
-                                <Text style={styles.ButtonInnerText}>
-                                    AUTO COMPLETE DETAILS
+                    {(this.state.newVehicle == "") ?
+                            <View style={styles.TextFieldView}>
+                        <View>
+                                <TextField
+                                    style={{
+                                        fontWeight:'bold',
+                                    }}
+                                    autoFocus={true}
+                                    label='Registration Number'
+                                    fontSize={15}
+                                    keyboardType='default'
+                                    tintColor={Apptheme}
+                                    baseColor={Apptheme}
+                                    errorColor="red"
+                                    activeLineWidth={2}
+                                    autoCapitalize='characters'
+                                    labelFontSize={13}
+                                     value={this.state.registerNo}
+                                    onChangeText={val => {
+                                        this.onChangeText('registerNo', val.trim())
+                                    }}
+                                />
+                            </View>
+                            <View style={{ width: '94%', marginHorizontal: '3%', justifyContent: 'center', alignItems: 'center' }}>
+                                <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.searchVehicleBy() }}>
+                                    <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
+                                        <Text style={styles.ButtonInnerText}>
+                                            AUTO COMPLETE DETAILS
                                 </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                                    </LinearGradient>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        :
+                        <View style={[styles.TextFieldView],{width:'100%'}}>
+                            <View style={{backgroundColor:lightBg}}>
+                                <Text style={styles.newVehicleMainViewText}>
+                                    Details found:
+                                    </Text>
+                            </View>
+                            <View style={{backgroundColor:"#ebebeb"}}>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.make}
+                                </Text>
+                            </View>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.model}
+                                </Text>
+                            </View>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.colour}
+                                </Text>
+                            </View>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.fuelType}
+                                </Text>
+                            </View>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.engineSizeLitre +"0 Liter"}
+                                </Text>
+                            </View>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.gearCount +" Gears"}
+                                </Text>
+                            </View>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.doorCount +" Doors"}
+                                </Text>
+                            </View>
+                            <View style={styles.newVehicleView}>
+                                <Text>
+                                    {this.state.newVehicle.seatCount +" Seats"}
+                                </Text>
+                            </View>
+                        </View>
+                        <View style={styles.TextFieldView}>
+                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.searchVehicleBy() }}>
+                                    <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
+                                        <Text style={styles.ButtonInnerText}>
+                                           ADD VEHICLE DETAIL
+                                </Text>
+                                    </LinearGradient>
+                                </TouchableOpacity>
+                        </View>
+                        </View>
+
+                    }
+                </ScrollView>
             </View>
         )
     }
@@ -131,5 +269,33 @@ const styles = StyleSheet.create({
     },
     ButtonInnerText: {
         ...CommponStyle.ButtonInnerText
-    }
+    },
+    newVehicleView:{
+        borderBottomColor:"#777",
+        borderBottomWidth:1,
+        alignItems:'center',
+        justifyContent:'center',
+        width:'100%',
+        height:40
+    },
+    newVehicleMainViewText:{
+        borderBottomColor:"#777",
+         borderBottomWidth:1,
+        textAlign: 'center',
+        fontSize: 20,
+        fontWeight: "bold",
+        paddingVertical: 10,
+        color: darkText
+    },
+    menuLoaderView: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255, 0.7)',
+        // backgroundColor: 'red',
+        zIndex: 10000,
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 60
+    },
 })

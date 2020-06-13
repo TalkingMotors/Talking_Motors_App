@@ -25,6 +25,7 @@ import Setting from './src/screens/Setting';
 import ForgotPassword from './src/screens/ForgotPassword';
 import UsersVehicle from './src/screens/UsersVehicle';
 import Favourites from './src/screens/Favourites';
+import Users from './src/screens/Users';
 
 const MyStackNavigator = createStackNavigator(
     {
@@ -50,6 +51,7 @@ const MyStackNavigator = createStackNavigator(
         ForgotPassword: { screen: ForgotPassword },
         UsersVehicle: { screen: UsersVehicle },
         Favourites: { screen: Favourites },
+        Users: { screen: Users },
     },
     {
         initialRouteName: 'Login',

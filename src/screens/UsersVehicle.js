@@ -31,10 +31,28 @@ export default class UsersVehicle extends React.Component {
             list: [],
             emptyList:'',
             isLoader:true,
-            ParentPage:this.props.navigation.state.params.userId.user.name
-
+            ParentPage:'',
         }
-        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+       this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            if(!Utilities.stringIsEmpty(this.props.navigation.state.params.userId.user) ){
+                this.state.ParentPage=this.props.navigation.state.params.userId.user.name
+                this.setState({
+                    ParentPage:this.state.ParentPage
+                })
+            }
+            else if(this.props.navigation.state.params.userId.name !=undefined){
+                this.state.ParentPage= this.props.navigation.state.params.userId.name
+                this.setState({
+                    ParentPage:this.state.ParentPage
+                })
+            }
+            else{
+                this.state.ParentPage="Users";
+                this.setState({
+                    ParentPage:this.state.ParentPage
+                })
+                console.log("else")
+            }
             this.myVehicle();
 
         })
@@ -74,7 +92,7 @@ export default class UsersVehicle extends React.Component {
         let id=0;
         id=this.props.navigation.state.params.userId.userID
         var response = await VehicleService.usersVehicle(id)
-         if (!Utilities.stringIsEmpty(response.vehicles) || response.success ) {
+        if (!Utilities.stringIsEmpty(response.vehicles) || response.success ) {
             if (response.vehicles.length > 0) {
                 for (var i = 0; i < response.vehicles.length; i++) {
                   

@@ -29,6 +29,7 @@ import BlockUser from './src/screens/BlockUser';
 import Setting from './src/screens/Setting';
 import UsersVehicle from './src/screens/UsersVehicle';
 import Favourites from './src/screens/Favourites';
+import Users from './src/screens/Users';
 
 const MyDrawerNavigator = createDrawerNavigator({
     Home: { screen: StackNavigator },
@@ -52,6 +53,7 @@ const MyDrawerNavigator = createDrawerNavigator({
    Setting: { screen: Setting, },
    UsersVehicle: { screen: UsersVehicle, },
    Favourites: { screen: Favourites, },
+   Users: { screen: Users, },
 },
     {
         initialRouteName: 'Home',

@@ -165,8 +165,6 @@ export default class Dashboard extends React.Component {
         }
     }
     render() {
-        console.log("list", this.state.list);
-        console.log("emptyList", this.state.emptyList);
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Dashboard" navigation={this.props.navigation} />

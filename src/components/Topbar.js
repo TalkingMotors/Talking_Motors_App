@@ -130,13 +130,14 @@ export default class Topbar extends React.Component {
                         </View>
                         :
                         <Image
+                        onPress={()=>this.props.navigateToUser()}
                             style={{ width: 34, height: 34, borderRadius: 17, marginLeft: 15 }}
                             source={{ uri: this.props.image }}
                         />
 
                     }
 
-                    <Text style={styles.ScreenName}>{this.props.username}</Text>
+                    <Text    onPress={()=>this.props.navigateToUser()} style={styles.ScreenName}>{this.props.username}</Text>
                     <Feather onPress={() => this.props.MoreItemsModal()} name="more-vertical" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )

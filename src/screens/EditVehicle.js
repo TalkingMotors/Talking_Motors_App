@@ -29,6 +29,7 @@ import * as UserService from '../services/User';
 import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
 import * as VehicleService from '../services/Vehicle';
+import * as VehicleLooks from '../services/SearchVehicleType';
 import {GetSpecificVehicle} from './Detail';
 export default class EditVehicle extends React.Component {
 
@@ -49,14 +50,35 @@ export default class EditVehicle extends React.Component {
             features: [],
             isModal:false,
         }
+       
         
     }
+    VehicleLookupAllFeatures = async () => {
+        var response = await VehicleLooks.VehicleLookupAllFeatures()
+        var allfeatures = response.features
+        for (var i = 0; i < allfeatures.length; i++) {
+            allfeatures[i].checkBox = false
+            for (var j = 0; j < this.state.features.length; j++) {
+                if (allfeatures[i].id == this.state.features[j].id) {
+                    allfeatures[i].checkBox = true
+                }
+            }
+        }
+        this.setState({
+            allfeatures: allfeatures,
 
+        })
+
+    }
     UNSAFE_componentWillMount() {
         try{
         let params = this.props.navigation.state.params.item
         var sortedImage=params.images.sort(function(a, b){return a.position - b.position});
         let allfeatures = this.props.navigation.state.params.allfeatures
+        if(allfeatures ==undefined){
+            allfeatures=[]     
+            this.VehicleLookupAllFeatures()
+        }
         this.setState({
             allData:params,
             description: params.description,
@@ -301,6 +323,7 @@ export default class EditVehicle extends React.Component {
                         </View>
                         <View style={{height:'78%'}}>
                         <ScrollView keyboardShouldPersistTaps='handled'>
+                            {this.state.allfeatures.length > 0 &&
                             <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
                              {this.state.allfeatures.map((item, index) => {
                                  if(item.checkBox){
@@ -331,6 +354,7 @@ export default class EditVehicle extends React.Component {
                                         }
                                 })}
                             </View>
+    }
                         </ScrollView>
                         </View>
                         <View style={styles.TextFieldView}>

@@ -90,14 +90,13 @@ export default class Detail extends React.Component {
                 image: vehicleData.images,
                 descrption: vehicleData.description,
                 price: vehicleData.price,
-                saleSwitch: vehicleData.forSale,
+                saleSwitch: vehicleData.sold,
                 ownerId: vehicleData.userID,
                 PremiumDate: vehicleData.PremiumDate,
                 features: vehicleData.features,
                 vehicleData: vehicleData,
                 isLoader:false
             }, () => {
-                console.log('this.state', this.state);
                 this.favIcon();
             })
         }
@@ -123,35 +122,12 @@ export default class Detail extends React.Component {
 
     UNSAFE_componentWillMount() {
         let vehicleData = this.props.navigation.state.params.item
-        console.log("vehicleData", vehicleData);
         let parent = this.props.navigation.state.params.parent
         this.stateupdate(vehicleData);
         this.setState({
             parent: parent,
         })
-        // this.setState({
-        //     registerNo: vehicleData.registrationNumber,
-        //     vehicleId: vehicleData.id,
-        //     make: vehicleData.make,
-        //     model: vehicleData.model,
-        //     year: vehicleData.buildYear,
-        //     transmission: vehicleData.transmissionType,
-        //     engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
-        //     doors: vehicleData.doorCount,
-        //     seats: vehicleData.seatCount,
-        //     bodyType: vehicleData.bodyType,
-        //     color: vehicleData.colour,
-        //     image: vehicleData.images,
-        //     descrption: vehicleData.description,
-        //     price: vehicleData.price,
-        //     saleSwitch: vehicleData.forSale,
-        //     parent: parent,
-        //     ownerId: vehicleData.userID,
-        //     PremiumDate: vehicleData.PremiumDate,
-        //     features: vehicleData.features,
-        //     vehicleData: vehicleData
-        // })
-        this.VehicleLookupAllFeatures();
+       this.VehicleLookupAllFeatures();
 
     }
 
@@ -176,7 +152,7 @@ export default class Detail extends React.Component {
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;
         this.props.navigation.navigate("EditVehicle", {
-            item: data,
+            item: this.state.vehicleData,
             allfeatures: this.state.allfeatures
         })
     }
@@ -214,7 +190,6 @@ export default class Detail extends React.Component {
             let params={
                 vehicleId:this.state.vehicleData.id
             }
-            console.log("params",params);
             var response = await VehicleService.removeFavourite(params)
             if(response.success){
                 this.stateupdate(response.vehicle);
@@ -249,19 +224,23 @@ export default class Detail extends React.Component {
       if(Object.keys(Storage.userData).length > 0){
             if(Storage.userData.userId != this.state.vehicleData.userID){
                 if(this.state.vehicleData.favourited){
-                    console.log("if true");
                     this.setState({
                         isFavourite:true
                     })
                 }
                 else{
-                    console.log("else false");
                     this.setState({
                         isFavourite:false
                     })
                 }
             }
         }
+    }
+
+    toggleSwitch=()=>{
+        this.setState({
+            saleSwitch:!this.state.saleSwitch
+        })
     }
     render() {
          return (

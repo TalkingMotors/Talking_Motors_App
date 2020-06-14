@@ -160,6 +160,26 @@ export let InsertVehicleImage = async (params) => {
         return null
     }
 }
+export let addNewVehicle = async (params) => {
+    try {
+        console.log("params",params);
+        if (Storage.networkStatus.isConnected) {
+            console.log(APIConstants.VEHICLE_ENDPOINT)
+            let response = await fetch(APIConstants.VEHICLE_ENDPOINT, {
+                method: 'POST',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
 export let UpdateVehicle = async (params) => {
     try {
        if (Storage.networkStatus.isConnected) {

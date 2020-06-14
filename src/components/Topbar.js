@@ -95,7 +95,7 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
-                    {this.props.parent == "talk" && this.props.vehicleData.userID == Storage.userData.userID &&
+                    {this.props.vehicleData.userID == Storage.userData.userId &&
                        
                        <FontAwesome
                             onPress={() => this.props.EditVehicle()}

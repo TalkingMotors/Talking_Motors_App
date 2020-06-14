@@ -43,6 +43,57 @@ export default class ListVehicle extends React.Component {
         Linking.openURL(`mailto:support@talkingmotorsapp.com?subject=SendMail&body=${this.state.registerNo.toUpperCase()}`)
     }
 
+
+
+    addVehicle = async ()=>{
+        this.setState({
+            isloader: true
+        })
+        var data = this.state.newVehicle;
+        var obj = {
+            bodyTypeID: data.bodyTypeId,
+            buildYear: data.buildYear,
+            colourChangeCount: data.colourChangeCount,
+            colourID: data.colourId,
+            driverSeatPositionID: data.driverSeatPositionId,
+            derivative: data.derivative,
+            description: "",
+            doorCount: data.doorCount,
+            driveTypeID: data.driveTypeId,
+            engineCylinderConfigID: data.engineCylinderConfigId,
+            engineFuelDeliveryID: data.engineFuelDeliveryId,
+            enginePowerBhp: data.enginePowerBhp,
+            engineSizeID: data.engineSizeId,
+            engineValveCount: data.engineValveCount,
+            exactModel: data.exactModel,
+            forSale: false,
+            fuelTypeID: data.fuelTypeId,
+            gearCount: data.gearCount,
+            makeID: data.makeId,
+            modelID: data.modelId,
+            postcode: "",
+            registrationNumber: this.state.registerNo.toUpperCase(),
+            roadFundLicenseBandID: data.roadFundLicenseBandId,
+            roadFundLicenseSixMonth: data.roadFundLicenseSixMonth,
+            roadFundLicenseTwelveMonth: data.roadFundLicenseTwelveMonth,
+            seatCount: data.seatCount,
+            stolen: true,
+            transmissionTypeID: data.transmissionTypeId,
+        }
+        var response = await VehicleService.addNewVehicle(obj)
+        if (response.success) {
+            this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
+            this.setState({
+                isloader: false
+            })
+        }
+        else{
+            this.setState({
+                isloader: false
+            })
+        }
+    }
+
     searchVehicleBy = async () => {
         let { registerNo } = this.state
         this.setState({
@@ -236,7 +287,7 @@ export default class ListVehicle extends React.Component {
                             </View>
                         </View>
                         <View style={styles.TextFieldView}>
-                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.searchVehicleBy() }}>
+                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.addVehicle() }}>
                                     <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                         <Text style={styles.ButtonInnerText}>
                                            ADD VEHICLE DETAIL

@@ -42,6 +42,42 @@ export let getVehicleData = async (vrn) => {
         return null
     }
 }
+export let modData = async (vrn) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.MOT_ENDPOINT + vrn, {
+                method: 'GET',
+                crossDomain: true,
+                headers: Utilities.setHeaders()
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let financeDetail = async (vrn) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.VEHICLES_FINANCEDATA_ENDPOINT + vrn, {
+                method: 'GET',
+                crossDomain: true,
+                headers: Utilities.setHeaders()
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
 export let usersVehicle = async (userId) => {
     try {
         if (Storage.networkStatus.isConnected) {

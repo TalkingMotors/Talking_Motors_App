@@ -51,8 +51,16 @@ export default class Home extends React.Component {
         this.navigateToVehicleType = this.navigateToVehicleType.bind(this)
         Utilities.asyncStorage_GetKey(Constants.JWT_TOKEN).then(response => {
              Storage.jwt_Token = JSON.parse(response)
-             console.log("Token", Storage.jwt_Token)
-        })
+         })
+        Utilities.asyncStorage_GetKey(Constants.DashboardDisplay).then(response => {
+            if(JSON.parse(response)==null){
+                Storage.dashboardDisplay = 0
+            }
+            else{
+                Storage.dashboardDisplay = JSON.parse(response)
+            }
+       })
+        
     }
     ToggleModal = () => {
         this.setState({
@@ -71,6 +79,7 @@ export default class Home extends React.Component {
                 if(respose){
                     if(respose.success){
                      Storage.userData = respose.user;
+                     console.log(" Storage.userData", Storage.userData);
                      Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
                     }
                 }

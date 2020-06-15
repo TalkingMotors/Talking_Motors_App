@@ -11,6 +11,7 @@ import {
     StatusBar,
     StyleSheet,
     Switch,
+    Alert,
     Dimensions,
     ActivityIndicator,
     Modal,
@@ -21,7 +22,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme, lightText, darkText, LinearColor, lightBg,LinearColorGreen ,GreenBg } from '../helpers/CommponStyle';
+import { Apptheme, lightText, darkText, LinearColor, lightBg, LinearColorGreen, GreenBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
@@ -29,7 +30,34 @@ import Storage from '../helpers/Storage';
 import Slider from './Slider';
 import * as VehicleLooks from '../services/SearchVehicleType';
 import * as VehicleService from '../services/Vehicle';
+import RNIap, {
+    InAppPurchase,
+    PurchaseError,
+    SubscriptionPurchase,
+    acknowledgePurchaseAndroid,
+    consumePurchaseAndroid,
+    finishTransaction,
+    finishTransactionIOS,
+    purchaseErrorListener,
+    purchaseUpdatedListener,
+} from 'react-native-iap';
 export var GetSpecificVehicle;
+const itemSkus = Platform.select({
+    ios: [
+        'com.cooni.point1000',
+        'com.cooni.point5000', // dooboolab
+    ],
+    android: [
+        // 'android.test.purchased', // subscription
+        'mot_details', // subscription
+        'dvla_details', // subscription
+        // 'point_1000', '5000_point', // dooboolab
+    ],
+});
+
+
+let purchaseUpdateSubscription;
+let purchaseErrorSubscription;
 export default class Detail extends React.Component {
     constructor(props) {
         super(props);
@@ -57,11 +85,17 @@ export default class Detail extends React.Component {
             allfeatures: [],
             vehicleData: '',
             isModal: false,
-            isFavourite:undefined,
-            isLoader:false,
+            isFavourite: undefined,
+            isLoader: false,
+            productList: [],
+            selectPackage: 0,
+            ismotDataDetail: false,
+            motDataDetail: [],
+            isfinanceDetail: false,
+            financeDetail: []
         }
-        this.AddFavourite=this.AddFavourite.bind(this);
-        this.RemoveFavourite=this.RemoveFavourite.bind(this);
+        this.AddFavourite = this.AddFavourite.bind(this);
+        this.RemoveFavourite = this.RemoveFavourite.bind(this);
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.GetSpecificVehicle(this.props.navigation.state.params.item.id)
 
@@ -72,7 +106,15 @@ export default class Detail extends React.Component {
             isModal: !this.state.isModal
         })
     }
-
+    getItems = async () => {
+        try {
+            const products = await RNIap.getProducts(itemSkus);
+            // const products = await RNIap.getSubscriptions(itemSkus);
+            this.setState({ productList: products });
+        } catch (err) {
+            console.warn(err.code, err.message);
+        }
+    };
     stateupdate = (vehicleData) => {
         try {
             this.setState({
@@ -95,7 +137,7 @@ export default class Detail extends React.Component {
                 PremiumDate: vehicleData.PremiumDate,
                 features: vehicleData.features,
                 vehicleData: vehicleData,
-                isLoader:false
+                isLoader: false
             }, () => {
                 this.favIcon();
             })
@@ -111,7 +153,7 @@ export default class Detail extends React.Component {
             var response = await VehicleService.GetSpecificVehicle(id)
             var vehicleData = response.vehicle
             if (response.success) {
-              this.stateupdate(vehicleData);
+                this.stateupdate(vehicleData);
 
             }
         }
@@ -127,10 +169,122 @@ export default class Detail extends React.Component {
         this.setState({
             parent: parent,
         })
-       this.VehicleLookupAllFeatures();
+        this.VehicleLookupAllFeatures();
+        this.getItems()
 
     }
 
+    async componentDidMount() {
+        try {
+            const result = await RNIap.initConnection();
+            await RNIap.consumeAllItemsAndroid();
+
+        } catch (err) {
+            console.warn(err.code, err.message);
+        }
+
+        purchaseUpdateSubscription = purchaseUpdatedListener(
+            async (purchase) => {
+                const receipt = purchase.transactionReceipt;
+                if (receipt) {
+                    try {
+                        console.log("receipt", receipt);
+                        // if (Platform.OS === 'ios') {
+                        //   finishTransactionIOS(purchase.transactionId);
+                        // } else if (Platform.OS === 'android') {
+                        //   // If consumable (can be purchased again)
+                        //   consumePurchaseAndroid(purchase.purchaseToken);
+                        //   // If not consumable
+                        //   acknowledgePurchaseAndroid(purchase.purchaseToken);
+                        // }
+                        const ackResult = await finishTransaction(purchase);
+                    } catch (ackErr) {
+                    }
+
+                    //   this.setState({receipt}, () => this.goNext());
+                }
+            },
+        );
+
+        purchaseErrorSubscription = purchaseErrorListener(
+            (error) => {
+                // Alert.alert('purchase error', JSON.stringify(error));
+            },
+        );
+    }
+
+    componentWillUnmount() {
+        if (purchaseUpdateSubscription) {
+            purchaseUpdateSubscription.remove();
+            purchaseUpdateSubscription = null;
+        }
+        if (purchaseErrorSubscription) {
+            purchaseErrorSubscription.remove();
+            purchaseErrorSubscription = null;
+        }
+        RNIap.endConnection();
+    }
+
+    getAvailablePurchases = async () => {
+        try {
+            console.info(
+                'Get available purchases (non-consumable or unconsumed consumable)',
+            );
+            const purchases = await RNIap.getAvailablePurchases();
+            console.info('Available purchases :: ', purchases);
+            if (purchases && purchases.length > 0) {
+                this.setState({
+                    availableItemsMessage: `Got ${purchases.length} items.`,
+                    receipt: purchases[0].transactionReceipt,
+                });
+            }
+        } catch (err) {
+            console.warn(err.code, err.message);
+            //   Alert.alert(err.message);
+        }
+    };
+    requestPurchase = async (sku) => {
+        try {
+
+            let result = await RNIap.requestPurchase(sku);
+            if (result) {
+                console.log("result", result);
+                console.log("selectPackage", this.state.selectPackage);
+                if (this.state.selectPackage == 1) {
+                    this.state.ismotDataDetail = true
+                    this.setState({
+                        ismotDataDetail: this.state.ismotDataDetail
+                    })
+                    var response = await VehicleService.modData(this.state.registerNo)
+                    console.log("response", response);
+                    if (response.success) {
+                        if (response.motHistoryData.motHistoryRecordCount > 0) {
+                            this.setState({
+                                motDataDetail: response.motHistoryData.motHistoryRecordList
+                            })
+                        }
+                    }
+                }
+                if (this.state.selectPackage == 2) {
+                    this.state.isfinanceDetail = true
+                    this.setState({
+                        isfinanceDetail: this.state.isfinanceDetail
+                    })
+                    var response = await VehicleService.financeDetail(this.state.registerNo)
+                    console.log("response", response);
+                    if (response.success) {
+                        if (response.financeData.financeRecordList > 0) {
+                            this.setState({
+                                financeDetail: response.financeData.financeRecordList
+                            })
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn(err.code, err.message);
+        }
+    };
     VehicleLookupAllFeatures = async () => {
         var response = await VehicleLooks.VehicleLookupAllFeatures()
         var allfeatures = response.features
@@ -160,101 +314,160 @@ export default class Detail extends React.Component {
         this.props.navigation.navigate("Message")
     }
     sendMessage = () => {
-        try{
-            if(Object.keys(Storage.userData).length>0){
+        try {
+            if (Object.keys(Storage.userData).length > 0) {
 
-           
-        var message = {
-            vrm: this.state.registerNo,
-            userId: this.state.ownerId,
-            vehicleId: this.state.vehicleId,
-            message: "",
-            image: null
+
+                var message = {
+                    vrm: this.state.registerNo,
+                    userId: this.state.ownerId,
+                    vehicleId: this.state.vehicleId,
+                    message: "",
+                    image: null
+                }
+                this.props.navigation.navigate("Messenger", { conversationId: 0, messageBody: message })
+            }
+            else {
+                this.ToggleModal();
+            }
         }
-        this.props.navigation.navigate("Messenger", { conversationId: 0, messageBody: message })
-    }
-    else{
-        this.ToggleModal();
-    }
-    }
-    catch(e){
-        console.log("Exception",e)
-    }
+        catch (e) {
+            console.log("Exception", e)
+        }
     }
 
-    RemoveFavourite = async ()=>{
-        try{
+    RemoveFavourite = async () => {
+        try {
             this.setState({
-                isLoader:true
+                isLoader: true
             })
-            let params={
-                vehicleId:this.state.vehicleData.id
+            let params = {
+                vehicleId: this.state.vehicleData.id
             }
             var response = await VehicleService.removeFavourite(params)
-            if(response.success){
+            if (response.success) {
                 this.stateupdate(response.vehicle);
             }
         }
-        catch(e){
-            
-            console.log("Exception",e)
+        catch (e) {
+
+            console.log("Exception", e)
         }
     }
-   AddFavourite = async ()=>{
-        try{
+    AddFavourite = async () => {
+        try {
             this.setState({
-                isLoader:true
+                isLoader: true
             })
-            let params={
-                vehicleId:this.state.vehicleData.id
+            let params = {
+                vehicleId: this.state.vehicleData.id
             }
-            console.log("params",params);
+            console.log("params", params);
             var response = await VehicleService.addFavourite(params)
-            if(response.success){
+            if (response.success) {
                 this.stateupdate(response.vehicle);
             }
         }
-        catch(e){
-            
-            console.log("Exception",e)
+        catch (e) {
+
+            console.log("Exception", e)
         }
     }
 
-    favIcon =()=>{
-      if(Object.keys(Storage.userData).length > 0){
-            if(Storage.userData.userId != this.state.vehicleData.userID){
-                if(this.state.vehicleData.favourited){
+    favIcon = () => {
+        if (Object.keys(Storage.userData).length > 0) {
+            if (Storage.userData.userId != this.state.vehicleData.userID) {
+                if (this.state.vehicleData.favourited) {
                     this.setState({
-                        isFavourite:true
+                        isFavourite: true
                     })
                 }
-                else{
+                else {
                     this.setState({
-                        isFavourite:false
+                        isFavourite: false
                     })
                 }
             }
         }
     }
 
-    toggleSwitch=()=>{
+    toggleSwitch = () => {
         this.setState({
-            saleSwitch:!this.state.saleSwitch
+            saleSwitch: !this.state.saleSwitch
         })
+    }
+
+    dvlaMot = (id) => {
+        Alert.alert(
+            "MOT & Mileage",
+            // "A vehicle with this registration is already on the system. \n\nIf you think this is an error, or you have recently purchased this vehicle please get in touch with us below.",
+            "Check the details of this vehicle against the official DVLA database so you know exactly what you are buying",
+
+            [
+
+                {
+                    text: "NO THANKS",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: `Buy NOW FOR ${this.state.productList[1].localizedPrice}`,
+                    onPress: () => {
+                        this.setState({
+                            selectPackage: id
+                        })
+                        this.requestPurchase(this.state.productList[1].productId)
+                    },
+                    // onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+
+            ],
+            { cancelable: false }
+        );
+    }
+    dvlaDetailData = (id) => {
+        Alert.alert(
+            "Information check",
+            // "A vehicle with this registration is already on the system. \n\nIf you think this is an error, or you have recently purchased this vehicle please get in touch with us below.",
+            "The most comprehensive vehicle check available. Includes MOT history, import/export status, V5 issue date, plate changes, number of keepers, VIN number, outstanding finance and history of stolen, scrapped or written off status.",
+
+            [
+
+                {
+                    text: "NO THANKS",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: `Buy NOW FOR ${this.state.productList[0].localizedPrice}`,
+                    onPress: () => {
+                        this.setState({
+                            selectPackage: id
+                        })
+                        this.requestPurchase(this.state.productList[0].productId)
+                    },
+                    // onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+
+            ],
+            { cancelable: false }
+        );
     }
     render() {
          return (
             <View style={styles.ParentView}>
-                <Topbar 
-                 RemoveFavourite={this.RemoveFavourite} 
-                 AddFavourite={this.AddFavourite} 
-                 vehicleData={this.state.vehicleData} 
-                 isFavourite={this.state.isFavourite} 
-                 ParentPage="Detail" 
-                 EditVehicle={this.EditVehicle} 
-                 parent={this.state.parent} 
-                 navigation={this.props} />
-                   {this.state.isloader &&
+                <Topbar
+                    RemoveFavourite={this.RemoveFavourite}
+                    AddFavourite={this.AddFavourite}
+                    vehicleData={this.state.vehicleData}
+                    isFavourite={this.state.isFavourite}
+                    ParentPage="Detail"
+                    EditVehicle={this.EditVehicle}
+                    parent={this.state.parent}
+                    navigation={this.props} />
+                {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
                             color="#ed0000"
@@ -483,7 +696,7 @@ export default class Detail extends React.Component {
 
                     <View style={[styles.ButtonView, { marginTop: 20, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
                         <Text >For Sale: </Text>
-                        {(this.state.userId == this.state.ownerId )?
+                        {(this.state.userId == this.state.ownerId) ?
                             <Switch
                                 thumbColor={Apptheme}
                                 onValueChange={this.toggleSwitch}
@@ -492,23 +705,101 @@ export default class Detail extends React.Component {
                             <Text>{(this.state.saleSwitch) ? "Yes" : "No"}</Text>
                         }
                     </View>
-                        {( (this.state.userId != this.state.ownerId ) || Utilities.stringIsEmpty(this.state.userId)) &&
+                    {((this.state.userId != this.state.ownerId) || Utilities.stringIsEmpty(this.state.userId)) &&
                         <View>
-                    <LinearGradient colors={LinearColorGreen} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
-                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("ListingType")}>
-                                {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
-                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>CHECK DVLA MOT & MILEAGE</Text>
-                            </TouchableOpacity>
-                        </LinearGradient>
+                            {!this.state.ismotDataDetail &&
 
-                        <LinearGradient colors={LinearColorGreen} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
-                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.props.navigation.navigate("ListingType")}>
-                                {/* <Feather name="message-circle" color={lightText} size={22} style={{ paddingHorizontal: 10 }} /> */}
-                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>CHECK DVLA & FINANCE DETAILS</Text>
-                            </TouchableOpacity>
-                        </LinearGradient>
+                                <LinearGradient colors={LinearColorGreen} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                                    <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.dvlaMot(1)}>
+                                        <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>CHECK DVLA MOT & MILEAGE</Text>
+                                    </TouchableOpacity>
+                                </LinearGradient>
+                            }
+
+                            {this.state.ismotDataDetail &&
+
+                                <View>
+                                    <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: 10 }}>
+                                        <Text style={{ color: Apptheme, fontSize: 16 }}>
+
+                                            DVLA MOT & MILEAGE
+                                     </Text>
+                                    </View>
+                                    {(this.state.motDataDetail.length > 0) ?
+                                        <View>
+                                            <View style={{ marginVertical: 2, width: '94%', marginHorizontal: '3%', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row' }}>
+                                                <Text style={{ color: darkText, fontSize: 16, fontWeight: 'bold' }}>
+                                                    MOT Test Date
+                                           </Text>
+                                                <Text style={{ color: darkText, position: 'absolute', right: 10, fontSize: 16 }}>
+                                                    {this.state.motDataDetail[0].motTestDate}
+                                                </Text>
+                                            </View>
+
+                                            <View style={{ marginVertical: 2, width: '94%', marginHorizontal: '3%', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row' }}>
+                                                <Text style={{ color: darkText, fontSize: 16, fontWeight: 'bold' }}>
+                                                    Result
+                                           </Text>
+                                                <Text style={{ color: darkText, position: 'absolute', right: 10, fontSize: 16 }}>
+                                                    {this.state.motDataDetail[0].result}
+                                                </Text>
+                                            </View>
+
+                                            <View style={{ marginVertical: 2, width: '94%', marginHorizontal: '3%', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row' }}>
+                                                <Text style={{ color: darkText, fontSize: 16, fontWeight: 'bold' }}>
+                                                    Odo Meter Reading
+                                           </Text>
+                                                <Text style={{ color: darkText, position: 'absolute', right: 10, fontSize: 16 }}>
+                                                    {this.state.motDataDetail[0].odometerReading}
+                                                </Text>
+                                            </View>
+                                            <View style={{ marginVertical: 2, width: '94%', marginHorizontal: '3%', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row' }}>
+                                                <Text style={{ color: darkText, fontSize: 16, fontWeight: 'bold' }}>
+                                                    Odo Meter Units
+                                           </Text>
+                                                <Text style={{ color: darkText, position: 'absolute', right: 10, fontSize: 16 }}>
+                                                    {this.state.motDataDetail[0].odometerUnits}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        :
+                                        <View style={{ marginVertical: 10 }}>
+                                            <Text style={{ textAlign: 'center', fontSize: 14, color: darkText }}>
+                                                No DVLA MOT & MILEAGE data found
+                                            </Text>
+                                        </View>
+                                    }
+                                </View>
+
+                            }
+                            {!this.state.isfinanceDetail &&
+                                <LinearGradient colors={LinearColorGreen} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                                    <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.dvlaDetailData(2)}>
+                                        <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>CHECK DVLA & FINANCE DETAILS</Text>
+                                    </TouchableOpacity>
+                                </LinearGradient>
+                            }
+                            {this.state.isfinanceDetail &&
+                                <View>
+                                    <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: 10 }}>
+                                        <Text style={{ color: Apptheme, fontSize: 16 }}>
+                                            DVLA & FINANCE DETAILS
+  </Text>
+                                    </View>
+                                    {(this.state.financeDetail.length > 0) ?
+                                        <View>
+                                        </View>
+                                        :
+                                        <View style={{ marginVertical: 10 }}>
+                                            <Text style={{ textAlign: 'center', fontSize: 14, color: darkText }}>
+                                                No DVLA & FINANCE DETAILS found
+         </Text>
+                                        </View>
+                                    }
+                                </View>
+                            }
                         </View>
-                        }
+                    }
                     {
                         this.state.userId == this.state.ownerId ?
                             <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
@@ -551,8 +842,8 @@ export default class Detail extends React.Component {
                             </TouchableOpacity>
                         </LinearGradient>
                     }
-                   
- 
+
+
 
 
 
@@ -577,7 +868,7 @@ export default class Detail extends React.Component {
                                 <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
 
                                     <Text style={{ fontSize: 14, color: "black", paddingHorizontal: 10 }}>
-                                       You must be logged in to message this user Please login or register now
+                                        You must be logged in to message this user Please login or register now
                                     </Text>
                                     <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: "flex-end" }}>
                                         <TouchableOpacity

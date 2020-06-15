@@ -13,6 +13,7 @@ export let saveUpdateDevice = async (params) => {
 export let showAndroidNotification = (notification) =>{
     try{
         const data = notification.data
+        console.log("data",data);
         console.log(JSON.stringify(data))
         let notificationTitle =  notification._title != undefined ? notification._title : data.Title;
         let notificationMessage = notification._body;

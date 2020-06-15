@@ -3,8 +3,8 @@ const API_Path = {
     IP_URL: "http://54.171.245.252:80/",
     DEV_URL: "http://dev.talkingmotorsapp.com/",
     LIVE_URL: "http://live.talkingmotorsapp.com/",
-    // BASE_URL : "http://dev.talkingmotorsapp.com/"
-    BASE_URL : "http://live.talkingmotorsapp.com/"
+    BASE_URL : "http://dev.talkingmotorsapp.com/"
+    // BASE_URL : "http://live.talkingmotorsapp.com/"
     
 };
 
@@ -21,6 +21,7 @@ const APIService = {
     MOT_ENDPOINT: API_Path.BASE_URL + "vehicle/mot-data",
     DVLA_ENDPOINT: API_Path.BASE_URL + "vehicle/all-dvla-data",
     MY_VEHICLES_ENDPOINT: API_Path.BASE_URL + "vehicle/my-vehicles",
+    VEHICLES_FINANCEDATA_ENDPOINT: API_Path.BASE_URL + "vehicle/finance-data",
     VEHICLE_DATA_ENDPOINT: API_Path.BASE_URL + "vehicle/vehicle-data/",    //"vehicle/vehicle-data/{vrm}",
     DVLA_VEHICLE_DATA_ENDPOINT: API_Path.BASE_URL + "vehicle/all-dvla-data/",   //"vehicle/all-dvla-data/{vrm}",
     DVLA_VEHICLE_AND_MOT_DATA_ENDPOINT: API_Path.BASE_URL + "/vehicle/vehicle-and-mot-data/",  //"/vehicle/vehicle-and-mot-data/{vrm}",

@@ -10,6 +10,7 @@ export default class AndroidNotification extends Component {
             await  firebase.messaging().getToken()
             .then(fcmToken => {
               if (fcmToken) {
+                console.log("fcmToken",fcmToken);
                  NetInfo.fetch().then(isConnected => {
                       if (isConnected) {
                         let udid = DeviceInfo.getUniqueId();
@@ -25,6 +26,7 @@ export default class AndroidNotification extends Component {
       const notificationOpen = await firebase.notifications().getInitialNotification();
             if (notificationOpen) {
                 const notification = notificationOpen.notification;
+                console.log("notificationOpen 1",notificationOpen);
                 DeviceHelper.showAndroidNotification(notification)
                 firebase.notifications().removeDeliveredNotification(notification.notificationId);
             } 
@@ -35,6 +37,7 @@ export default class AndroidNotification extends Component {
             this.notificationListener = firebase.notifications().onNotification((notification) => {
                 notification.android.setChannelId(Constants.firebaseChannelId).android.setSmallIcon('ic_launcher');
                 firebase.notifications().displayNotification(notification);
+                console.log("notificationOpen 2",notification);
                 DeviceHelper.showAndroidNotification(notification)
                 firebase.notifications().removeDeliveredNotification(notification.notificationId);
                 
@@ -42,6 +45,7 @@ export default class AndroidNotification extends Component {
             this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
                 const notification = notificationOpen.notification;
                 DeviceHelper.showAndroidNotification(notification);
+                console.log("notificationOpen 3",notification);
                 firebase.notifications().removeDeliveredNotification(notification.notificationId);
                 
             });

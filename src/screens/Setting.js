@@ -44,7 +44,7 @@ export default class Setting extends React.Component {
 
 
     }
-
+   
 
     UpdatesUserService = async (userObj) => {
         var userObject = {

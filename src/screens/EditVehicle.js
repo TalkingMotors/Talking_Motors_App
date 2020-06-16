@@ -252,11 +252,8 @@ export default class EditVehicle extends React.Component {
     }
 
     render() {
-        console.log("motDueDate", moment(this.state.motDueDate).format('L'));
         return (
-
-
-            <View style={styles.ParentView}>
+          <View style={styles.ParentView}>
                 <Topbar ParentPage="Edit Your Vehicle" navigation={this.props} />
 
                 {this.state.isloader &&

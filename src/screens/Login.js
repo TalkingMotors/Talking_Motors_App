@@ -51,7 +51,7 @@ export default class Login extends React.Component {
         this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
             if (Object.keys(Storage.userData).length > 0) {
                 
-                this.props.navigation.navigate("Home")
+                this.props.navigation.replace("Home")
                 SplashScreen.hide();
              
             }
@@ -62,13 +62,13 @@ export default class Login extends React.Component {
         );
 
         if (Object.keys(Storage.userData).length > 0) {
-            this.props.navigation.navigate("Home")
+            this.props.navigation.replace("Home")
             SplashScreen.hide();
         } else {
             Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(response => {
                 if (response) {
                     Storage.userData = JSON.parse(response);
-                    this.props.navigation.navigate("Home")
+                    this.props.navigation.replace("Home")
                     SplashScreen.hide();
 
                 }
@@ -81,7 +81,7 @@ export default class Login extends React.Component {
             if (Object.keys(Storage.userData).length > 0) {
                 
                 SplashScreen.hide();
-                this.props.navigation.navigate("Home")
+                this.props.navigation.replace("Home")
              
             }
             else{

@@ -438,7 +438,13 @@ export default class VehicleType extends React.Component {
             // longitude: 0.0,
             // latitude: 0.0,
         }
-        var filterparam = {};
+        var filterparam = {
+            stolen:false,
+            distance:200,
+            orderBy:this.state.selectedsort,
+            numberOfResults:30,
+            forSale:this.state.switchValue
+        };
         let items = Object.entries(param);
         items.map(item => {
             let key = item[0];
@@ -447,6 +453,7 @@ export default class VehicleType extends React.Component {
                 filterparam[key] = value
             }
         });
+
         console.log("filterparam",filterparam);
         var response = await VehicleLooks.SearchVehicleTypes(filterparam)
         console.log("response", response);
@@ -454,6 +461,7 @@ export default class VehicleType extends React.Component {
         {
         listVehicle:response.vehicles,
         resultcount:response.numberOfResults,
+        filterparam:filterparam
         })
     }
 

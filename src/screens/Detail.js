@@ -66,7 +66,9 @@ export default class Detail extends React.Component {
         super(props);
         this.state = {
             registerNo: '',
+            derivative:'',
             make: '',
+            engineSize:'',
             model: '',
             year: '',
             transmission: '',
@@ -135,6 +137,7 @@ export default class Detail extends React.Component {
                 engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
                 doors: vehicleData.doorCount,
                 seats: vehicleData.seatCount,
+                engineSize:vehicleData.engineSize,
                 bodyType: vehicleData.bodyType,
                 color: vehicleData.colour,
                 image: vehicleData.images,
@@ -142,6 +145,7 @@ export default class Detail extends React.Component {
                 price: vehicleData.price,
                 saleSwitch: vehicleData.sold,
                 ownerId: vehicleData.userID,
+                derivative:(!Utilities.stringIsEmpty(vehicleData.derivative)? vehicleData.derivative:""),
                 PremiumDate: vehicleData.PremiumDate,
                 features: vehicleData.features,
                 userMileage:vehicleData.userMileage,
@@ -544,6 +548,14 @@ export default class Detail extends React.Component {
                             {this.props.navigation.state.params.item.title}
                         </Text>
                     </View>
+                        
+                    <View>
+                            <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5,paddingHorizontal:10 }}>
+                                {this.state.make +" "+ this.state.model+" "+this.state.engineSize +" " +this.state.derivative}
+                            </Text>
+                        </View>
+
+
                     {!Utilities.stringIsEmpty(this.state.price) &&
                         <View>
                             <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5 }}>

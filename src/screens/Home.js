@@ -47,9 +47,9 @@ export default class Home extends React.Component {
             isTalkModal:false,
             isModal:false
         }
-        this.backAndroidHandler=this.backAndroidHandler.bind(this);
+        // this.backAndroidHandler=this.backAndroidHandler.bind(this);
         this._didFocusSubscription =  props.navigation.addListener('didFocus', payload => {
-            BackHandler.addEventListener('hardwareBackPress', this.backAndroidHandler)
+            // BackHandler.addEventListener('hardwareBackPress', this.backAndroidHandler)
         })
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
@@ -68,11 +68,11 @@ export default class Home extends React.Component {
         
     }
 
-    backAndroidHandler() {
-        console.log("this.props",this.props);
-        // BackHandler.exitApp();
-        // return true
-    }
+    // backAndroidHandler() {
+    //     console.log("this.props",this.props);
+    //     // BackHandler.exitApp();
+    //     // return true
+    // }
     ToggleModal = () => {
         this.setState({
             isModal: !this.state.isModal
@@ -85,13 +85,13 @@ export default class Home extends React.Component {
 
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
             console.log("willBlur")
-            BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
+            // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
         })
         
     }
     componentWillUnmount(){
         console.log("componentWillUnmount")
-        BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
+        // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
     }
     getUserBy = (userId) => {
         try{

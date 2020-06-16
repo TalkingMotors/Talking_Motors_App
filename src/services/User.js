@@ -59,14 +59,11 @@ export let getUserById = async (userId) => {
 
 export let updateUser = async (userObj) => {
     try {
-        console.log(APIConstants.UPDATE_USER_ENDPOINT);
-        if (Storage.networkStatus.isConnected) {
+       if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UPDATE_USER_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
-                body: JSON.stringify({
-                    userObj
-                })
+                body: JSON.stringify(userObj)
             })
             let result = response.json()
             return result;

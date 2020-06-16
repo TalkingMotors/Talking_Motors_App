@@ -288,7 +288,7 @@ export default class EditVehicle extends React.Component {
                             <View>
 
                                 <TextField
-                                    label='Post Code'
+                                    label='Postcode'
                                     fontSize={13}
                                     keyboardType='default'
                                     tintColor={Apptheme}

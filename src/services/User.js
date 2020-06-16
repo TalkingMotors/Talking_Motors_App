@@ -101,6 +101,24 @@ export let changeProfilePhoto = async (image) => {
         return null
     }
 }
+export let removeProfileImage = async () => {
+    try {
+        console.log(APIConstants.REMOVE_USER_IMAGE_ENDPOINT);
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.REMOVE_USER_IMAGE_ENDPOINT, {
+                method: 'DELETE',
+                headers: Utilities.setHeaders(),
+               })
+            let result = response.json()
+            return result;
+        } else {
+            console.log(e.message)
+            return null
+        }
+    } catch (e) {
+        return null
+    }
+}
 
 
 export let ForgetPasswordCode = async (params) => {

@@ -11,6 +11,7 @@ import {
     StatusBar,
     StyleSheet,
     Switch,
+    Share,
     Alert,
     Dimensions,
     ActivityIndicator,
@@ -19,6 +20,8 @@ import {
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -92,10 +95,14 @@ export default class Detail extends React.Component {
             ismotDataDetail: false,
             motDataDetail: [],
             isfinanceDetail: false,
-            financeDetail: []
+            financeDetail: [],
+            userMileage:'',
+            postcode:'',
         }
         this.AddFavourite = this.AddFavourite.bind(this);
         this.RemoveFavourite = this.RemoveFavourite.bind(this);
+        this.shareAction = this.shareAction.bind(this);
+        this.onShare = this.onShare.bind(this);
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.GetSpecificVehicle(this.props.navigation.state.params.item.id)
 
@@ -117,6 +124,7 @@ export default class Detail extends React.Component {
     };
     stateupdate = (vehicleData) => {
         try {
+            console.log("vehicleData",vehicleData);
             this.setState({
                 registerNo: vehicleData.registrationNumber,
                 vehicleId: vehicleData.id,
@@ -136,8 +144,12 @@ export default class Detail extends React.Component {
                 ownerId: vehicleData.userID,
                 PremiumDate: vehicleData.PremiumDate,
                 features: vehicleData.features,
+                userMileage:vehicleData.userMileage,
+                postcode:vehicleData.postcode,
                 vehicleData: vehicleData,
-                isLoader: false
+
+                isLoader: false,
+                shareLoader:false
             }, () => {
                 this.favIcon();
             })
@@ -146,8 +158,34 @@ export default class Detail extends React.Component {
             console.log("stateupdate", e);
         }
     }
-
-
+    shareAction() {
+        if (!this.state.shareLoader) {
+          this.onShare();
+          setTimeout(() => {
+            this.state.shareLoader = false
+          }, 500);
+        }
+      }
+    onShare = async () => {
+        try {
+          this.state.shareLoader = true
+          const result = await Share.share({
+            message:`https://t77ry.app.goo.gl/?link=http://talkingmotorsapp.com/vehicles/${this.state.registerNo}&apn=com.talkingmotorsapp.talkingmotors&ibi=com.talkingmotorsapp.talkingmotors&isi=1121996881&ad=0&ius=talkingmotors`
+          })
+    
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // shared with activity type of result.activityType
+            } else {
+              // shared
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // dismissed
+          }
+        } catch (error) {
+            console.log("Error",error);
+        }
+      };
     GetSpecificVehicle = GetSpecificVehicle = async (id) => {
         try {
             var response = await VehicleService.GetSpecificVehicle(id)
@@ -399,7 +437,7 @@ export default class Detail extends React.Component {
 
     dvlaMot = (id) => {
         Alert.alert(
-            "MOT & Mileage",
+            "MOT & Mileage check",
             // "A vehicle with this registration is already on the system. \n\nIf you think this is an error, or you have recently purchased this vehicle please get in touch with us below.",
             "Check the details of this vehicle against the official DVLA database so you know exactly what you are buying",
 
@@ -459,6 +497,7 @@ export default class Detail extends React.Component {
          return (
             <View style={styles.ParentView}>
                 <Topbar
+                    shareAction={this.shareAction}
                     RemoveFavourite={this.RemoveFavourite}
                     AddFavourite={this.AddFavourite}
                     vehicleData={this.state.vehicleData}
@@ -660,6 +699,35 @@ export default class Detail extends React.Component {
                         </View>
                     </View>
 
+                    <View style={[styles.MainItemView, { backgroundColor: '#fffff', height: 50 }]}>
+                        <View style={styles.ItemViewBox1}>
+                            <View style={{ width: '20%', justifyContent: 'center', alignItems: "center" }}>
+                                <Entypo name="location-pin" size={16} color="#777" />
+                            </View>
+                            <View style={{ width: '80%', justifyContent: 'center', }}>
+                                <Text style={styles.TextHead}>
+                                    Location
+                            </Text>
+                                <Text style={styles.TextTail}>
+                                    {this.state.postcode}
+                                </Text>
+                            </View>
+                        </View>
+                        <View style={styles.ItemViewBox1}>
+                            <View style={{ width: '20%', justifyContent: 'center', alignItems: "center" }}>
+                                <FontAwesome5 name="discourse" size={16} color="#777" />
+                            </View>
+                            <View style={{ width: '80%', justifyContent: 'center', }}>
+                                <Text style={styles.TextHead}>
+                                    Mileage
+                            </Text>
+                                <Text style={styles.TextTail}>
+                                    {this.state.userMileage}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+
 
                     {this.state.parent == "talk" && !Utilities.stringIsEmpty(this.state.features) &&
                         <View>
@@ -683,7 +751,7 @@ export default class Detail extends React.Component {
                     }
 
                     <View style={{ width: '100%', paddingVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ color: Apptheme, fontSize: 16 }}>MORE DESCRPTION</Text>
+                        <Text style={{ color: Apptheme, fontSize: 16 }}>DESCRIPTION</Text>
                     </View>
 
                     <View style={{ width: '100%', paddingHorizontal: 20 }}>

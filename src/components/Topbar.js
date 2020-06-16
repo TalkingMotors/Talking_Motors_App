@@ -59,7 +59,7 @@ export default class Topbar extends React.Component {
                         <Image
                             resizeMode="contain"
                             style={{ height: 50, width: 50 }}
-                            source={require('../images/header-logo.png')}
+                            source={require('../images/logo.png')}
                         />
                     </View>
                     {(Object.keys(Storage.userData).length > 0)?
@@ -74,16 +74,16 @@ export default class Topbar extends React.Component {
             )
         }
 
-        else if (this.props.ParentPage == "Dashboard") {
+        else if (this.props.ParentPage == "My Dashboard") {
             return (
                 <View style={styles.MainView}>
                     <Feather
-                        onPress={() => this.props.navigation.goBack()}
+                        onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
                     <FontAwesome onPress={()=>this.props.ToggleModal()} name="folder-open" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                     <FontAwesome
-                        onPress={() => this.props.navigation.navigate("ListVehicle")}
+                        onPress={() => this.props.navigation.navigation.navigate("ListVehicle")}
                         name="plus" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )
@@ -102,7 +102,7 @@ export default class Topbar extends React.Component {
                             name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                     }
                         {this.favIcon()}
-                    <Feather name="share-2" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    <Feather name="share-2" onPress={()=>this.props.shareAction()} color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )
         }
@@ -118,11 +118,22 @@ export default class Topbar extends React.Component {
                 </View>
             )
         }
+        else if (this.props.ParentPage == "Vehicle Type") {
+            return (
+                <View style={styles.MainView}>
+                    <Feather
+                        onPress={() => this.props.navigation.navigation.goBack()}
+                        name="arrow-left" color={lightText} size={22} style={styles.Icons} />
+                    <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
+                    <FontAwesome onPress={() => this.props.resetAllFields()} name="eraser" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                </View>
+            )
+        }
         else if (this.props.ParentPage == "Messenger") {
             return (
                 <View style={styles.MainView}>
                     <Feather
-                        onPress={() => this.props.navigation.navigation.navigate("Message")}
+                        onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     {Utilities.stringIsEmpty(this.props.image) ?
                         <View style={{ marginLeft: 15, width: 35, height: 35, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', borderRadius: 50, }}>

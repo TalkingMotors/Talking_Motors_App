@@ -65,11 +65,11 @@ export default class SearchResultVehicle extends React.Component {
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Vehicle Search" navigation={this.props} />
                 <ScrollView>
-                    <LinearGradient colors={LinearColor} style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
-                        <Text style={{ fontSize: 18, color: lightText, fontWeight: 'bold' }}>
+                    <View style={{ marginHorizontal: '2%', borderRadius: 5, paddingTop: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+                        <Text style={{ fontSize: 18, color: Apptheme, fontWeight: 'bold' }}>
                             {this.state.result} results
                         </Text>
-                    </LinearGradient>
+                    </View>
                     <View style={{width:'100%',height:'100%'}}>
                     <FlatList
                         data={this.state.list}

@@ -206,11 +206,11 @@ export default class UsersVehicle extends React.Component {
                     </View>
                 }
                 <ScrollView>
-                    <LinearGradient colors={LinearColor} style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
-                        <Text style={{ fontSize: 18, color: lightText, fontWeight: 'bold' }}>
+                    <View style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+                        <Text style={{ fontSize: 18, color: Apptheme, fontWeight: 'bold' }}>
                             {this.state.list.length } results
                         </Text>
-                    </LinearGradient>
+                    </View>
                     <FlatList
                         data={this.state.list}
                         listKey={(item, index) => 'recent-' + index.toString()}

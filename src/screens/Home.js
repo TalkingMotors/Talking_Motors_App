@@ -9,6 +9,7 @@ import {
     TextInput,
     StatusBar,
     Modal,
+    BackHandler,
     StyleSheet,
     ImageBackground,
     TouchableOpacity
@@ -46,6 +47,10 @@ export default class Home extends React.Component {
             isTalkModal:false,
             isModal:false
         }
+        this.backAndroidHandler=this.backAndroidHandler.bind(this);
+        this._didFocusSubscription =  props.navigation.addListener('didFocus', payload => {
+            BackHandler.addEventListener('hardwareBackPress', this.backAndroidHandler)
+        })
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
         this.navigateToVehicleType = this.navigateToVehicleType.bind(this)
@@ -62,6 +67,12 @@ export default class Home extends React.Component {
        })
         
     }
+
+    backAndroidHandler() {
+        console.log("this.props",this.props);
+        // BackHandler.exitApp();
+        // return true
+    }
     ToggleModal = () => {
         this.setState({
             isModal: !this.state.isModal
@@ -71,7 +82,16 @@ export default class Home extends React.Component {
         if (Object.keys(Storage.userData).length > 0) {
             this.getUserBy(Storage.userData.userId)
         }
+
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
+            console.log("willBlur")
+            BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
+        })
         
+    }
+    componentWillUnmount(){
+        console.log("componentWillUnmount")
+        BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
     }
     getUserBy = (userId) => {
         try{
@@ -180,7 +200,7 @@ export default class Home extends React.Component {
                                         TALK
                                      </Text>
                                     <Text style={{ textAlign: 'center', color: lightText }}>
-                                        message other Taking Motors users
+                                        message other Talking Motors users
                                     </Text>
                                 </View>
                                 <FontAwesome5 name="angle-right" size={24} color={lightText} style={styles.BoxIcon} />
@@ -219,7 +239,7 @@ export default class Home extends React.Component {
                             style={styles.ButtonViewImage}>
                             <View style={styles.ImageView}>
                                 <Image
-                                    source={require('../images/third.png')}
+                                    source={require('../images/second.png')}
                                     style={styles.Image}
                                 />
                                 <View style={{ position: 'absolute' }}>

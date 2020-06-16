@@ -37,14 +37,14 @@ export default class Profile extends React.Component {
             telephone: Storage.userData.telephone,
             photoUrl: Storage.userData.thumbUrl,
             disableButton: false,
-            isloader:false,
+            isloader: false,
             errorMessage: "This is a required field.",
             errordisplayName: false,
             errornickName: false,
-            errorEmaill:false,
-            ModalOpen:false
+            errorEmaill: false,
+            ModalOpen: false
 
-            
+
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.stateUpdate()
@@ -52,10 +52,10 @@ export default class Profile extends React.Component {
         })
 
 
-        console.log("Storage.userData",Storage.userData); 
+        console.log("Storage.userData", Storage.userData);
     }
 
-    stateUpdate=()=>{
+    stateUpdate = () => {
         this.setState({
             userData: Storage.userData,
             displayName: Storage.userData.name,
@@ -77,10 +77,10 @@ export default class Profile extends React.Component {
         }
     }
     onChangeText = (key, value) => {
-        if(key.length == 0) {
+        if (key.length == 0) {
 
         }
-        this.setState({ [key]: value, loginFail:false ,errorMessage:"This is a required field." })
+        this.setState({ [key]: value, loginFail: false, errorMessage: "This is a required field." })
     }
 
     openCamera = () => {
@@ -97,12 +97,12 @@ export default class Profile extends React.Component {
             }
 
         });
-    } 
+    }
     openGallery = () => {
         ImagePicker.clean();
         this.setState({
             ModalOpen: !this.state.ModalOpen
-        }, ()=>{
+        }, () => {
             ImagePicker.openPicker({
                 width: 200,
                 height: 200,
@@ -113,16 +113,16 @@ export default class Profile extends React.Component {
                     var base64Image = `${imageDetail.data}`
                     this.changeProfileImage(base64Image)
                 }
-    
+
             });
         }
-        ) 
+        )
     }
     updateUser = () => {
         try {
 
             Keyboard.dismiss()
-            console.log("this.state",this.state);
+            console.log("this.state", this.state);
             if (Utilities.stringIsEmpty(this.state.email)) {
                 this.setState({
                     errorEmaill: true
@@ -134,46 +134,46 @@ export default class Profile extends React.Component {
                     errorEmaill: true,
                     errorMessage: "Enter a valid E-mail."
                 })
-                return 
+                return
             }
-            
+
             if (Utilities.stringIsEmpty(this.state.displayName)) {
                 this.setState({
                     errordisplayName: true
                 })
                 return
             }
-          var userObject = {
+            var userObject = {
                 email: this.state.email,
                 name: this.state.displayName,
                 nickname: this.state.nickName,
                 telephone: this.state.telephone,
                 notificationsEnabled: Storage.userData.notificationsEnabled,
                 locationServicesEnabled: Storage.userData.locationServicesEnabled
-              }
-              this.setState({
+            }
+            this.setState({
                 isloader: true
             })
             UserService.updateUser(userObject).then(response => {
-                if(response){
-                    if(response.success){
-                        console.log("response",response);
-                     Storage.userData = response.user;
-                     Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
-                    
-                     this.setState({
-                        userData: Storage.userData,
-                        displayName: Storage.userData.name,
-                        email: Storage.userData.email,
-                        nickName: Storage.userData.nickname,
-                        telephone: Storage.userData.telephone,
-                        photoUrl: Storage.userData.thumbUrl,
-                        isloader: false
-                    })
+                if (response) {
+                    if (response.success) {
+                        console.log("response", response);
+                        Storage.userData = response.user;
+                        Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
+
+                        this.setState({
+                            userData: Storage.userData,
+                            displayName: Storage.userData.name,
+                            email: Storage.userData.email,
+                            nickName: Storage.userData.nickname,
+                            telephone: Storage.userData.telephone,
+                            photoUrl: Storage.userData.thumbUrl,
+                            isloader: false
+                        })
 
                     }
                 }
-                else{
+                else {
                     this.setState({
                         isloader: false
                     })
@@ -181,7 +181,7 @@ export default class Profile extends React.Component {
             });
         }
         catch (e) {
-         console.log("Profile", "changeProfileImage", "User", "Exception", e.message)
+            console.log("Profile", "changeProfileImage", "User", "Exception", e.message)
             this.setState({
                 isloader: false
             })
@@ -190,21 +190,22 @@ export default class Profile extends React.Component {
     changeProfileImage = async (base64Image) => {
         try {
             this.setState({
-                isloader:true
+                isloader: true
             })
+
             UserService.changeProfilePhoto(base64Image).then(response => {
-                if(response){
-                    if(response.success){
-                     Storage.userData = response.user;
-                     Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
-                     this.setState({
-                        photoUrl: Storage.userData.thumbUrl,
-                        isloader:false
-                     })
-                    }
-                    else{
+                if (response) {
+                    if (response.success) {
+                        Storage.userData = response.user;
+                        Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
                         this.setState({
-                            isloader:true
+                            photoUrl: Storage.userData.thumbUrl,
+                            isloader: false
+                        })
+                    }
+                    else {
+                        this.setState({
+                            isloader: true
                         })
                     }
                 }
@@ -212,7 +213,40 @@ export default class Profile extends React.Component {
         }
         catch (e) {
             this.setState({
-                isloader:true
+                isloader: true
+            })
+        }
+    }
+
+    deletePhoto = async () => {
+
+        try {
+            this.ToggleModal()
+            this.setState({
+                isloader: true
+            })
+
+            UserService.removeProfileImage().then(response => {
+                if (response) {
+                     if (response.success) {
+                        Storage.userData = response.user;
+                        Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
+                        this.setState({
+                            photoUrl: "",
+                            isloader: false
+                        })
+                    }
+                    else {
+                        this.setState({
+                            isloader: true
+                        })
+                    }
+                }
+            });
+        }
+        catch (e) {
+            this.setState({
+                isloader: true
             })
         }
     }
@@ -220,7 +254,7 @@ export default class Profile extends React.Component {
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Profile" navigation={this.props} />
+                <Topbar ParentPage="Edit your profile" navigation={this.props} />
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -237,23 +271,23 @@ export default class Profile extends React.Component {
                                 source={{ uri: this.state.photoUrl }}
                             />
                             <View style={{ width: 40, justifyContent: 'center', backgroundColor: Apptheme, alignItems: 'center', height: 40, borderColor: lightBg, borderWidth: 1, borderRadius: 20, position: 'absolute', bottom: 1, right: 0 }}>
-                                 <TouchableOpacity
-                                            // onPress={() => this.openCamera()}
-                                            onPress={() => this.ToggleModal()}
-                                            style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                        <FontAwesome name="camera" size={15} color={lightBg} />     
-                                        </TouchableOpacity>
+                                <TouchableOpacity
+                                    // onPress={() => this.openCamera()}
+                                    onPress={() => this.ToggleModal()}
+                                    style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                    <FontAwesome name="camera" size={15} color={lightBg} />
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
-                    <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>{ this.state.displayName }</Text>
+                    <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>{this.state.displayName}</Text>
 
                     <TouchableOpacity
-                    onPress={()=>this.props.navigation.navigate("ChangePassword")}
+                        onPress={() => this.props.navigation.navigate("ChangePassword")}
                         style={styles.ChangePasswordView}>
                         <FontAwesome name="edit" style={{ paddingHorizontal: 5 }} color={linkText} size={16} />
                         <Text style={styles.ChangePasswordText}>
-                           {Labels.Profile.changePassword} 
+                            {Labels.Profile.changePassword}
                         </Text>
                     </TouchableOpacity>
 
@@ -261,7 +295,7 @@ export default class Profile extends React.Component {
 
                     <View style={styles.TextFieldView}>
                         <TextField
-                            label= {Labels.Profile.email}
+                            label={Labels.Profile.email}
                             fontSize={13}
                             keyboardType='default'
                             tintColor={Apptheme}
@@ -276,9 +310,10 @@ export default class Profile extends React.Component {
                                 this.setState({
                                     errorEmaill: false
                                 })
-                                this.onChangeText('email', val) }}
+                                this.onChangeText('email', val)
+                            }}
                         />
-                          {this.state.errorEmaill &&
+                        {this.state.errorEmaill &&
                             <View style={styles.errorView}>
                                 <Text style={styles.errorViewText}>
                                     {this.state.errorMessage}
@@ -286,7 +321,7 @@ export default class Profile extends React.Component {
                             </View>
                         }
                         <TextField
-                            label= {Labels.Profile.userName}
+                            label={Labels.Profile.userName}
                             fontSize={13}
                             keyboardType='default'
                             tintColor={Apptheme}
@@ -297,14 +332,15 @@ export default class Profile extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.nickName}
-                            onChangeText={val => { 
+                            onChangeText={val => {
                                 this.setState({
                                     errornickName: false
                                 })
-                                this.onChangeText('nickName', val)}}
-                            
+                                this.onChangeText('nickName', val)
+                            }}
+
                         />
-                         {this.state.errornickName &&
+                        {this.state.errornickName &&
                             <View style={styles.errorView}>
                                 <Text style={styles.errorViewText}>
                                     {this.state.errorMessage}
@@ -312,7 +348,7 @@ export default class Profile extends React.Component {
                             </View>
                         }
                         <TextField
-                            label= {Labels.Profile.displayName}
+                            label={Labels.Profile.displayName}
                             fontSize={13}
                             keyboardType='default'
                             tintColor={Apptheme}
@@ -327,7 +363,8 @@ export default class Profile extends React.Component {
                                 this.setState({
                                     errordisplayName: false
                                 })
-                                this.onChangeText('displayName', val)}}
+                                this.onChangeText('displayName', val)
+                            }}
                         />
                         {this.state.errordisplayName &&
                             <View style={styles.errorView}>
@@ -338,7 +375,7 @@ export default class Profile extends React.Component {
                         }
 
                         <TextField
-                            label= {Labels.Profile.telephone}
+                            label={Labels.Profile.telephone}
                             fontSize={13}
                             keyboardType='phone-pad'
                             tintColor={Apptheme}
@@ -349,68 +386,68 @@ export default class Profile extends React.Component {
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.telephone}
-                            onChangeText={val => { this.onChangeText('telephone', val)}}
+                            onChangeText={val => { this.onChangeText('telephone', val) }}
                         />
 
                     </View>
 
                     <View style={styles.LoginButtonView}>
-                        <TouchableOpacity style={styles.GradientButtonView} disabled = {this.state.disableButton} onPress= {()=> {this.updateUser()}} >
+                        <TouchableOpacity style={styles.GradientButtonView} disabled={this.state.disableButton} onPress={() => { this.updateUser() }} >
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
-                                {Labels.Profile.save}
+                                    {Labels.Profile.save}
                                 </Text>
                             </LinearGradient>
                         </TouchableOpacity>
                     </View>
                     {this.state.ModalOpen &&
-                    <View style={{ position: 'absolute', top:(this.state.selectedpositionUrl=="")? '30%':'20%', height:(this.state.selectedpositionUrl=="")?260:320, width: '80%',marginHorizontal:'10%' }}>
-                        <SafeAreaView style={{borderColor:Apptheme,borderWidth:2, borderRadius: 10, height: '100%', width: '96%', marginHorizontal: '2%', backgroundColor: "#fff" }}>
-                               <View style={{margin:10,}}>
-                                 <Text style={{fontWeight:'bold',textAlign:'center',fontSize:18}}>
-                                 Edit profile image
+                        <View style={{ position: 'absolute', top: (this.state.selectedpositionUrl == "") ? '30%' : '20%', height: (this.state.selectedpositionUrl == "") ? 260 : 320, width: '80%', marginHorizontal: '10%' }}>
+                            <SafeAreaView style={{ borderColor: Apptheme, borderWidth: 2, borderRadius: 10, height: '100%', width: '96%', marginHorizontal: '2%', backgroundColor: "#fff" }}>
+                                <View style={{ margin: 10, }}>
+                                    <Text style={{ fontWeight: 'bold', textAlign: 'center', fontSize: 18 }}>
+                                        Edit profile image
                                 </Text>
-                               </View>
-                            
-                            <View style={styles.ModalMainRow}>
-                            <View style={styles.ModalSubRow}>
-                                    <TouchableOpacity
-                                        onPress={() => this.openCamera()}
-                                        style={styles.ModalButton}>
-
-                                        <FontAwesome name="camera" color={Apptheme} style={{ fontSize: 30, }} />
-                                        <Text style={styles.ModalText}>
-                                            TAKE A PHOTO
-                                             </Text>
-                                    </TouchableOpacity>
                                 </View>
 
-                            <View style={styles.ModalSubRow}>
-                                <TouchableOpacity
-                                    onPress={() => this.openGallery()}
-                                    style={styles.ModalButton}>
-                                    <FontAwesome name="photo" color={Apptheme} style={{ fontSize: 30, }} />
-                                    <Text style={styles.ModalText}>
-                                        GALLERY
-                                             </Text>
-                                </TouchableOpacity>
-                            </View>
-                            {this.state.selectedpositionUrl != "" &&
-                                <View style={styles.ModalSubRow}>
-                                    <TouchableOpacity
-                                        onPress={() => this.deletePhoto()}
-                                        style={styles.ModalButton}>
-                                        <AntDesign name="delete" color={Apptheme} style={{ fontSize: 30, }} />
-                                        <Text style={styles.ModalText}>
-                                            DELETE THIS PHOTO
-                                             </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            }
-                                
+                                <View style={styles.ModalMainRow}>
+                                    <View style={styles.ModalSubRow}>
+                                        <TouchableOpacity
+                                            onPress={() => this.openCamera()}
+                                            style={styles.ModalButton}>
 
-                            </View>
-                            {/* <View style={{ justifyContent: 'center', alignItems: 'center',marginTop:10 }}> */}
+                                            <FontAwesome name="camera" color={Apptheme} style={{ fontSize: 30, }} />
+                                            <Text style={styles.ModalText}>
+                                                TAKE A PHOTO
+                                             </Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    <View style={styles.ModalSubRow}>
+                                        <TouchableOpacity
+                                            onPress={() => this.openGallery()}
+                                            style={styles.ModalButton}>
+                                            <FontAwesome name="photo" color={Apptheme} style={{ fontSize: 30, }} />
+                                            <Text style={styles.ModalText}>
+                                                GALLERY
+                                             </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    {this.state.selectedpositionUrl != "" &&
+                                        <View style={styles.ModalSubRow}>
+                                            <TouchableOpacity
+                                                onPress={() => this.deletePhoto()}
+                                                style={styles.ModalButton}>
+                                                <AntDesign name="delete" color={Apptheme} style={{ fontSize: 30, }} />
+                                                <Text style={styles.ModalText}>
+                                                    DELETE THIS PHOTO
+                                             </Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    }
+
+
+                                </View>
+                                {/* <View style={{ justifyContent: 'center', alignItems: 'center',marginTop:10 }}> */}
                                 <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: 40, }} activeOpacity={1} onPress={() => this.ToggleModal()} >
                                     <View style={styles.headerModalView}>
                                         <Text style={{ fontSize: 20, color: '#333' }}>
@@ -418,10 +455,10 @@ export default class Profile extends React.Component {
                                         </Text>
                                     </View>
                                 </TouchableOpacity>
-                            {/* </View> */}
-                        </SafeAreaView>
-                    </View>
-                }
+                                {/* </View> */}
+                            </SafeAreaView>
+                        </View>
+                    }
 
                 </ScrollView>
             </View>
@@ -454,7 +491,7 @@ const styles = StyleSheet.create({
         width: '90%',
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal:'5%',
+        marginHorizontal: '5%',
     },
     GradientButtonView: {
         ...CommponStyle.GradiendButtonView
@@ -473,7 +510,7 @@ const styles = StyleSheet.create({
     ChangePasswordText: {
         color: linkText,
         fontSize: 14,
-        paddingBottom:2
+        paddingBottom: 2
     },
     errorView: {
         alignSelf: "center"
@@ -494,13 +531,13 @@ const styles = StyleSheet.create({
         width: '90%',
         // height: '60%'
     },
-    ModalSubRow:{
-        width: '100%', 
-         marginVertical: 20
+    ModalSubRow: {
+        width: '100%',
+        marginVertical: 20
     },
-    ModalButton:{
-        paddingLeft:20,
-        flexDirection:'row' 
+    ModalButton: {
+        paddingLeft: 20,
+        flexDirection: 'row'
     },
     ModalText: {
         fontSize: 18

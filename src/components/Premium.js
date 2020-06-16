@@ -173,7 +173,7 @@ export default class PremiumModal extends Component {
                             </Text>
                             </View>
                             <Text style={{ paddingHorizontal: 15, }}>
-                                PREMIUM listing gives you 10 photo, increased description, and puts youat the top
+                                PREMIUM listing gives you 10 photo, increased descriptions, and puts you at the top
                                 of the search results, so you can sell your vehicle more quickly.
                             </Text>
 

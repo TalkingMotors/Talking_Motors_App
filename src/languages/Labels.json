@@ -13,7 +13,7 @@
     "Profile" : {
         "changePassword" : "Change Password",
         "email" : "Email",
-        "userName" : "User Name",
+        "userName" : "Username",
         "displayName" : "Display Name",
         "telephone" : "Telephone Number",
         "save" : "SAVE"

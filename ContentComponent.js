@@ -133,8 +133,8 @@ export default class ContentContainer extends React.Component {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Favourites')} style={styles.SideMenuItemView}>
-                    <View style={styles.IconView}>
+               <TouchableOpacity onPress={() => this.navigatetoComponent('Favourites')} style={styles.SideMenuItemView}>
+                   <View style={styles.IconView}>
                         <FontAwesome name='star' style={styles.SideMenuIcon}
                         />
                     </View>
@@ -159,6 +159,7 @@ export default class ContentContainer extends React.Component {
                     <TouchableOpacity onPress={() => {
                         Utilities.asyncStorage_RemoveKey(Constants.USER_DATA)
                         Utilities.asyncStorage_RemoveKey(Constants.JWT_TOKEN)
+                        Utilities.asyncStorage_RemoveKey(Constants.DashboardDisplay)
                         Storage.userData = {}
                         this.props.navigation.navigate('Login')
                     }

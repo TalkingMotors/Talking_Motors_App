@@ -103,6 +103,7 @@ export default class VehicleType extends React.Component {
 
         }
         this.ModalToggle = this.ModalToggle.bind(this)
+        this.resetAllFields = this.resetAllFields.bind(this)
         this.BodyTypeList();
     }
 
@@ -462,7 +463,9 @@ export default class VehicleType extends React.Component {
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Vehicle Type" navigation={this.props} />
+                <Topbar 
+                resetAllFields={this.resetAllFields}
+                ParentPage="Vehicle Type" navigation={this.props} />
                 <View style={{ width: '100%', height: 50, position: 'absolute', bottom: 0 }}>
                     <View style={styles.ButtonView}>
                         <TouchableOpacity onPress={() => this.searchVehicle()} style={styles.GradientButtonView} >
@@ -784,7 +787,7 @@ export default class VehicleType extends React.Component {
                             onValueChange={this.toggleSwitch}
                             value={this.state.switchValue} />
                     </View>
-                    <View style={styles.ButtonView}>
+                    {/* <View style={styles.ButtonView}>
                         <TouchableOpacity style={styles.GradientButtonView}
                             onPress={() => { this.resetAllFields() }}>
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
@@ -793,7 +796,7 @@ export default class VehicleType extends React.Component {
                                 </Text>
                             </LinearGradient>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
 
                     {this.state.isModal &&
                         <CommonModal

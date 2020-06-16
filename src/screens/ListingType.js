@@ -47,7 +47,9 @@ export default class ListingType extends React.Component {
     }
     checkedSessionFreeListing = () => {
         if (Object.keys(Storage.userData).length > 0) {
-            this.props.navigation.navigate("ListVehicle")
+            this.props.navigation.navigate("ListVehicle",{
+                item:1
+            })
         }
         else {
             this.ToggleModal()
@@ -60,32 +62,32 @@ export default class ListingType extends React.Component {
                 <Topbar ParentPage="Select Listing Type" navigation={this.props} />
                 <View style={styles.ParentView}>
                     <View style={{ alignItems: 'center' }}>
-                        <Text style={{ paddingVertical: 10, fontSize: 20, fontWeight: 'bold' }}>PREMIUM Listing</Text>
-                        <Text style={{ textAlign: 'center', color: "#333", paddingHorizontal: 10 }}>
-                            A PREMIUM listing gives you these great features designedto help sell your vehicle more quickly.
+                        <Text style={{ paddingVertical: 10, fontSize: 20, fontWeight: 'bold', color:'black' }}>PREMIUM Listing</Text>
+                        <Text style={{ textAlign: 'center', color:'black', paddingHorizontal: 10 }}>
+                            A PREMIUM listing gives you these great features designed to help sell your vehicle more quickly.
                         </Text>
 
                         <View style={{ marginTop: 10, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ color: "#333" }}>
+                            <Text style={{ color:'black' }}>
                                 -10 photos
                             </Text>
-                            <Text style={{ color: "#333" }}>
+                            <Text style={{ color:'black' }}>
                                 -Unlimited description length
                             </Text>
-                            <Text style={{ color: "#333" }}>
+                            <Text style={{ color:'black' }}>
                                 -Feature selection list
                             </Text>
-                            <Text style={{ color: "#333" }}>
+                            <Text style={{ color:'black' }}>
                                 -Bold ads, placed above FREE ads
                             </Text>
                         </View>
 
                         <View style={{ marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ paddingHorizontal: 10 }}>
+                            <Text style={{ paddingHorizontal: 10 ,color:'black'}}>
                                 Increase your chances of selling your vehicle for just
                             </Text>
-                            <Text style={{ paddingHorizontal: 10 }}>
-                                $4.99 now for a months's PREMIUM listing!
+                            <Text style={{ paddingHorizontal: 10,color:'black' }}>
+                            £4.99 now for a months's PREMIUM listing!
                             </Text>
                         </View>
                         <View style={{ width: '94%', marginHorizontal: '3%', justifyContent: 'center' }}>
@@ -95,8 +97,8 @@ export default class ListingType extends React.Component {
                         </View>
 
 
-                        <Text style={{ paddingVertical: 10, fontSize: 20, fontWeight: 'bold' }}>Free Listing</Text>
-                        <Text style={{ textAlign: 'center', color: "#333", paddingHorizontal: 10 }}>
+                        <Text style={{ paddingVertical: 10, fontSize: 20, fontWeight: 'bold',color:'black' }}>Free Listing</Text>
+                        <Text style={{ textAlign: 'center', color:'black', paddingHorizontal: 10 }}>
                             FREE one month listing including one photo and a short description.
                         </Text>
 
@@ -126,7 +128,7 @@ export default class ListingType extends React.Component {
                         <View style={{ width: '100%', height: '100%' }}>
                             <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center',  }}>
                                 <Text style={[styles.headerModalText, { color: darkText, paddingTop: 10,paddingLeft:10, fontSize: 20, fontWeight: 'bold' }]}>
-                                   Sell your Vehicle
+                                   Sell your vehicle
                             </Text>
                             </View>
                             <View style={{ height: '78%',  }}>

@@ -130,7 +130,7 @@ export default class Talk extends Component {
                             </Text>
                             </View>
                             <Text style={{ paddingHorizontal: 15, }}>
-                                Just enter the registration number of the car you are interested in, and clock 'Search' below
+                                Just enter the registration number of the car you are interested in, and click 'Search' below
                         </Text>
 
                             <View style={styles.TextFieldView}>

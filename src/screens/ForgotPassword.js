@@ -7,8 +7,8 @@ import {
     Button,
     StyleSheet,
     ActivityIndicator,
-    TouchableOpacity,
     Dimensions,
+    TouchableOpacity,
     Image
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -29,6 +29,7 @@ export default class ForgotPassword extends React.Component {
             errorEmailMessage: '',
             isloader:false,
         }
+
 
     }
     componentWillMount() {
@@ -106,7 +107,7 @@ export default class ForgotPassword extends React.Component {
                         <LinearGradient colors={LinearColor} style={styles.LogoGradient}>
                             <Image
                                 resizeMode="contain"
-                                style={{ height: 100, width: 100 }}
+                                style={{ height: 80, width: 80 }}
                                 source={require('../images/header-logo.png')}
                             />
                         </LinearGradient>

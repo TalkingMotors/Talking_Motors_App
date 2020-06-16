@@ -190,7 +190,7 @@ export default class Dashboard extends React.Component {
             <View style={styles.ParentView}>
                 <Topbar
                     ToggleModal={this.ToggleModal}
-                    ParentPage="Dashboard" navigation={this.props.navigation} />
+                    ParentPage="My Dashboard" navigation={this.props} />
                 <ScrollView>
                 
                 {this.state.display == 1 &&
@@ -200,11 +200,11 @@ export default class Dashboard extends React.Component {
                     </Text>
                 }
 
-                    <LinearGradient colors={LinearColor} style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
-                        <Text style={{ fontSize: 18, color: lightText, fontWeight: 'bold' }}>
+                    <View style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10,paddingBottom:0, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+                        <Text style={{ fontSize: 18, color: Apptheme, fontWeight: 'bold' }}>
                             YOUR VEHICLES
                         </Text>
-                    </LinearGradient>
+                    </View>
                     <FlatList
                         data={this.state.list}
                         listKey={(item, index) => 'recent-' + index.toString()}

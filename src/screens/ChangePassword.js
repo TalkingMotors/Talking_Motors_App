@@ -6,6 +6,8 @@ import {
     Text,
     Button,
     StyleSheet,
+    ActivityIndicator,
+    Dimensions,
     TouchableOpacity,
     Image
 } from 'react-native';
@@ -24,7 +26,8 @@ export default class ChangePassword extends React.Component {
         this.state = {
             email: '',
             errorEmail: false,
-            errorEmailMessage: ''
+            errorEmailMessage: '',
+            isloader:false,
         }
 
     }
@@ -67,16 +70,70 @@ export default class ChangePassword extends React.Component {
         }
     }
 
+    navigateToResetPassword = async () => {
+        try {
+            if (Utilities.stringIsEmpty(this.state.email)) {
+                this.setState({
+                    errorEmail: true,
+                    errorEmailMessage: "Enter your email."
+                })
+                return
+            }
+            if (Utilities.emailRegex.test(this.state.email) == false) {
+             this.setState({
+                    errorEmail: true,
+                    errorEmailMessage: "Enter correct email address."
+                })
+                return
+            }
+            this.setState({
+                isloader: true
+            })
+            var params = { "email": this.state.email }
+            let response = await UserService.ForgetPasswordCode(params)
+            console.log("response",response);
+            if (response.success) {
+                this.setState({
+                    isloader:false
+                })
+                this.props.navigation.navigate("ResetPassword")
+            }
+            else {
+                this.setState({
+                    errorEmail: true,
+                    isloader: false,
+                    errorEmailMessage: response.message
+                })
+            }
+        }
+        catch (e) {
+            console.log("navigateToResetPassword Exception", e);
+            this.setState({
+                errorEmail: true,
+                isloader: false,
+                errorEmailMessage: "Failed to connect to server"
+            })
+        }
+    }
+
     render() {
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Change Password" navigation={this.props} />
+                {this.state.isloader &&
+                    <View style={styles.menuLoaderView}>
+                        <ActivityIndicator
+                            color="#ed0000"
+                            size="large"
+                        />
+                    </View>
+                }
                 <ScrollView keyboardShouldPersistTaps="always">
                     <View style={styles.LogoView}>
                         <LinearGradient colors={LinearColor} style={styles.LogoGradient}>
                             <Image
                                 resizeMode="contain"
-                                style={{ height: 100, width: 100 }}
+                                style={{ height: 80, width: 80 }}
                                 source={require('../images/header-logo.png')}
                             />
                         </LinearGradient>
@@ -138,7 +195,9 @@ export default class ChangePassword extends React.Component {
 
 
                     <View style={styles.LoginButtonView}>
-                        <TouchableOpacity style={styles.GradientButtonView} >
+                        <TouchableOpacity onPress={() =>
+                            this.navigateToResetPassword()
+                        } style={styles.GradientButtonView} >
                             <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                 <Text style={styles.ButtonInnerText}>
                                     RESET PASSWORD
@@ -216,5 +275,16 @@ const styles = StyleSheet.create({
     },
     errorViewText: {
         ...CommponStyle.errorViewText
+    },
+    menuLoaderView: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255, 0.7)',
+        // backgroundColor: 'red',
+        zIndex: 10000,
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 60
     },
 })

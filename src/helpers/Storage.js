@@ -3,7 +3,7 @@ const Storage = {
     userData: {},
     jwt_Token: "",
     dashboardDisplay:0,
-
+    lastemail:''
 }
 
 export default Storage;

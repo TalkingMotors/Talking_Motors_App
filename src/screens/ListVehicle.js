@@ -32,7 +32,16 @@ export default class ListVehicle extends React.Component {
             registerNo: '',
             newVehicle: '',
             isLoader: false,
+            param: 0
         }
+        console.log("!!", this.props.navigation.state.params)
+        if (!Utilities.stringIsEmpty(this.props.navigation.state.params)) {
+            this.state.param = 1;
+            this.setState({
+                param: this.state.param
+            })
+        }
+
     }
 
     onChangeText = (key, value) => {
@@ -45,7 +54,7 @@ export default class ListVehicle extends React.Component {
 
 
 
-    addVehicle = async ()=>{
+    addVehicle = async () => {
         this.setState({
             isloader: true
         })
@@ -87,7 +96,7 @@ export default class ListVehicle extends React.Component {
                 isloader: false
             })
         }
-        else{
+        else {
             this.setState({
                 isloader: false
             })
@@ -149,7 +158,7 @@ export default class ListVehicle extends React.Component {
                     })
                     Alert.alert(
                         "Vehicle not found",
-                        "this vehicle has not been found in the DVLA database.",
+                        "This vehicle has not been found in the DVLA database.",
                         [
                             {
                                 text: "OK",
@@ -172,8 +181,7 @@ export default class ListVehicle extends React.Component {
         })
     }
     render() {
-        console.log("this.state.registerNo",this.state.registerNo);
-        return (
+       return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="List Vehicle" navigation={this.props} />
                 {this.state.isloader &&
@@ -184,32 +192,56 @@ export default class ListVehicle extends React.Component {
                         />
                     </View>
                 }
-              
-                    <ScrollView style={{width:'100%'}}>
-                    <View style={{ width: '100%', height: 200, justifyContent: 'center', alignItems: 'center' }}>
-                        <Image
-                            style={{ width: '100%', height: 200 }}
-                            resizeMode='stretch'
-                            source={require('../images/banner.jpg')}
-                        />
-                        <View style={{ position: 'absolute', alignItems: 'center' }}>
-                            <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                List your vehicle to chat with friends,
+
+                <ScrollView style={{ width: '100%' }}>
+                    {(this.state.param == 0) ?
+                        <View style={{ width: '100%', height: 200, justifyContent: 'center', alignItems: 'center' }}>
+
+                            <Image
+                                style={{ width: '100%', height: 200 }}
+                                resizeMode='stretch'
+                                source={require('../images/banner.jpg')}
+                            />
+                            <View style={{ position: 'absolute', alignItems: 'center' }}>
+                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                                    List your vehicle to chat with friends,
                         </Text>
-                            <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                family and other car enthusiasts.
+                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                                    family and other car enthusiasts.
                         </Text>
-                            <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center' }}>
-                                Simple and reliable messaging service to keep in touch and share information
+                                <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center' }}>
+                                    Simple and reliable messaging service to keep in touch and share information
                         </Text>
+                            </View>
                         </View>
-                    </View>
+                        :
+                        <View style={{ width: '100%', height: 200, justifyContent: 'center', alignItems: 'center' }}>
+
+                            <Image
+                                style={{ width: '100%', height: 200 }}
+                                resizeMode='stretch'
+                                source={require('../images/background.png')}
+                            />
+                            <View style={{ position: 'absolute', alignItems: 'center' }}>
+                                <Text style={{textAlign:'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                                 Sell your vehicle quickly and
+                                     </Text>
+                                <Text style={{ textAlign:'center',color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                                    effortlessl with a quick and easy process.
+                                    </Text>
+                                <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center' }}>
+                                   Selling has never been easier with our seamless process, you can create am AD in seconds and most
+                                   of all it's FREE for a one month listing with one photo.
+                                </Text>
+                            </View>
+                        </View>
+                    }
                     {(this.state.newVehicle == "") ?
-                            <View style={styles.TextFieldView}>
-                        <View>
+                        <View style={styles.TextFieldView}>
+                            <View>
                                 <TextField
                                     style={{
-                                        fontWeight:'bold',
+                                        fontWeight: 'bold',
                                     }}
                                     autoFocus={true}
                                     label='Registration Number'
@@ -221,7 +253,7 @@ export default class ListVehicle extends React.Component {
                                     activeLineWidth={2}
                                     autoCapitalize='characters'
                                     labelFontSize={13}
-                                     value={this.state.registerNo}
+                                    value={this.state.registerNo}
                                     onChangeText={val => {
                                         this.onChangeText('registerNo', val.trim())
                                     }}
@@ -238,63 +270,63 @@ export default class ListVehicle extends React.Component {
                             </View>
                         </View>
                         :
-                        <View style={[styles.TextFieldView],{width:'100%'}}>
-                            <View style={{backgroundColor:lightBg}}>
+                        <View style={[styles.TextFieldView], { width: '100%' }}>
+                            <View style={{ backgroundColor: lightBg }}>
                                 <Text style={styles.newVehicleMainViewText}>
                                     Details found:
                                     </Text>
                             </View>
-                            <View style={{backgroundColor:"#ebebeb"}}>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.make}
-                                </Text>
+                            <View style={{ backgroundColor: "#ebebeb" }}>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.make}
+                                    </Text>
+                                </View>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.model}
+                                    </Text>
+                                </View>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.colour}
+                                    </Text>
+                                </View>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.fuelType}
+                                    </Text>
+                                </View>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.engineSizeLitre + "0 Liter"}
+                                    </Text>
+                                </View>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.gearCount + " Gears"}
+                                    </Text>
+                                </View>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.doorCount + " Doors"}
+                                    </Text>
+                                </View>
+                                <View style={styles.newVehicleView}>
+                                    <Text>
+                                        {this.state.newVehicle.seatCount + " Seats"}
+                                    </Text>
+                                </View>
                             </View>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.model}
-                                </Text>
-                            </View>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.colour}
-                                </Text>
-                            </View>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.fuelType}
-                                </Text>
-                            </View>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.engineSizeLitre +"0 Liter"}
-                                </Text>
-                            </View>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.gearCount +" Gears"}
-                                </Text>
-                            </View>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.doorCount +" Doors"}
-                                </Text>
-                            </View>
-                            <View style={styles.newVehicleView}>
-                                <Text>
-                                    {this.state.newVehicle.seatCount +" Seats"}
-                                </Text>
-                            </View>
-                        </View>
-                        <View style={styles.TextFieldView}>
-                        <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.addVehicle() }}>
+                            <View style={styles.TextFieldView}>
+                                <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.addVehicle() }}>
                                     <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                         <Text style={styles.ButtonInnerText}>
-                                           ADD VEHICLE DETAIL
+                                            ADD VEHICLE DETAIL
                                 </Text>
                                     </LinearGradient>
                                 </TouchableOpacity>
-                        </View>
+                            </View>
                         </View>
 
                     }
@@ -321,17 +353,17 @@ const styles = StyleSheet.create({
     ButtonInnerText: {
         ...CommponStyle.ButtonInnerText
     },
-    newVehicleView:{
-        borderBottomColor:"#777",
-        borderBottomWidth:1,
-        alignItems:'center',
-        justifyContent:'center',
-        width:'100%',
-        height:40
+    newVehicleView: {
+        borderBottomColor: "#777",
+        borderBottomWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: 40
     },
-    newVehicleMainViewText:{
-        borderBottomColor:"#777",
-         borderBottomWidth:1,
+    newVehicleMainViewText: {
+        borderBottomColor: "#777",
+        borderBottomWidth: 1,
         textAlign: 'center',
         fontSize: 20,
         fontWeight: "bold",

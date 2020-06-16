@@ -30,7 +30,7 @@ import Setting from './src/screens/Setting';
 import UsersVehicle from './src/screens/UsersVehicle';
 import Favourites from './src/screens/Favourites';
 import Users from './src/screens/Users';
-
+import ForgotPassword from './src/screens/ForgotPassword';
 const MyDrawerNavigator = createDrawerNavigator({
     Home: { screen: StackNavigator },
     Profile: { screen: Profile },
@@ -53,6 +53,7 @@ const MyDrawerNavigator = createDrawerNavigator({
    Setting: { screen: Setting, },
    UsersVehicle: { screen: UsersVehicle, },
    Favourites: { screen: Favourites, },
+   ForgotPassword: { screen: ForgotPassword, },
    Users: { screen: Users, },
 },
     {

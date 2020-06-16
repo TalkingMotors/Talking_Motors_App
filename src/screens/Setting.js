@@ -55,7 +55,7 @@ export default class Setting extends React.Component {
             notificationsEnabled: this.state.NotificationSwitch,
             locationServicesEnabled: this.state.LocationService
         }
-       UserService.updateUser(userObject).then(response => {
+        UserService.updateUser(userObject).then(response => {
             if (response) {
                 if (response.success) {
                 }
@@ -79,7 +79,7 @@ export default class Setting extends React.Component {
             Storage.userData.locationServicesEnabled = value;
             Utilities.asyncStorage_RemoveKey(Constants.USER_DATA)
             Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(Storage.userData))
-            this.UpdatesUserService(obj)
+            this.UpdatesUserService(Storage.userData)
         })
 
     }
@@ -94,24 +94,24 @@ export default class Setting extends React.Component {
     }
     render() {
         return (
-            <View>
-                <Topbar ParentPage="Setting" navigation={this.props} />
+            <View style={styles.ParentView}>
+                <Topbar ParentPage="Settings" navigation={this.props} />
                 <Text style={styles.MainText}>
-                    Update your settings for the app
+                    Update your settings for the app.
                     </Text>
 
-                <LinearGradient colors={LinearColor} style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
-                    <Text style={{ fontSize: 18, color: lightText, fontWeight: 'bold' }}>
+                <View style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+                    <Text style={{ color: Apptheme, fontSize: 20, fontWeight: 'bold' }}>
                         SETTINGS
                         </Text>
-                </LinearGradient>
+                </View>
 
                 <View style={styles.MainView}>
 
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification</Text>
                         <Switch
-                            thumbColor={Apptheme}
+                            thumbColor={(this.state.NotificationSwitch) ? Apptheme : "#999"}
                             onValueChange={this.NotificationSwitch}
                             value={this.state.NotificationSwitch} />
                     </View>
@@ -119,7 +119,7 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification Sound</Text>
                         <Switch
-                            thumbColor={Apptheme}
+                            thumbColor={(this.state.NotificationSound) ? Apptheme : "#999"}
                             onValueChange={this.NotificationSound}
                             value={this.state.NotificationSound} />
                     </View>
@@ -128,7 +128,7 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification Vibrate</Text>
                         <Switch
-                            thumbColor={Apptheme}
+                            thumbColor={(this.state.NotificationVibrate) ? Apptheme : "#999"}
                             onValueChange={this.NotificationVibrate}
                             value={this.state.NotificationVibrate} />
                     </View>
@@ -137,7 +137,7 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification LED</Text>
                         <Switch
-                            thumbColor={Apptheme}
+                            thumbColor={(this.state.NotificationLed) ? Apptheme : "#999"}
                             onValueChange={this.NotificationLed}
                             value={this.state.NotificationLed} />
                     </View>
@@ -146,22 +146,31 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Location Services</Text>
                         <Switch
-                            thumbColor={Apptheme}
+                            thumbColor={(this.state.LocationService) ? Apptheme : "#999"}
                             onValueChange={this.LocationService}
                             value={this.state.LocationService} />
                     </View>
 
+                    <Text style={{ textAlign: 'center', paddingTop: 20 }}>
+                        Terms & Conditions
+                </Text>
 
-
-
-
+               
                 </View>
+                <Text style={{ textAlign: 'center',position:'absolute',bottom:10,left:'45%' }}>
+                       1.54
+                </Text>
             </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
+    ParentView: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: lightBg
+    },
     MainText: {
         padding: 10,
         marginTop: 10,

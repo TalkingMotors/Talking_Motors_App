@@ -51,26 +51,26 @@ export default class Login extends React.Component {
         this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
             if (Object.keys(Storage.userData).length > 0) {
                 
-                SplashScreen.hide();
                 this.props.navigation.navigate("Home")
+                SplashScreen.hide();
              
             }
             else{
-               
                 SplashScreen.hide();
             }
         }
         );
 
         if (Object.keys(Storage.userData).length > 0) {
-             this.props.navigation.navigate("Home")
+            this.props.navigation.navigate("Home")
+            SplashScreen.hide();
         } else {
             Utilities.asyncStorage_GetKey(Constants.USER_DATA).then(response => {
                 if (response) {
                     Storage.userData = JSON.parse(response);
                     this.props.navigation.navigate("Home")
                     SplashScreen.hide();
-                    
+
                 }
             })
 
@@ -93,7 +93,9 @@ export default class Login extends React.Component {
         // SplashScreen.hide();
     }
     onChangeText = (key, value) => {
-        this.setState({ [key]: value, loginFail: false })
+        this.setState({ [key]: value, loginFail: false }, () => {
+            this.forceUpdate()
+        })
     }
     Login = async () => {
         try {
@@ -120,8 +122,10 @@ export default class Login extends React.Component {
                     if (response.success) {
                         Storage.userData = response.user;
                         Storage.jwt_Token = response.token;
+                        Storage.lastemail = response.user.email
                         Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
                         Utilities.asyncStorage_SaveKey(Constants.JWT_TOKEN, JSON.stringify(response.token))
+                        Utilities.asyncStorage_SaveKey(Constants.LAST_EMAIL, JSON.stringify(response.user.email))
                         this.setState({
                             isloader: false
                         })
@@ -168,7 +172,7 @@ export default class Login extends React.Component {
                         <LinearGradient colors={LinearColor} style={styles.LogoGradient}>
                             <Image
                                 resizeMode="contain"
-                                style={{ height: 100, width: 100 }}
+                                style={{ height: 80, width: 80 }}
                                 source={require('../images/header-logo.png')}
                             />
                         </LinearGradient>
@@ -264,9 +268,11 @@ export default class Login extends React.Component {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate("ForgotPassword")} style={styles.ForgetPasswordView}>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navigation.navigate("ForgotPassword")
+                        }} style={styles.ForgetPasswordView}>
                             <Text style={styles.ForgetPasswordText}>
-                                Forgot Password?
+                                Forgotten password?
                         </Text>
                         </TouchableOpacity>
 
@@ -324,7 +330,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: 100,
-        height: 100,
+        height: 110,
         borderRadius: 10
     },
     LoginView: {

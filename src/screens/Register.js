@@ -90,7 +90,7 @@ export default class Register extends React.Component {
             else if (Utilities.emailRegex.test(this.state.email) == false) {
                 this.setState({
                     errorEmaill: true,
-                    errorMessage: "Enter a valid E-mail."
+                    errorMessage: "Enter a valid email "
                 })
                 return 
             }
@@ -177,7 +177,7 @@ export default class Register extends React.Component {
                         <LinearGradient colors={LinearColor} style={styles.LogoGradient}>
                             <Image
                                 resizeMode="contain"
-                                style={{ height: 90, width: 90 }}
+                                style={{ height: 80, width: 80 }}
                                 source={require('../images/header-logo.png')}
                             />
                         </LinearGradient>
@@ -223,7 +223,7 @@ export default class Register extends React.Component {
                         }
 
                         <TextField
-                            label='Enter User Name'
+                            label='Enter Username'
                             fontSize={13}
                             keyboardType='default'
                             tintColor={Apptheme}
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: 100,
-        height: 100,
+        height: 110,
         borderRadius: 10
     },
     LoginView: {

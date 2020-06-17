@@ -93,7 +93,9 @@ export default class ListVehicle extends React.Component {
         if (response.success) {
             this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
             this.setState({
-                isloader: false
+                isloader: false,
+                newVehicle:''
+
             })
         }
         else {
@@ -227,7 +229,7 @@ export default class ListVehicle extends React.Component {
                                  Sell your vehicle quickly and
                                      </Text>
                                 <Text style={{ textAlign:'center',color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                    effortlessl with a quick and easy process.
+                                    effortlessly with a quick and easy process.
                                     </Text>
                                 <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center' }}>
                                    Selling has never been easier with our seamless process, you can create am AD in seconds and most

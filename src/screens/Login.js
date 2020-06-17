@@ -151,8 +151,6 @@ export default class Login extends React.Component {
     }
     render() {
         return (
-
-
             <View style={styles.ParentView}>
                 <StatusBar
                     barStyle="light-content"
@@ -298,7 +296,9 @@ export default class Login extends React.Component {
                                 need to register to message users or list a car.
                         </Text>
 
-                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.props.navigation.navigate("Home") }}>
+                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => {
+                                this.props.navigation.navigate("Home")
+                            }}>
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
                                         USE WITHOUT ACCOUNT
@@ -326,13 +326,11 @@ const styles = StyleSheet.create({
         // justifyContent: 'center',
         // alignItems: 'center'
     },
+
     LogoGradient: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 100,
-        height: 110,
-        borderRadius: 10
+        ...CommponStyle.LogoGradient
     },
+
     LoginView: {
         justifyContent: 'center',
         alignItems: 'center'

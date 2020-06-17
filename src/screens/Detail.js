@@ -10,12 +10,14 @@ import {
     TextInput,
     StatusBar,
     StyleSheet,
+    Linking,
     Switch,
     Share,
     Alert,
     Dimensions,
     ActivityIndicator,
     Modal,
+
     TouchableOpacity
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -66,9 +68,9 @@ export default class Detail extends React.Component {
         super(props);
         this.state = {
             registerNo: '',
-            derivative:'',
+            derivative: '',
             make: '',
-            engineSize:'',
+            engineSize: '',
             model: '',
             year: '',
             transmission: '',
@@ -97,9 +99,10 @@ export default class Detail extends React.Component {
             ismotDataDetail: false,
             motDataDetail: [],
             isfinanceDetail: false,
+            forSale: false,
             financeDetail: [],
-            userMileage:'',
-            postcode:'',
+            userMileage: '',
+            postcode: '',
         }
         this.AddFavourite = this.AddFavourite.bind(this);
         this.RemoveFavourite = this.RemoveFavourite.bind(this);
@@ -126,7 +129,7 @@ export default class Detail extends React.Component {
     };
     stateupdate = (vehicleData) => {
         try {
-            console.log("vehicleData",vehicleData);
+            console.log("vehicleData", vehicleData);
             this.setState({
                 registerNo: vehicleData.registrationNumber,
                 vehicleId: vehicleData.id,
@@ -137,23 +140,24 @@ export default class Detail extends React.Component {
                 engine: (!Utilities.stringIsEmpty(vehicleData.engineSize) ? vehicleData.engineSize : "") + " " + vehicleData.fuelType,
                 doors: vehicleData.doorCount,
                 seats: vehicleData.seatCount,
-                engineSize:vehicleData.engineSize,
+                engineSize: vehicleData.engineSize,
                 bodyType: vehicleData.bodyType,
                 color: vehicleData.colour,
                 image: vehicleData.images,
                 descrption: vehicleData.description,
                 price: vehicleData.price,
                 saleSwitch: vehicleData.sold,
+                forSale: vehicleData.forSale,
                 ownerId: vehicleData.userID,
-                derivative:(!Utilities.stringIsEmpty(vehicleData.derivative)? vehicleData.derivative:""),
+                derivative: (!Utilities.stringIsEmpty(vehicleData.derivative) ? vehicleData.derivative : ""),
                 PremiumDate: vehicleData.PremiumDate,
                 features: vehicleData.features,
-                userMileage:vehicleData.userMileage,
-                postcode:vehicleData.postcode,
+                userMileage: vehicleData.userMileage,
+                postcode: vehicleData.postcode,
                 vehicleData: vehicleData,
 
                 isLoader: false,
-                shareLoader:false
+                shareLoader: false
             }, () => {
                 this.favIcon();
             })
@@ -164,32 +168,32 @@ export default class Detail extends React.Component {
     }
     shareAction() {
         if (!this.state.shareLoader) {
-          this.onShare();
-          setTimeout(() => {
-            this.state.shareLoader = false
-          }, 500);
+            this.onShare();
+            setTimeout(() => {
+                this.state.shareLoader = false
+            }, 500);
         }
-      }
+    }
     onShare = async () => {
         try {
-          this.state.shareLoader = true
-          const result = await Share.share({
-            message:`https://t77ry.app.goo.gl/?link=http://talkingmotorsapp.com/vehicles/${this.state.registerNo}&apn=com.talkingmotorsapp.talkingmotors&ibi=com.talkingmotorsapp.talkingmotors&isi=1121996881&ad=0&ius=talkingmotors`
-          })
-    
-          if (result.action === Share.sharedAction) {
-            if (result.activityType) {
-              // shared with activity type of result.activityType
-            } else {
-              // shared
+            this.state.shareLoader = true
+            const result = await Share.share({
+                message: `https://t77ry.app.goo.gl/?link=http://talkingmotorsapp.com/vehicles/${this.state.registerNo}&apn=com.talkingmotorsapp.talkingmotors&ibi=com.talkingmotorsapp.talkingmotors&isi=1121996881&ad=0&ius=talkingmotors`
+            })
+
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    // shared with activity type of result.activityType
+                } else {
+                    // shared
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
             }
-          } else if (result.action === Share.dismissedAction) {
-            // dismissed
-          }
         } catch (error) {
-            console.log("Error",error);
+            console.log("Error", error);
         }
-      };
+    };
     GetSpecificVehicle = GetSpecificVehicle = async (id) => {
         try {
             var response = await VehicleService.GetSpecificVehicle(id)
@@ -416,6 +420,41 @@ export default class Detail extends React.Component {
         }
     }
 
+    CallNo = (number) => {
+        if (Platform.OS === 'android') {
+            phoneNumber = `tel:${number}`;
+        }
+        else { phoneNumber = `telprompt:${number}`; }
+        Linking.openURL(phoneNumber);
+    }
+
+    callUser = () => {
+        let phoneNumber = '';
+        let number = this.state.vehicleData.user.telephone
+        Alert.alert(
+            `${number}`,
+            // "A vehicle with this registration is already on the system. \n\nIf you think this is an error, or you have recently purchased this vehicle please get in touch with us below.",
+            "Are you confirm for call now.",
+            [
+
+                {
+                    text: "CANCELL",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: 'CALL',
+                    onPress: () => {
+                        this.CallNo(number)
+                    },
+                    // onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+
+            ],
+            { cancelable: false }
+        );
+    }
     favIcon = () => {
         if (Object.keys(Storage.userData).length > 0) {
             if (Storage.userData.userId != this.state.vehicleData.userID) {
@@ -498,7 +537,7 @@ export default class Detail extends React.Component {
         );
     }
     render() {
-         return (
+        return (
             <View style={styles.ParentView}>
                 <Topbar
                     shareAction={this.shareAction}
@@ -548,12 +587,12 @@ export default class Detail extends React.Component {
                             {this.props.navigation.state.params.item.title}
                         </Text>
                     </View>
-                        
+
                     <View>
-                            <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5,paddingHorizontal:10 }}>
-                                {this.state.make +" "+ this.state.model+" "+this.state.engineSize +" " +this.state.derivative}
-                            </Text>
-                        </View>
+                        <Text style={{ textAlign: 'center', color: Apptheme, fontWeight: 'bold', fontSize: 16, paddingVertical: 5, paddingHorizontal: 10 }}>
+                            {this.state.make + " " + this.state.model + " " + this.state.engineSize + " " + this.state.derivative}
+                        </Text>
+                    </View>
 
 
                     {!Utilities.stringIsEmpty(this.state.price) &&
@@ -901,6 +940,18 @@ export default class Detail extends React.Component {
                                     <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>SEND MESSAGES</Text>
                                 </TouchableOpacity>
                             </LinearGradient>
+                    }
+
+                    {
+                        this.state.userId != this.state.ownerId && this.state.forSale == true && !Utilities.stringIsEmpty(this.state.vehicleData.user.telephone) &&
+                        <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >
+                            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => this.callUser()}>
+
+
+                                <Text style={{ fontWeight: 'bold', textAlign: 'center', color: lightText }}>CALL USER</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+
                     }
                     {this.state.PremiumDate == 0 &&
                         <LinearGradient colors={LinearColor} style={{ borderRadius: 10, justifyContent: 'center', width: '96%', marginHorizontal: '2%', height: 50, marginVertical: 10 }} >

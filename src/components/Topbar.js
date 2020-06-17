@@ -22,26 +22,26 @@ export default class Topbar extends React.Component {
         this.state = {
             ParentPage: ''
         }
-        // console.log("props", this.props)
+        console.log("props", this.props)
         // console.log(" Storage.userData",  Storage.userData)
 
-        
+
     }
-    
-    favIcon =()=>{
-        if(this.props.isFavourite != undefined){
-            if(this.props.isFavourite){
+
+    favIcon = () => {
+        if (this.props.isFavourite != undefined) {
+            if (this.props.isFavourite) {
                 return <FontAwesome onPress={() => this.props.RemoveFavourite()} name="star" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
-                      
+
             }
-            else{
-               return <FontAwesome name="star-o" onPress={() => this.props.AddFavourite()} color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
-              
+            else {
+                return <FontAwesome name="star-o" onPress={() => this.props.AddFavourite()} color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
+
             }
         }
     }
 
-          
+
     render() {
         if (this.props.ParentPage == "Home") {
             return (
@@ -53,7 +53,9 @@ export default class Topbar extends React.Component {
                         backgroundColor={Apptheme}
                     />
                     <Feather
-                        onPress={() => this.props.navigation.screenProps.openDraw()}
+                        onPress={() =>{ this.props.navigation.screenProps.openDraw()
+                            this.props.updateTopBar()
+                        }}
                         name="menu" color={lightText} size={22} style={styles.Icons} />
                     <View style={{ justifyContent: 'center', alignItems: 'center', width: '75%' }}>
                         <Image
@@ -62,15 +64,15 @@ export default class Topbar extends React.Component {
                             source={require('../images/logo.png')}
                         />
                     </View>
-                    {(Object.keys(Storage.userData).length > 0)?
-                    <FontAwesome onPress={() => this.props.Dashboard()} name="dashboard" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
-                    :
-                    <FontAwesome onPress={() => this.props.navigation.navigation.navigate("Login")} name="sign-in" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
-                        }
+                    {(Object.keys(Storage.userData).length > 0) ?
+                        <FontAwesome onPress={() => this.props.Dashboard()} name="dashboard" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                        :
+                        <FontAwesome onPress={() => this.props.navigation.navigation.navigate("Login")} name="sign-in" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    }
                     {Object.keys(Storage.userData).length > 0 &&
                         <FontAwesome onPress={() => this.props.Profile()} name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 60 }]} />
                     }
-                    </View>
+                </View>
             )
         }
 
@@ -81,7 +83,7 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
-                    <FontAwesome onPress={()=>this.props.ToggleModal()} name="folder-open" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
+                    <FontAwesome onPress={() => this.props.ToggleModal()} name="folder-open" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                     <FontAwesome
                         onPress={() => this.props.navigation.navigation.navigate("ListVehicle")}
                         name="plus" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
@@ -96,13 +98,13 @@ export default class Topbar extends React.Component {
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
                     {this.props.vehicleData.userID == Storage.userData.userId &&
-                       
-                       <FontAwesome
+
+                        <FontAwesome
                             onPress={() => this.props.EditVehicle()}
                             name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                     }
-                        {this.favIcon()}
-                    <Feather name="share-2" onPress={()=>this.props.shareAction()} color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    {this.favIcon()}
+                    <Feather name="share-2" onPress={() => this.props.shareAction()} color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )
         }
@@ -141,18 +143,33 @@ export default class Topbar extends React.Component {
                         </View>
                         :
                         <Image
-                        onPress={()=>this.props.navigateToUser()}
+                            onPress={() => this.props.navigateToUser()}
                             style={{ width: 34, height: 34, borderRadius: 17, marginLeft: 15 }}
                             source={{ uri: this.props.image }}
                         />
 
                     }
 
-                    <Text    onPress={()=>this.props.navigateToUser()} style={styles.ScreenName}>{this.props.username}</Text>
+                    <Text onPress={() => this.props.navigateToUser()} style={styles.ScreenName}>{this.props.username}</Text>
                     <Feather onPress={() => this.props.MoreItemsModal()} name="more-vertical" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
             )
         }
+        else if (this.props.ParentPage == "Blocked User") {
+            return (
+                <LinearGradient colors={LinearColor} style={styles.MainView}>
+                    <Feather
+                        onPress={() => {
+                            console.log("this.props.", this.props.navigation);
+                            this.props.navigation.navigation.navigate("Message")
+                        }
+                        }
+                        name="arrow-left" color={lightText} size={22} style={styles.Icons} />
+                    <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
+                </LinearGradient>
+            )
+        }
+
         else {
             return (
                 <LinearGradient colors={LinearColor} style={styles.MainView}>

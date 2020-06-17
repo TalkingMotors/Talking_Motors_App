@@ -466,11 +466,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     LogoGradient: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 100,
-        height: 110,
-        borderRadius: 10
+        ...CommponStyle.LogoGradient
     },
     LoginView: {
         justifyContent: 'center',

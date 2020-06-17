@@ -32,6 +32,7 @@ import Constants from "../helpers/Constants";
 import AndroidNotification from '../components/AndroidNotification';
 import IOSNotification from '../components/IOSNotification';
 export var SearchVehicleModalToggle;
+import { NavigationEvents } from 'react-navigation';
 export default class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -43,29 +44,43 @@ export default class Home extends React.Component {
             Text3: darkText,
             Text4: lightText,
             Text5: darkText,
-            parent:'',
-            isTalkModal:false,
-            isModal:false
+            parent: '',
+            isTalkModal: false,
+            isModal: false,
+            check: true
         }
+        this.updateTopBar = this.updateTopBar.bind(this)
         // this.backAndroidHandler=this.backAndroidHandler.bind(this);
-        this._didFocusSubscription =  props.navigation.addListener('didFocus', payload => {
+
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+           setInterval(() => {
+            this.updateTopBar()
+           }, 2000);
+           
             // BackHandler.addEventListener('hardwareBackPress', this.backAndroidHandler)
         })
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
         this.navigateToVehicleType = this.navigateToVehicleType.bind(this)
         Utilities.asyncStorage_GetKey(Constants.JWT_TOKEN).then(response => {
-             Storage.jwt_Token = JSON.parse(response)
-         })
+            Storage.jwt_Token = JSON.parse(response)
+        })
         Utilities.asyncStorage_GetKey(Constants.DashboardDisplay).then(response => {
-            if(JSON.parse(response)==null){
+            if (JSON.parse(response) == null) {
                 Storage.dashboardDisplay = 0
             }
-            else{
+            else {
                 Storage.dashboardDisplay = JSON.parse(response)
             }
-       })
-        
+        })
+
+    }
+    
+    updateTopBar = () => {
+        console.log("updateTopBar")
+        this.setState({
+            check: !this.state.check
+        })
     }
 
     // backAndroidHandler() {
@@ -87,42 +102,42 @@ export default class Home extends React.Component {
             console.log("willBlur")
             // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
         })
-        
+
     }
-    componentWillUnmount(){
+    componentWillUnmount() {
         console.log("componentWillUnmount")
         // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
     }
     getUserBy = (userId) => {
-        try{
+        try {
             UserService.getUserById(userId).then(respose => {
-                if(respose){
-                    if(respose.success){
-                     Storage.userData = respose.user;
-                     console.log(" Storage.userData", Storage.userData);
-                     Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
+                if (respose) {
+                    if (respose.success) {
+                        Storage.userData = respose.user;
+                        console.log(" Storage.userData", Storage.userData);
+                        Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
                     }
                 }
-             })
+            })
         }
-        catch(e){
+        catch (e) {
 
         }
     }
     navigateToDashboard = () => {
         if (Object.keys(Storage.userData).length > 0) {
-        this.props.navigation.navigate("Dashboard")
+            this.props.navigation.navigate("Dashboard")
         }
-        else{
+        else {
             this.props.navigation.navigate("Login")
         }
     }
 
     navigateToProfile = () => {
         if (Object.keys(Storage.userData).length > 0) {
-        this.props.navigation.navigate("Profile")
+            this.props.navigation.navigate("Profile")
         }
-        else{
+        else {
             this.props.navigation.navigate("Login")
         }
     }
@@ -130,7 +145,7 @@ export default class Home extends React.Component {
     TalkModalToggle = (parent) => {
         this.setState({
             isTalkModal: !this.state.isTalkModal,
-           
+
         })
     }
     SearchVehicleModalToggle = SearchVehicleModalToggle = () => {
@@ -148,8 +163,14 @@ export default class Home extends React.Component {
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar Dashboard={this.navigateToDashboard} Profile={this.navigateToProfile} ParentPage="Home" navigation={this.props} />
-              
+
+                <Topbar
+                    updateTopBar={this.updateTopBar}
+                    Dashboard={this.navigateToDashboard}
+                    Profile={this.navigateToProfile}
+                    ParentPage="Home"
+                    navigation={this.props} />
+
                 <View style={styles.BoxView}>
                     <View style={styles.BoxParent}>
                         <TouchableHighlight
@@ -157,7 +178,7 @@ export default class Home extends React.Component {
                             underlayColor="transparent"
                             onPressIn={() => this.setState({ Text1: Apptheme })}
                             onPressOut={() => this.setState({ Text1: darkText })}
-                            onPress={() => { 
+                            onPress={() => {
                                 if (Object.keys(Storage.userData).length > 0) {
                                     this.props.navigation.navigate("ListVehicle");
                                 }
@@ -186,9 +207,10 @@ export default class Home extends React.Component {
                             onPressOut={() => this.setState({ Text2: lightText })}
                             onPress={() => {
                                 this.setState({
-                                    parent:"talk"
+                                    parent: "talk"
                                 })
-                                this.TalkModalToggle()}}
+                                this.TalkModalToggle()
+                            }}
                             style={styles.ButtonViewImage}>
                             <View style={styles.ImageView}>
                                 <Image
@@ -264,9 +286,10 @@ export default class Home extends React.Component {
                             onPressOut={() => this.setState({ Text5: darkText })}
                             onPress={() => {
                                 this.setState({
-                                    parent:"vehicle_Check"
+                                    parent: "vehicle_Check"
                                 })
-                                this.TalkModalToggle()}}
+                                this.TalkModalToggle()
+                            }}
                             style={styles.ButtonView}>
                             <View style={styles.BoxTitleView}>
 
@@ -285,11 +308,11 @@ export default class Home extends React.Component {
 
                 </View>
                 {
-                Platform.OS == "ios" ? <IOSNotification props={this.props} />
-                  :
-                 <AndroidNotification props={this.props} />
+                    Platform.OS == "ios" ? <IOSNotification props={this.props} />
+                        :
+                        <AndroidNotification props={this.props} />
                 }
-              
+
                 {this.state.isTalkModal &&
                     <TalkModal parent={this.state.parent} navigation={this.props.navigation} TalkModalToggle={this.TalkModalToggle} />
                 }
@@ -297,7 +320,7 @@ export default class Home extends React.Component {
                     <SearchVehicleModal navigateToVehicleType={this.navigateToVehicleType} TalkModalToggle={this.TalkModalToggle} SearchVehicleModalToggle={this.SearchVehicleModalToggle} />
                 }
 
-                    <Modal
+                <Modal
                     animationType="fade"
                     transparent={true}
                     visible={this.state.isModal}
@@ -309,41 +332,41 @@ export default class Home extends React.Component {
                 >
                     <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '40%', height: '20%', width: '86%', marginHorizontal: '7%', }}>
                         <View style={{ width: '100%', height: '100%' }}>
-                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center',  }}>
-                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0,paddingLeft:10, fontSize: 20, fontWeight: 'bold' }]}>
+                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', }}>
+                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0, paddingLeft: 10, fontSize: 20, fontWeight: 'bold' }]}>
                                     Add a vehicle
                             </Text>
                             </View>
-                            <View style={{ height: '78%',  }}>
+                            <View style={{ height: '78%', }}>
                                 <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
-                                    
-                                    <Text style={{fontSize:14,color:"black",paddingHorizontal:10}}>
+
+                                    <Text style={{ fontSize: 14, color: "black", paddingHorizontal: 10 }}>
                                         You need to be logged in to add a vehicle.
                                     </Text>
-                                    <View style={{marginTop:20,flexDirection:'row',justifyContent:"flex-end"}}>
-                                    <TouchableOpacity
-                                    onPress={()=>{
-                                        this.ToggleModal()
-                                    }} style={{padding:10,marginHorizontal:5}}>
-                                        <Text style={{color:Apptheme,}}>
-                                            CANCEL
+                                    <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: "flex-end" }}>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                this.ToggleModal()
+                                            }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                            <Text style={{ color: Apptheme, }}>
+                                                CANCEL
                                         </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={()=>{
-                                        this.ToggleModal()
-                                        this.props.navigation.replace("Login")
-                                    }} style={{padding:10,marginHorizontal:5}}>
-                                    <Text style={{color:Apptheme,}}>
-                                          LOGIN
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => {
+                                            this.ToggleModal()
+                                            this.props.navigation.replace("Login")
+                                        }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                            <Text style={{ color: Apptheme, }}>
+                                                LOGIN
                                         </Text>
-                                    </TouchableOpacity>
+                                        </TouchableOpacity>
                                     </View>
 
-                                   
+
                                 </View>
                             </View>
-                         </View >
-                  </SafeAreaView>
+                        </View >
+                    </SafeAreaView>
                 </Modal>
             </View>
         )
@@ -395,15 +418,15 @@ const styles = StyleSheet.create({
         right: 20
     },
 
-    ImageView:{
-        height: '100%', 
-        width: '100%', 
-        alignItems: 'center', 
+    ImageView: {
+        height: '100%',
+        width: '100%',
+        alignItems: 'center',
         justifyContent: 'center'
     },
-    Image:{
-        width: '100%', 
-        height: '100%' 
+    Image: {
+        width: '100%',
+        height: '100%'
     }
 
 

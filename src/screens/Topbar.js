@@ -23,6 +23,7 @@ export default class Topbar extends React.Component {
     }
     render() {
         if (this.props.ParentPage == "Home") {
+           
             return (
                 <View style={styles.MainView}>
 

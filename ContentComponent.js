@@ -45,7 +45,7 @@ export default class ContentContainer extends React.Component {
         }
     }
     render() {
-       return (
+      return (
             <View style={styles.ParentView}>
                 <LinearGradient colors={LinearColor} style={styles.SidebarProfileView}>
                     <View style={styles.userProfileView}>

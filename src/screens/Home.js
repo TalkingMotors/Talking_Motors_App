@@ -53,11 +53,7 @@ export default class Home extends React.Component {
         // this.backAndroidHandler=this.backAndroidHandler.bind(this);
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
-           setInterval(() => {
             this.updateTopBar()
-           }, 2000);
-           
-            // BackHandler.addEventListener('hardwareBackPress', this.backAndroidHandler)
         })
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
@@ -75,9 +71,8 @@ export default class Home extends React.Component {
         })
 
     }
-    
+
     updateTopBar = () => {
-        console.log("updateTopBar")
         this.setState({
             check: !this.state.check
         })
@@ -99,8 +94,7 @@ export default class Home extends React.Component {
         }
 
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
-            console.log("willBlur")
-            // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
+             // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
         })
 
     }

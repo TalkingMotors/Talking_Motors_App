@@ -63,6 +63,6 @@ const AppContainer = createAppContainer(MyStackNavigator);
 
 export default class StackNavigator extends Component {
     render() {
-        return <AppContainer screenProps={{ openDraw: () => this.props.navigation.dispatch(DrawerActions.openDrawer()) }} />;
+       return <AppContainer screenProps={{ openDraw: () => this.props.navigation.dispatch(DrawerActions.openDrawer()) }} />;
     }
 }

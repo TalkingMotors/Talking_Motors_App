@@ -97,6 +97,7 @@ export default class EditVehicleImage extends React.Component {
     }
     openCamera = () => {
         try {
+            ImagePicker.clean();
             ImagePicker.openCamera({
                 width: 200,
                 height: 200,

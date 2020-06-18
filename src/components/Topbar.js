@@ -10,6 +10,7 @@ import {
     Image,
     StatusBar
 } from 'react-native';
+import { createDrawerNavigator, DrawerItems, DrawerActions } from 'react-navigation-drawer';
 import LinearGradient from 'react-native-linear-gradient';
 import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
 import * as Utilities from "../helpers/Utilities";
@@ -23,9 +24,6 @@ export default class Topbar extends React.Component {
             ParentPage: ''
         }
         console.log("props", this.props)
-        // console.log(" Storage.userData",  Storage.userData)
-
-
     }
 
     favIcon = () => {
@@ -43,6 +41,7 @@ export default class Topbar extends React.Component {
 
 
     render() {
+        // this.props.navigation.navigation.openDrawer()
         if (this.props.ParentPage == "Home") {
             return (
                 <View style={styles.MainView}>
@@ -53,7 +52,12 @@ export default class Topbar extends React.Component {
                         backgroundColor={Apptheme}
                     />
                     <Feather
-                        onPress={() =>{ this.props.navigation.screenProps.openDraw()
+                        onPress={() => {
+                            // this.props.navigation.screenProps.openDraw()
+
+                            this.props.navigation.navigation.dispatch(DrawerActions.openDrawer())
+                            // this.props.navigation.openDrawer()
+
                             this.props.updateTopBar()
                         }}
                         name="menu" color={lightText} size={22} style={styles.Icons} />

@@ -84,6 +84,9 @@ export default class Profile extends React.Component {
     }
 
     openCamera = () => {
+        this.setState({
+            ModalOpen: false
+        })
         ImagePicker.openCamera({
             width: 200,
             height: 200,
@@ -228,7 +231,7 @@ export default class Profile extends React.Component {
 
             UserService.removeProfileImage().then(response => {
                 if (response) {
-                     if (response.success) {
+                    if (response.success) {
                         Storage.userData = response.user;
                         Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
                         this.setState({

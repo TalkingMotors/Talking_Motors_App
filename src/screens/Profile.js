@@ -52,7 +52,7 @@ export default class Profile extends React.Component {
         })
 
 
-        console.log("Storage.userData", Storage.userData);
+        
     }
 
     stateUpdate = () => {
@@ -173,6 +173,7 @@ export default class Profile extends React.Component {
                             photoUrl: Storage.userData.thumbUrl,
                             isloader: false
                         })
+                        this.props.navigation.goBack();
 
                     }
                 }
@@ -333,6 +334,7 @@ export default class Profile extends React.Component {
                             activeLineWidth={2}
                             autoCapitalize="none"
                             autoCorrect={false}
+                            maxLength={15}
                             labelFontSize={13}
                             value={this.state.nickName}
                             onChangeText={val => {
@@ -360,6 +362,7 @@ export default class Profile extends React.Component {
                             activeLineWidth={2}
                             autoCapitalize="none"
                             autoCorrect={false}
+                            maxLength={15}
                             labelFontSize={13}
                             value={this.state.displayName}
                             onChangeText={val => {
@@ -386,6 +389,7 @@ export default class Profile extends React.Component {
                             errorColor="red"
                             activeLineWidth={2}
                             autoCapitalize="none"
+                            maxLength={15}
                             autoCorrect={false}
                             labelFontSize={13}
                             value={this.state.telephone}

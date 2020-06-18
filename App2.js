@@ -47,7 +47,7 @@ import Users from './src/screens/Users';
 import ContentComponent from './ContentComponent';
 import LoginScreen from './src/screens/Login'
 import HomeScreen from './src/screens/Home'
-
+console.disableYellowBox = true;
 export default class App extends React.Component {
     render() {
         return <AppDrawer />;

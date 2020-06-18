@@ -59,7 +59,7 @@ export default class EditVehicle extends React.Component {
             insuranceDate: '',
             seletedId: 0,
             isInsurance: false,
-            isLoader:false
+            isLoader: false
         }
 
 
@@ -84,7 +84,7 @@ export default class EditVehicle extends React.Component {
     UNSAFE_componentWillMount() {
         try {
             let params = this.props.navigation.state.params.item
-           var sortedImage = params.images.sort(function (a, b) { return a.position - b.position });
+            var sortedImage = params.images.sort(function (a, b) { return a.position - b.position });
             let allfeatures = this.props.navigation.state.params.allfeatures
             if (allfeatures == undefined) {
                 allfeatures = []
@@ -102,9 +102,9 @@ export default class EditVehicle extends React.Component {
                 PremiumDate: params.PremiumDate,
                 allImages: params.images,
                 allfeatures: allfeatures,
-                insuranceDueDate: (params.insuranceDueDate==null)?"":params.insuranceDueDate,
-                motDueDate: (params.motDueDate==null)?"":params.motDueDate,
-                taxDueDate: (params.taxDueDate==null)?"":params.taxDueDate,
+                insuranceDueDate: (params.insuranceDueDate == null) ? "" : params.insuranceDueDate,
+                motDueDate: (params.motDueDate == null) ? "" : params.motDueDate,
+                taxDueDate: (params.taxDueDate == null) ? "" : params.taxDueDate,
             })
         }
         catch (e) {
@@ -113,7 +113,7 @@ export default class EditVehicle extends React.Component {
 
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
             this.setState({
                 postCode: '',
@@ -136,6 +136,7 @@ export default class EditVehicle extends React.Component {
                 insuranceDate: '',
                 seletedId: 0,
                 isInsurance: false,
+
 
             })
         })
@@ -165,11 +166,12 @@ export default class EditVehicle extends React.Component {
                 sold: this.state.saleSwitch,
                 insuranceDueDate: this.state.insuranceDueDate,
                 motDueDate: this.state.motDueDate,
-                taxDueDate:  this.state.taxDueDate,
+                taxDueDate: this.state.taxDueDate,
             }
             var response = await VehicleService.UpdateVehicle(param)
-             if (response) {
-               GetSpecificVehicle(this.state.allData.id)
+            if (response) {
+                console.log("response", response);
+                GetSpecificVehicle(this.state.allData.id)
                 this.setState({
                     isLoader: false
                 })
@@ -226,7 +228,7 @@ export default class EditVehicle extends React.Component {
         this.setState({
             seletedId: id
         })
-     }
+    }
 
     DateModal = () => {
         this.setState({
@@ -253,10 +255,10 @@ export default class EditVehicle extends React.Component {
 
     render() {
         return (
-          <View style={styles.ParentView}>
+            <View style={styles.ParentView}>
                 <Topbar ParentPage="Edit Your Vehicle" navigation={this.props} />
 
-                {this.state.isloader &&
+                {this.state.isLoader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
                             color="#ed0000"

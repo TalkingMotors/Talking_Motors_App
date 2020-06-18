@@ -124,7 +124,7 @@ export default class ListVehicle extends React.Component {
                         isloader: false
                     })
                     Alert.alert(
-                        "This Vehicle is already registered",
+                        "This vehicle is already registered",
                         "A vehicle with this registration is already on the system. \n\nIf you think this is an error, or you have recently purchased this vehicle please get in touch with us below.",
 
                         [

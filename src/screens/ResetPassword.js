@@ -54,7 +54,7 @@ onChangeText = (key, value) => {
             else if (Utilities.emailRegex.test(this.state.email) == false) {
                 this.setState({
                     errorEmaill: true,
-                    errorMessage: "Enter a valid E-mail."
+                    errorMessage: "Enter a valid email."
                 })
                 return 
             }

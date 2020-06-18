@@ -23,14 +23,14 @@ export default class AndroidNotification extends Component {
               } 
             });
             
-      const notificationOpen = await firebase.notifications().getInitialNotification();
+      var notificationOpen = await firebase.notifications().getInitialNotification();
             if (notificationOpen) {
-                const notification = notificationOpen.notification;
+                var notification = notificationOpen.notification;
                 console.log("notificationOpen 1",notificationOpen);
                 DeviceHelper.showAndroidNotification(notification)
                 firebase.notifications().removeDeliveredNotification(notification.notificationId);
             } 
-            const channel = new firebase.notifications.Android.Channel(Constants.firebaseChannelId, 'Talking Motors', firebase.notifications.Android.Importance.Max).setDescription('Talking Motors');
+            var channel = new firebase.notifications.Android.Channel(Constants.firebaseChannelId, 'Talking Motors', firebase.notifications.Android.Importance.Max).setDescription('Talking Motors');
             firebase.notifications().android.createChannel(channel);
             this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification) => {
             });
@@ -43,7 +43,7 @@ export default class AndroidNotification extends Component {
                 
             });
             this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-                const notification = notificationOpen.notification;
+                var notification = notificationOpen.notification;
                 DeviceHelper.showAndroidNotification(notification);
                 console.log("notificationOpen 3",notification);
                 firebase.notifications().removeDeliveredNotification(notification.notificationId);

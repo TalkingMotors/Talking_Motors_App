@@ -53,11 +53,7 @@ export default class Topbar extends React.Component {
                     />
                     <Feather
                         onPress={() => {
-                            // this.props.navigation.screenProps.openDraw()
-
                             this.props.navigation.navigation.dispatch(DrawerActions.openDrawer())
-                            // this.props.navigation.openDrawer()
-
                             this.props.updateTopBar()
                         }}
                         name="menu" color={lightText} size={22} style={styles.Icons} />
@@ -119,7 +115,7 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
-                    <Feather name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    <Feather onPress={() => this.props.editSetting()} name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                     <FontAwesome onPress={() => this.props.BlockUser()} name="user-times" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                 </View>
             )
@@ -135,11 +131,25 @@ export default class Topbar extends React.Component {
                 </View>
             )
         }
-        else if (this.props.ParentPage == "Messenger") {
+        else if (this.props.ParentPage == "Create Group") {
             return (
                 <View style={styles.MainView}>
                     <Feather
                         onPress={() => this.props.navigation.navigation.goBack()}
+                        name="arrow-left" color={lightText} size={22} style={styles.Icons} />
+                    <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
+                    <FontAwesome onPress={() => this.props.addPerson()} name="plus" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                    {this.props.List.length > 0 &&
+                        <FontAwesome onPress={() => this.props.isgroupModal()} name="check" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 60 }]} />
+                    }
+                </View>
+            )
+        }
+        else if (this.props.ParentPage == "Messenger") {
+            return (
+                <View style={styles.MainView}>
+                    <Feather
+                        onPress={() => this.props.navigation.navigation.navigate("Message")}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     {Utilities.stringIsEmpty(this.props.image) ?
                         <View style={{ marginLeft: 15, width: 35, height: 35, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', borderRadius: 50, }}>
@@ -153,9 +163,22 @@ export default class Topbar extends React.Component {
                         />
 
                     }
+                    <View style={{ paddingLeft: 0 }}>
 
-                    <Text onPress={() => this.props.navigateToUser()} style={styles.ScreenName}>{this.props.username}</Text>
-                    <Feather onPress={() => this.props.MoreItemsModal()} name="more-vertical" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                        <Text onPress={() => this.props.navigateToUser()} style={styles.ScreenName}>
+                            {(this.props.username.length > 0) ? this.props.username : "Conversation"}
+                        </Text>
+                        {this.props.membersCount.length > 0 &&
+                            <Text onPress={() => this.props.navigateToUser()} style={[styles.ScreenName, { fontSize: 12 }]}>{this.props.groupMembersActive.length} users joined</Text>
+                        }
+                    </View>
+                    {(this.props.username.length > 0)
+                        ?
+                        <Feather onPress={() => this.props.MoreItemsModal()} name="more-vertical" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+                        :
+                        <FontAwesome onPress={() => this.props.ConversationNamePopup()} name="plus" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
+
+                    }
                 </View>
             )
         }

@@ -18,14 +18,16 @@ import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 import Topbar from '../components/Topbar';
 import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
-var screenheight= Dimensions.get('window').height;
+var screenheight = Dimensions.get('window').height;
 
 export default class Users extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             isLoad: true,
-            List: []
+            List: [],
+            Leftmember: [],
+            invitedMembers: []
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.GetBlockUser()
@@ -45,41 +47,53 @@ export default class Users extends React.Component {
 
     GetBlockUser = () => {
         try {
-            let members=this.props.navigation.state.params.members;
+            let members = this.props.navigation.state.params.members;
+            console.log("members", members);
+            var invitedMembers = [];
+            var Leftmember = [];
+            var joinedmember = []
+            joinedmember = members.filter(i => i.status.id == 3)
+            invitedMembers = members.filter(i => i.status.id == 1)
+            Leftmember = members.filter(i => i.status.id == 5)
             this.setState({
                 isLoad: false,
-                List: members
+                List: joinedmember,
+                invitedMembers: invitedMembers,
+                Leftmember: Leftmember
+
             })
+
         }
-        catch(e){
-            console.log("Exception",e);
+        catch (e) {
+            console.log("Exception", e);
         }
     }
-   
+
 
     flatListEmptyMessage = () => {
-        if (this.state.List.length == 0 ) {
+        if (this.state.List.length == 0) {
             return (
-            <View style={{justifyContent:'center',alignItems:'center',height:screenheight-120,width:'100%',}}>
-                 <FontAwesome name="user" size={60} color={Apptheme} />
-                    <Text style={{fontSize:24,color:Apptheme,fontWeight:'bold'}}>BLOCKED USERS</Text>
-                 <Text style={styles.noRecordFoundText}>No blocked users to display</Text>
-            </View>
-      ) }
+                <View style={{ justifyContent: 'center', alignItems: 'center', height: screenheight - 120, width: '100%', }}>
+                    <FontAwesome name="user" size={60} color={Apptheme} />
+                    <Text style={{ fontSize: 24, color: Apptheme, fontWeight: 'bold' }}>BLOCKED USERS</Text>
+                    <Text style={styles.noRecordFoundText}>No blocked users to display</Text>
+                </View>
+            )
+        }
     }
 
-    UsersVehicle =(item)=>{
-        item.user.userID=item.user.userId
-        this.props.navigation.navigate("UsersVehicle",{
-            userId:item.user
+    UsersVehicle = (item) => {
+        item.user.userID = item.user.userId
+        this.props.navigation.navigate("UsersVehicle", {
+            userId: item.user
         })
 
     }
-   
+
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar  ParentPage="Users" navigation={this.props} />
+                <Topbar ParentPage="Users" navigation={this.props} />
 
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
@@ -90,9 +104,44 @@ export default class Users extends React.Component {
                     </View>
                 }
                 <ScrollView >
-                    <View style={{ width: '96%',height:screenheight, marginHorizontal: '2%', marginVertical: 10 }}>
-                        <Text style={{color:Apptheme,textAlign:'center',fontSize:20,fontWeight:'bold'}}> JOINED</Text>
-                      
+
+                    {this.state.invitedMembers.length > 0 &&
+                        <View style={{ width: '96%',  marginHorizontal: '2%', marginVertical: 10 }}>
+                            <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> INVITED</Text>
+                            {this.state.invitedMembers.map((item, index) => {
+                                return (
+                                    <TouchableOpacity
+                                        onPress={() => this.UsersVehicle(item)}
+                                        key={index} style={styles.ChatBoxView}>
+                                        <View style={styles.UserImageView}>
+                                            {
+                                                Utilities.stringIsEmpty(item.user.imageUrl) ?
+                                                    <View style={styles.ImageIconView}>
+                                                        <FontAwesome name="user" size={40} color={Apptheme} />
+                                                    </View>
+                                                    :
+                                                    <Image
+                                                        style={styles.UserImage}
+                                                        source={{ uri: item.user.imageUrl }}
+                                                    />
+                                            }
+
+                                        </View>
+                                        <View style={{ width: '50%', marginTop: 30 }}>
+                                            <Text style={styles.UserNameText}>
+                                                {item.user.name}
+                                            </Text>
+                                            <View style={styles.UserDetailView}>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
+                    }
+                    <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
+                        <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> JOINED</Text>
+
                         <FlatList
                             data={this.state.List}
                             renderItem={({ item, index }) =>
@@ -125,16 +174,50 @@ export default class Users extends React.Component {
                                         </View>
                                     </View>
                                     {Storage.userData.userId == item.user.userId &&
-                                    <View style={[styles.UserImageView,]}>
-                                        <FontAwesome name="unlock-alt" size={24} color={Apptheme} />
-                                     </View>
-                                  }
+                                        <View style={[styles.UserImageView,]}>
+                                            <FontAwesome name="unlock-alt" size={24} color={Apptheme} />
+                                        </View>
+                                    }
                                 </TouchableOpacity>
                             }
-                           
                             ListEmptyComponent={this.flatListEmptyMessage}
                         />
                     </View>
+
+                    {this.state.Leftmember.length > 0 &&
+                        <View style={{ width: '96%',  marginHorizontal: '2%', marginVertical: 10 }}>
+                            <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> LEFT</Text>
+                            {this.state.Leftmember.map((item, index) => {
+                                return (
+                                    <TouchableOpacity
+                                        onPress={() => this.UsersVehicle(item)}
+                                        key={index} style={styles.ChatBoxView}>
+                                        <View style={styles.UserImageView}>
+                                            {
+                                                Utilities.stringIsEmpty(item.user.imageUrl) ?
+                                                    <View style={styles.ImageIconView}>
+                                                        <FontAwesome name="user" size={40} color={Apptheme} />
+                                                    </View>
+                                                    :
+                                                    <Image
+                                                        style={styles.UserImage}
+                                                        source={{ uri: item.user.imageUrl }}
+                                                    />
+                                            }
+
+                                        </View>
+                                        <View style={{ width: '50%', marginTop: 30 }}>
+                                            <Text style={styles.UserNameText}>
+                                                {item.user.name}
+                                            </Text>
+                                            <View style={styles.UserDetailView}>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
+                    }
                 </ScrollView>
 
             </View>
@@ -147,7 +230,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: lightBg,
-      
+
         // paddingBottom: 50
         // backgroundColor: 'lightgray',
 
@@ -180,8 +263,8 @@ const styles = StyleSheet.create({
     ChatBoxView: {
         height: 90,
         flexDirection: 'row',
-        borderBottomWidth:1,
-        borderBottomColor:"#d2d2d2"
+        borderBottomWidth: 1,
+        borderBottomColor: "#d2d2d2"
     },
     UserImageView: {
         width: '30%',
@@ -189,8 +272,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     UserImage: {
-        borderColor:Apptheme,
-        borderWidth:1,
+        borderColor: Apptheme,
+        borderWidth: 1,
         width: 75,
         height: 75,
         borderRadius: 50
@@ -202,7 +285,7 @@ const styles = StyleSheet.create({
     UserNameText: {
         fontSize: 16,
         fontWeight: 'bold',
-        paddingTop:5,
+        paddingTop: 5,
         color: darkText
     },
     UserCountText: {
@@ -233,10 +316,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: "bold"
     },
-    noRecordFoundText :{ 
-        textAlign:'center',
-        fontSize:14,
-        paddingTop:5,
+    noRecordFoundText: {
+        textAlign: 'center',
+        fontSize: 14,
+        paddingTop: 5,
     },
     ImageIconView: {
         borderColor: "#d2d2d2",

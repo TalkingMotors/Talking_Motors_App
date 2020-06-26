@@ -126,8 +126,8 @@ export default class Register extends React.Component {
             })
             console.log("params",params);
             UserService.register(params).then(response => {
+                console.log("response",response);
                 if (response) {
-                    console.log("response",response);
                     if (response.success) {
                         Storage.userData = response.user;
                         Storage.jwt_Token = response.token;
@@ -426,7 +426,7 @@ export default class Register extends React.Component {
                                     <TouchableOpacity
                                     onPress={()=>{
                                         this.ToggleModal()
-                                        this.props.navigation.replace("Home")
+                                        this.props.navigation.navigate("Home")
                                     }} style={{padding:10,marginHorizontal:5}}>
                                         <Text style={{color:Apptheme,}}>
                                             CONTINUE
@@ -434,7 +434,7 @@ export default class Register extends React.Component {
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={()=>{
                                         this.ToggleModal()
-                                        this.props.navigation.replace("ListVehicle")
+                                        this.props.navigation.navigate("ListVehicle")
                                     }} style={{padding:10,marginHorizontal:5}}>
                                     <Text style={{color:Apptheme,}}>
                                             ADD A VEHICLE

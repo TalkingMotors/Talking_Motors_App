@@ -14,6 +14,7 @@ import {
     Keyboard,
     ActivityIndicator,
     ImageBackground,
+    Alert,
     StyleSheet,
     KeyboardAvoidingView,
     TouchableOpacity
@@ -21,6 +22,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import { GiftedChat } from 'react-native-gifted-chat'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -33,7 +35,8 @@ import * as VehicleService from '../services/Vehicle';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText, GreenBg } from '../helpers/CommponStyle';
-
+import * as vehicleService from '../services/Vehicle';
+import RemoveGroup from '../components/RemoveGroup';
 const image = require('../images/userImage.jpg')
 const screen_height = Dimensions.get('window').height
 export default class Messenger extends React.Component {
@@ -55,13 +58,20 @@ export default class Messenger extends React.Component {
             senderName: "",
             senderImageUrl: "",
             isPopup: false,
+            isGroup: false,
+            isAdduser: false,
             isKeyboard: false,
             convoname: '',
             isChangeConversationNamePopup: false,
             isclearHostoryPopup: false,
             isBlockUserPopup: false,
-            members : {}
-         }
+            members: {},
+            membersCount: [],
+            registerNo: '',
+            isremoveModal: false,
+            isGroupOwner: false,
+            groupMembersActive: 0,
+        }
         this.MoreItemsModal = this.MoreItemsModal.bind(this);
         this._keyboardDidShow = this._keyboardDidShow.bind(this);
         this._keyboardDidHide = this._keyboardDidHide.bind(this);
@@ -96,23 +106,24 @@ export default class Messenger extends React.Component {
         })
     }
     componentDidMount() {
-        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
-            this.setState({
-                conversationId: 0,
-                conversationDetail: [],
-                messages: [],
-                userId: Storage.userData.userId,
-                sendButtonVisible: false,
-                typeMessage: '',
-                vehicleId: 0,
-                vrn: "",
-                userIds: {},
-                messageBody: {},
-                lastReadMessageId: 0,
-                isLoad: true,
+        // this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
+        //     this.setState({
+        //         conversationId: 0,
+        //         conversationDetail: [],
+        //         messages: [],
+        //         membersCount: [],
+        //         userId: Storage.userData.userId,
+        //         sendButtonVisible: false,
+        //         typeMessage: '',
+        //         vehicleId: 0,
+        //         vrn: "",
+        //         userIds: {},
+        //         messageBody: {},
+        //         lastReadMessageId: 0,
+        //         isLoad: true,
 
-            })
-        })
+        //     })
+        // })
 
         // this.setState({
         //     messages: [
@@ -161,12 +172,13 @@ export default class Messenger extends React.Component {
     getConverationDetail = (id) => {
         try {
             MessagesService.GetConversationDetail(id).then(respose => {
+                console.log("respose", respose);
                 if (respose) {
-                     if (respose.success) {
+                    if (respose.success) {
                         this.state.conversationDetail = respose.conversation
-                        console.log("ikm-messages",this.state.conversationDetail)
+                        console.log("ikm-messages", this.state.conversationDetail)
                         //var obj = JSON.parse(jsonObj)[0];
-                        
+
                         // respose.conversation.messages.forEach(element => {
                         //     element._id = element.id;
                         //     element.text = element.message;
@@ -179,28 +191,35 @@ export default class Messenger extends React.Component {
                             return a.time.localeCompare(b.time);
                         });
                         var previousDate = ""
-                            this.state.messages.forEach(element => {
-                            if(Utilities.stringIsEmpty(previousDate)) {
+                        this.state.messages.forEach(element => {
+                            if (Utilities.stringIsEmpty(previousDate)) {
                                 element.dateSeprator = Utilities.FormatDate(element.time)
                                 previousDate = Utilities.FormatDate(element.time)
-                            }else if(previousDate != Utilities.FormatDate(element.time))  {
+                            } else if (previousDate != Utilities.FormatDate(element.time)) {
                                 element.dateSeprator = Utilities.FormatDate(element.time)
                                 previousDate = Utilities.FormatDate(element.time)
-                            } else{
+                            } else {
                                 element.dateSeprator = ""
-                            }   
-                            
+                            }
+
                             element.time = Utilities.FormatTime(element.time).toLowerCase()
-                            
+
                         });
 
-                        console.log("ikm-messages",this.state.messages)
+                        console.log("ikm-messages", this.state.messages)
                         if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
                             this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
                         }
 
                         this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId
+                        var isGroupOwner = false;
+                        isGroupOwner = (this.state.conversationDetail.owner.userId == Storage.userData.userId)
                         this.state.vrn = this.state.conversationDetail.name
+                        var groupMembersActive = 0
+                        if (this.state.conversationDetail.members.length > 0) {
+                            groupMembersActive = this.state.conversationDetail.members.filter((val) => val.status.id == 3)
+
+                        }
                         this.setSenderProps(this.state.conversationDetail.members)
                         //this.getUserIds(this.state.conversationDetail.members);
                         this.setState({
@@ -210,7 +229,10 @@ export default class Messenger extends React.Component {
                             convoname: this.state.conversationDetail.name,
                             senderName: this.state.conversationDetail.name,
                             isLoad: false,
-                            members:this.state.conversationDetail.members
+                            membersCount: this.state.conversationDetail.members,
+                            members: this.state.conversationDetail.members,
+                            isGroupOwner: isGroupOwner,
+                            groupMembersActive: groupMembersActive
                         })
                     }
                     else {
@@ -319,9 +341,84 @@ export default class Messenger extends React.Component {
         this.setState({
             isPopup: !this.state.isPopup
         })
+
+    }
+    addUserToGroup() {
+        this.state.isPopup = false
+        this.setState({
+            isPopup: this.state.isPopup
+        })
+        this.setState({
+            isAdduser: !this.state.isAdduser
+        })
+    }
+
+    removeGroupToUser = () => {
+        this.state.isPopup = false
+        this.setState({
+            isPopup: this.state.isPopup
+        })
+        this.setState({
+            isremoveModal: !this.state.isremoveModal
+        })
+    }
+    confromRemoveUser = async (userId) => {
+        try {
+            var param = {
+                conversationId: this.state.conversationId,
+                userId: userId
+            }
+            console.log("param", param)
+            var response = await MessagesService.removeUserToGroup(param);
+            console.log("response", response);
+            if (response.success) {
+                this.getConverationDetail(this.state.conversationId);
+            }
+            else {
+                Alert.alert(
+                    'Remove user operation failed.'
+                )
+            }
+
+        }
+        catch (e) { 
+            console.log("confromRemoveUser Exception", e)
+        }
+    }
+    addUserGroup = async () => {
+        try {
+            var registerNo = this.state.registerNo;
+            if (!Utilities.stringIsEmpty(registerNo)) {
+                var response = await vehicleService.searchRegisterNo(registerNo)
+                if (response.success) {
+                    if (!Utilities.stringIsEmpty(response.vehicle)) {
+                        this.addUserToGroup();
+
+                        var param = {
+                            conversationId: this.state.conversationId,
+                            vrm: registerNo.toUpperCase(),
+                            email: response.vehicle.user.email
+                        }
+                        var messageResponse = await MessagesService.addUserToGroup(param)
+                        if (messageResponse.success) {
+                            this.getConverationDetail(this.state.conversationId);
+                        }
+                    }
+                    else {
+                        this.addUserToGroup();
+                        Alert.alert(
+                            'Vehicle not found'
+                        )
+                    }
+                }
+
+            }
+        }
+        catch (e) {
+            console.log("addUserGroup Exception", e);
+        }
     }
     ConversationNamePopup = () => {
-
         this.setState({
             isPopup: false,
             isChangeConversationNamePopup: !this.state.isChangeConversationNamePopup
@@ -345,7 +442,7 @@ export default class Messenger extends React.Component {
         MessagesService.BlockUser(param).then(response => {
             console.log("response", response);
         })
-        
+
 
     }
     clearChatHistoryService = () => {
@@ -376,27 +473,34 @@ export default class Messenger extends React.Component {
         MessagesService.updateConversationName(param).then(response => {
             console.log("updateConversationName", response)
             this.setState({
-                senderName : this.state.convoname
+                senderName: this.state.convoname
             })
         })
     }
 
-    navigateToUser =()=>{
-         this.props.navigation.navigate("Users",{
-            members:this.state.members
-        })
+    navigateToUser = () => {
+        if (this.state.membersCount.length > 0) {
+            this.props.navigation.navigate("Users", {
+                members: this.state.members
+            })
+        }
     }
     render() {
+        console.log("this.state", this.state)
         return (
             <View style={styles.ParentView}>
-                <Topbar 
-                navigateToUser={this.navigateToUser} 
-                MoreItemsModal={this.MoreItemsModal}
-                ParentPage="Messenger" 
-                username={this.state.senderName} 
-                image={this.state.senderImageUrl} 
-                navigation={this.props} 
-                members = {this.state.members} />
+                <Topbar
+                    navigateToUser={this.navigateToUser}
+                    MoreItemsModal={this.MoreItemsModal}
+                    ConversationNamePopup={this.ConversationNamePopup}
+                    ParentPage="Messenger"
+                    username={this.state.senderName}
+                    image={this.state.senderImageUrl}
+                    navigation={this.props}
+                    conversationDetail={this.state.conversationDetail}
+                    conversationId={this.state.conversationId}
+                    groupMembersActive ={this.state.groupMembersActive}
+                    membersCount={this.state.membersCount} />
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -406,92 +510,106 @@ export default class Messenger extends React.Component {
                     </View>
                 }
                 <ScrollView style={{ marginBottom: 0 }}>
-                <View >
-                    <KeyboardAvoidingView
-                          keyboardVerticalOffset="80"
-                          enabled>
-                        
-                        <ScrollView>
-                            <ImageBackground style={{width:'100%'}} source={require('../images/tmmesbackan.png')} >
-                            <View style={styles.MessengerView}>
-                                <View style={styles.MessengerViewList}>
-                                   
-                                     <FlatList
-                                        data={this.state.messages}
-                                        renderItem={({ item, index }) =>
-                                            <View >
-                                                {
-                                                    item.user.userId != this.state.userId ?
-                                                       <View>
-                                                            {
-                                                                item.dateSeprator != "" ?
-                                                                <View style={{alignItems:'center'}}>
-                                                                        <Text style={styles.TimingText}>{item.dateSeprator}</Text>    
-                                                                </View>:
-                                                                null
-                                                            }
-                                                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                            
-                                                            <View style={{ borderWidth: 1, alignItems: 'center', borderColor: "#d2d2d2", justifyContent: 'center', backgroundColor: lightBg, width: 50, height: 50, borderRadius: 50, }}>
-                                                                {this.senderImage(item)}
-                                                            </View>
-                                                           
-                                                            
-                                                            <View style={styles.ReceivedMessageView}>
-                                                                <Text style={{paddingHorizontal:5,paddingVertical:4}}>
+                    <View >
+                        <KeyboardAvoidingView
+                            keyboardVerticalOffset="80"
+                            enabled>
 
-                                                                <Text style={{color:GreenBg,fontSize:14,fontWeight:'bold'}}>{ item.user.name } </Text>
-                                                                <Text style={styles.ReceivedMessageTextTime}>
-                                                                {item.time}
-                                                                </Text>
-                                                                </Text>
-                                                                <Text style={styles.ReceivedMessageText}>
-                                                                    {item.message}
-                                                                </Text>
-                                                            </View>
-                                                        </View>
-                                                        </View>
+                            <ScrollView>
+                                <ImageBackground style={{ width: '100%' }} source={require('../images/tmmesbackan.png')} >
+                                    <View style={styles.MessengerView}>
+                                        <View style={styles.MessengerViewList}>
 
-                                                        :
-                                                        <View >
-                                                           
-                                                            {
-                                                                item.dateSeprator != "" ?
-                                                                <View style={{alignItems:'center',}}>
-                                                                        <Text style={styles.TimingText}>{item.dateSeprator}</Text>    
-                                                                </View>:
-                                                                null
-                                                            }
-                                                          <View style={styles.SendMessageView}>
-                                                          <View style={styles.SendMessageBox}>
-                                                         <Text style={styles.SendMessageTextTime}>
-                                                                    {item.time}
-                                                                </Text>
-                                                                <Text style={styles.SendMessageText}>
-                                                                    {item.message}
-                                                                </Text>
-                                                                {(item.allRead || item.id < this.state.lastReadMessageId) ?
-                                                                    <FontAwesome5 name="check-double" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
-                                                                    :
-                                                                    <FontAwesome5 name="check" color={"#d2d2d2"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
-                                                                }
-                                                            </View>
-                                                            </View>
-                                                      </View>
+                                            <FlatList
+                                                data={this.state.messages}
+                                                renderItem={({ item, index }) =>
+                                                    <View >
+                                                        {
+                                                            item.user.userId != this.state.userId ?
+                                                                <View>
+                                                                    {
+                                                                        item.dateSeprator != "" ?
+                                                                            <View style={{ alignItems: 'center' }}>
+                                                                                <Text style={styles.TimingText}>{item.dateSeprator}</Text>
+                                                                            </View> :
+                                                                            null
+                                                                    }
+                                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+                                                                        <View style={{ borderWidth: 1, alignItems: 'center', borderColor: "#d2d2d2", justifyContent: 'center', backgroundColor: lightBg, width: 50, height: 50, borderRadius: 50, }}>
+                                                                            {this.senderImage(item)}
+                                                                        </View>
+
+
+                                                                        <View style={styles.ReceivedMessageView}>
+                                                                            <Text style={{ paddingHorizontal: 5, paddingVertical: 4 }}>
+
+                                                                                <Text style={{ color: GreenBg, fontSize: 14, fontWeight: 'bold' }}>{item.user.name} </Text>
+                                                                                <Text style={styles.ReceivedMessageTextTime}>
+                                                                                    {item.time}
+                                                                                </Text>
+                                                                            </Text>
+                                                                            <Text style={styles.ReceivedMessageText}>
+                                                                                {item.message}
+                                                                            </Text>
+                                                                        </View>
+                                                                    </View>
+                                                                </View>
+
+                                                                :
+                                                                <View >
+
+                                                                    {
+                                                                        item.dateSeprator != "" ?
+                                                                            <View style={{ alignItems: 'center', }}>
+                                                                                <Text style={styles.TimingText}>{item.dateSeprator}</Text>
+                                                                            </View> :
+                                                                            null
+                                                                    }
+                                                                    <View style={styles.SendMessageView}>
+                                                                        <View style={styles.SendMessageBox}>
+                                                                            <Text style={styles.SendMessageTextTime}>
+                                                                                {item.time}
+                                                                            </Text>
+                                                                            <Text style={styles.SendMessageText}>
+                                                                                {item.message}
+                                                                            </Text>
+                                                                            {(item.allRead || item.id < this.state.lastReadMessageId) ?
+                                                                                <FontAwesome5 name="check-double" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
+                                                                                :
+                                                                                <FontAwesome5 name="check" color={"#d2d2d2"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
+                                                                            }
+                                                                        </View>
+                                                                    </View>
+                                                                </View>
+                                                        }
+                                                    </View>
                                                 }
-                                            </View>
-                                        }
 
-                                        keyExtractor={(item, index) => index.toString()}
-                                    /> 
+                                                keyExtractor={(item, index) => index.toString()}
+                                            />
 
-                                </View>
-                            </View>
-                            </ImageBackground>
-                        </ScrollView>
-                    </KeyboardAvoidingView>
-              
-                </View>
+                                            {this.state.messages.length == 0 &&
+                                                <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                                                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                                        <FontAwesome name="comments" color={Apptheme} style={{ alignItems: 'center' }} size={80} />
+                                                        <Text style={{ paddingVertical: 10, textAlign: 'center', fontSize: 20, color: Apptheme, fontWeight: 'bold' }}>
+                                                            {this.state.convoname}
+                                                        </Text>
+                                                        <Text style={{ color: darkText }}>
+                                                            No messages to display
+                                                    </Text>
+                                                    </View>
+                                                </View>
+                                            }
+
+                                        </View>
+                                    </View>
+                                </ImageBackground>
+                            </ScrollView>
+                        </KeyboardAvoidingView>
+
+                    </View>
                 </ScrollView>
                 <View style={{ flexDirection: 'row', width: '100%', height: 55, }}>
                     <TouchableOpacity style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
@@ -531,31 +649,62 @@ export default class Messenger extends React.Component {
                     >
                         <TouchableOpacity onPress={() => this.MoreItemsModal()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
                         </TouchableOpacity>
-                        <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 5, top: 50, height: 150, width: '70%', right: 0, position: 'absolute' }}>
+                        <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 5, top: 50, height: (this.state.membersCount.length > 2 && this.state.isGroupOwner) ? 250 : (this.state.membersCount.length > 2 && !this.state.isGroupOwner) ? 100 : 150, width: '70%', right: 0, position: 'absolute' }}>
                             <ScrollView keyboardShouldPersistTaps='handled'>
                                 <View style={{ width: '100%', height: '100%' }}>
 
-                                    <TouchableOpacity onPress={() => this.ConversationNamePopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                                        <FontAwesome style={{ paddingHorizontal: 15 }} name="edit" size={24} color={Apptheme} />
-                                        <Text>Edit conversation name</Text>
-                                    </TouchableOpacity>
+                                    {this.state.membersCount.length > 2 && this.state.isGroupOwner &&
+                                        <TouchableOpacity onPress={() => this.addUserToGroup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                            <FontAwesome style={{ paddingHorizontal: 15 }} name="plus" size={24} color={Apptheme} />
+                                            <Text>Add user</Text>
+                                        </TouchableOpacity>
+
+                                    }
+
+                                    {this.state.membersCount.length > 2 && this.state.isGroupOwner &&
+                                        <TouchableOpacity onPress={() => this.removeGroupToUser()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                            <FontAwesome style={{ paddingHorizontal: 15 }} name="remove" size={24} color={Apptheme} />
+                                            <Text>Remove user</Text>
+                                        </TouchableOpacity>
+
+                                    }
+                                    {(this.state.membersCount.length > 2 && !this.state.isGroupOwner) ?
+                                        null
+                                        :
+                                        <TouchableOpacity onPress={() => this.ConversationNamePopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                            <FontAwesome style={{ paddingHorizontal: 15 }} name="edit" size={24} color={Apptheme} />
+                                            <Text>Edit conversation name</Text>
+                                        </TouchableOpacity>
+                                    }
 
                                     <TouchableOpacity onPress={() => this.clearHostoryPopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                                        <Feather style={{ paddingHorizontal: 15 }} name="delete" size={24} color={Apptheme} />
+                                        <FontAwesome style={{ paddingHorizontal: 15 }} name="history" size={24} color={Apptheme} />
                                         <Text>Clear chat history</Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity onPress={() => this.BlockUserPopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                                        <Entypo style={{ paddingHorizontal: 15 }} name="block" size={24} color={Apptheme} />
-                                        <Text>Block</Text>
-                                    </TouchableOpacity>
+                                    {(this.state.membersCount.length > 2) ?
+                                        <TouchableOpacity onPress={() => {
+                                            this.MoreItemsModal()
+                                            this.confromRemoveUser(Storage.userData.userId)}} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                            <AntDesign style={{ paddingHorizontal: 15 }} name="deleteusergroup" size={24} color={Apptheme} />
+                                            <Text>Leave group</Text>
+                                        </TouchableOpacity>
+
+                                        :
+                                        <TouchableOpacity onPress={() => this.BlockUserPopup()} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                            <Entypo style={{ paddingHorizontal: 15 }} name="block" size={24} color={Apptheme} />
+                                            <Text>Block</Text>
+                                        </TouchableOpacity>
+                                    }
+
+
                                 </View >
 
                             </ScrollView>
                         </SafeAreaView>
                     </Modal >
                 }
-
+{/* ConversationNamePopup */}
                 <Modal
                     animationType="fade"
                     transparent={true}
@@ -610,7 +759,7 @@ export default class Messenger extends React.Component {
                         </View>
                     </SafeAreaView>
                 </Modal >
-
+                {/* clearHostory */}
                 <Modal
                     animationType="fade"
                     transparent={true}
@@ -651,7 +800,7 @@ export default class Messenger extends React.Component {
                     </SafeAreaView>
                 </Modal >
 
-
+                {/* isBlockUser */}
                 <Modal
                     animationType="fade"
                     transparent={true}
@@ -690,6 +839,76 @@ export default class Messenger extends React.Component {
                     </SafeAreaView>
                 </Modal >
 
+                {/* Add group to user */}
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isAdduser}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.addUserToGroup()
+                    }}
+
+                >
+                    <TouchableOpacity onPress={() => this.addUserToGroup()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
+                    </TouchableOpacity>
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 5, top: (this.state.isKeyboard) ? 60 : 150, height: 230, width: '80%', marginHorizontal: "10%", position: 'absolute' }}>
+                        <ScrollView keyboardShouldPersistTaps='handled'>
+                            <View style={{ padding: 10, }}>
+                                <Text style={{ fontSize: 20, color: darkText, fontWeight: 'bold' }}>
+                                    Add  user
+                                    </Text>
+
+                                <Text style={{ fontSize: 16, paddingVertical: 5, color: darkText, }}>
+                                    To add a new user to this group, just enter their registration number below.
+                                </Text>
+                            </View>
+                            <View style={{ width: '100%', height: 250, justifyContent: 'flex-start', alignItems: 'center' }}>
+                                <View style={styles.TextFieldView}>
+                                    <TextField
+                                        label='Registration number'
+                                        fontSize={13}
+                                        keyboardType='default'
+                                        tintColor={Apptheme}
+                                        baseColor={Apptheme}
+                                        errorColor="red"
+                                        activeLineWidth={2}
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                        labelFontSize={13}
+                                        value={this.state.registerNo}
+                                        onChangeText={val => {
+                                            this.onChangeText('registerNo', val.trim())
+                                        }}
+                                    />
+                                </View>
+                                <View style={{ width: '90%', marginHorizontal: '5%', alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                    <TouchableOpacity onPress={() => this.addUserGroup()} style={styles.Modalbtn}>
+                                        <Text style={styles.ModalBtnText}>ADD</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={() => this.addUserToGroup()} style={styles.Modalbtn}>
+                                        <Text style={styles.ModalBtnText}>CANCEL</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View >
+
+                        </ScrollView>
+                    </SafeAreaView>
+                </Modal >
+
+                {/* remove user to Group  */}
+
+                {this.state.isremoveModal &&
+                    <RemoveGroup
+                        removeGroupToUser={this.removeGroupToUser}
+                        confromRemoveUser={this.confromRemoveUser}
+                        members={this.state.members}
+                        membersCount={this.state.membersCount}
+                    />
+
+                }
+
             </View>
         )
     }
@@ -717,19 +936,19 @@ const styles = StyleSheet.create({
         // width: '100%',
         alignSelf: 'flex-end',
         alignItems: 'flex-start',
-      
-       
+
+
     },
     SendMessageBox: {
         marginVertical: 5,
         backgroundColor: Apptheme,
-        minWidth:100,
+        minWidth: 100,
         width: '80%',
         borderRadius: 10,
         paddingVertical: 10,
-        paddingRight:10,
-        paddingLeft:10
-        
+        paddingRight: 10,
+        paddingLeft: 10
+
         // paddingLeft:30,
         // alignItems:'flex-start',
 
@@ -738,13 +957,13 @@ const styles = StyleSheet.create({
 
         // textAlign:'left',
         color: lightText,
-        fontSize:12,
+        fontSize: 12,
     },
     SendMessageText: {
         paddingHorizontal: 1,
         color: lightText,
-        fontSize:16,
-        paddingRight:10
+        fontSize: 16,
+        paddingRight: 10
     },
     ReceivedMessageView: {
         backgroundColor: '#eee',
@@ -755,18 +974,18 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginVertical: 5,
         paddingVertical: 5,
-        paddingHorizontal:10
+        paddingHorizontal: 10
     },
     ReceivedMessageTextTime: {
-        alignItems:'flex-end',
+        alignItems: 'flex-end',
         color: darkText,
-        
-        fontSize:12
+
+        fontSize: 12
     },
     ReceivedMessageText: {
         paddingHorizontal: 10,
         color: darkText,
-        fontSize:16
+        fontSize: 16
     },
     menuLoaderView: {
         ...CommonStyle.menuLoaderView
@@ -785,7 +1004,34 @@ const styles = StyleSheet.create({
         padding: 10,
         marginHorizontal: 5
     },
-    TimingText:{
-      color:Apptheme,fontWeight:'bold',padding:5
+    TimingText: {
+        color: Apptheme, fontWeight: 'bold', padding: 5
+    },
+    TextFieldView: {
+        width: '80%',
+        marginHorizontal: '10%'
+    },
+    Modalbtn: {
+        height: 35, margin: 3, marginHorizontal: 10, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'
+    },
+    ModalBtnText: {
+        color: Apptheme
+    },
+    Icons: {
+        marginLeft: 10,
+    },
+    ScreenName: {
+        paddingHorizontal: 15,
+        color: lightText,
+        fontSize: 16
+    },
+    footerBtn: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
+        width: '44%',
+        marginHorizontal: '3%',
+        height: 45,
+
     }
 })

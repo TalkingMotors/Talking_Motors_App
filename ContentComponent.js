@@ -290,7 +290,6 @@ const styles = StyleSheet.create({
         height: 80,
         borderRadius: 45,
         backgroundColor: lightText,
-        backgroundColor: 'blue'
     },
     userEmail: {
        color: lightText,

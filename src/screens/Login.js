@@ -118,6 +118,7 @@ export default class Login extends React.Component {
             })
             let params = { "email": this.state.username, "password": this.state.password }
             UserService.login(params).then(response => {
+                console.log("response",response);
                 if (response) {
                     if (response.success) {
                         Storage.userData = response.user;

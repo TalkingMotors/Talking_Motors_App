@@ -37,12 +37,86 @@ export let GetConversationDetail = async (id) => {
         console.log(e.message)
         return null
     }
+
+}
+
+export let getConversationByUserIds = async (param) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            console.log("!!",APIConstants.GET_CONVERSATION_BY_USER_IDS_ENDPOINT + "?"+ param.userIds + "&vrm=" + param.vrm + "&numberOfResults=50")
+            let response = await fetch(APIConstants.GET_CONVERSATION_BY_USER_IDS_ENDPOINT + "?" + param.userIds + "&vrm=" + param.vrm + "&numberOfResults=50", {
+                method: 'GET',
+                headers: Utilities.setHeaders()
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
 }
 
 export let sendMessageToConversation = async (params) => {
     try {
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.SEND_MESSAGE_TO_CONVERSATION_ENDPOINT, {
+                method: 'POST',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let addUserToGroup = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.ADD_USER_TO_GROUP_ENDPOINT, {
+                method: 'POST',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let removeUserToGroup = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.REMOVE_USER_FROM_GROUP_ENDPOINT, {
+                method: 'POST',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
+export let createGroup = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.CREATE_GROUP_ENDPOINT, {
                 method: 'POST',
                 headers: Utilities.setHeaders(),
                 body: JSON.stringify(params)
@@ -77,19 +151,15 @@ export let sendMessage = async (params) => {
     }
 }
 
+
 export let updateMessageStatusToRead = async (params) => {
     try {
-        console.log(JSON.stringify({
-            params
-        }));
+       
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UPDATE_LAST_READ_ID_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
-                body: JSON.stringify({
-                    conversationId: params.conversationId,
-                    messageId: params.messageId
-                })
+                body: JSON.stringify(params)
             })
             let result = response.json()
             return result;
@@ -101,6 +171,26 @@ export let updateMessageStatusToRead = async (params) => {
         return null
     }
 }
+export let updateGroupInvite = async (params) => {
+    try {
+       
+        if (Storage.networkStatus.isConnected) {
+            let response = await fetch(APIConstants.UPDATE_GROUP_INVITE_ENDPOINT, {
+                method: 'PATCH',
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            return result;
+        } else {
+            return null
+        }
+    } catch (e) {
+        console.log("error", e.message)
+        return null
+    }
+}
+
 export let updateConversationName = async (params) => {
     try {
         console.log(APIConstants.SET_CONVERSATION_NAME_ENDPOINT);
@@ -108,10 +198,7 @@ export let updateConversationName = async (params) => {
             let response = await fetch(APIConstants.SET_CONVERSATION_NAME_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
-                body: JSON.stringify({
-                    id: params.id,
-                    name: params.name
-                })
+                body: JSON.stringify(params)
             })
             let result = response.json()
             return result;
@@ -123,6 +210,7 @@ export let updateConversationName = async (params) => {
         return null
     }
 }
+
 export let ClearChatHistory = async (params) => {
     try {
         console.log(APIConstants.CLEAR_CHAT_HISTORY_ENDPOINT);
@@ -130,9 +218,7 @@ export let ClearChatHistory = async (params) => {
             let response = await fetch(APIConstants.CLEAR_CHAT_HISTORY_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
-                body: JSON.stringify({
-                    conversationId: params.conversationId
-                })
+                body: JSON.stringify(params)
             })
             let result = response.json()
             return result;

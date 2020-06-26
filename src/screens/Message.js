@@ -7,9 +7,14 @@ import {
     Image,
     StyleSheet,
     ActivityIndicator,
-    TouchableOpacity
+    Keyboard,
+    KeyboardAvoidingView,
+    Modal,
+    SafeAreaView,
+    TouchableOpacity,
+    Alert
 } from 'react-native';
-// import Feather from 'react-native-vector-icons/Feather';
+import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -19,20 +24,33 @@ import * as Utilities from "../helpers/Utilities";
 import * as MessagesService from '../services/Messages';
 import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
-
+import { TextField } from 'react-native-material-textfield';
 import Topbar from '../components/Topbar';
 import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
-
+import * as vehicleService from '../services/Vehicle';
+import InviteGroup from '../components/InviteGroup';
 //import { FluidNavigator, Transition } from '../../lib';
 export default class Message extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             isLoad: true,
-            myConversation: []
+            isModal: false,
+            isKeyboard: false,
+            registerNo: '',
+            myConversation: [],
+            invitedMembers: [],
+            Leftmember: [],
+            joinedmember: [],
+            isInviteModal: false,
+            conversationId: 0
+
         }
+        this._keyboardDidShow = this._keyboardDidShow.bind(this);
+        this._keyboardDidHide = this._keyboardDidHide.bind(this);
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.getMyConversations()
+
 
         })
 
@@ -45,22 +63,63 @@ export default class Message extends React.Component {
             })
         })
     }
+    _keyboardDidShow() {
+        this.setState({
+            isKeyboard: true
+        })
+    }
+    onChangeText = (key, value) => {
+        this.setState({ [key]: value, })
+    }
+
+    _keyboardDidHide() {
+        this.setState({
+            isKeyboard: false
+        })
+    }
+    componentWillMount() {
+        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
+        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide)
+    }
     getMyConversations = () => {
         try {
             MessagesService.MyConversations().then(respose => {
                 if (respose) {
                     if (respose.success) {
                         this.state.myConversation = respose.conversations.reverse()
+                        var conversation = this.state.myConversation;
                         console.log("myConversation", this.state.myConversation);
+                        var invitedMembers = [];
+                        var Leftmember = [];
+                        var joinedmember = []
+                        for (var i = 0; i < conversation.length; i++) {
+                            for (var j = 0; j < conversation[i].members.length; j++) {
+                                if (conversation[i].members[j].user.userId == Storage.userData.userId) {
+                                    if (conversation[i].members[j].status.id == 1) {
+                                        invitedMembers.push(conversation[i])
+                                    }
+                                    else if (conversation[i].members[j].status.id == 3) {
+                                        joinedmember.push(conversation[i])
+                                    }
+                                    else if (conversation[i].members[j].status.id == 5) {
+                                        Leftmember.push(conversation[i])
+                                    }
+                                }
+                            }
+                        }
+
                         this.setState({
                             myConversation: this.state.myConversation,
+                            invitedMembers: invitedMembers,
+                            joinedmember: joinedmember,
+                            Leftmember: Leftmember,
                             isLoad: false
                         })
                     }
                 }
-                else{
+                else {
                     this.setState({
-                         isLoad: false
+                        isLoad: false
                     })
                 }
             })
@@ -79,7 +138,13 @@ export default class Message extends React.Component {
                 if (member.user.userId === Storage.userData.userId) {
                     memberNamesCSV = "You" + memberNamesCSV
                 } else {
-                    memberNamesCSV = `${memberNamesCSV}, ${member.user.nickname}`
+                    if (memberNamesCSV == "") {
+                        memberNamesCSV = ` ${member.user.nickname}`
+                    }
+                    else {
+
+                        memberNamesCSV = `${memberNamesCSV} , ${member.user.nickname}`
+                    }
                 }
             });
             return memberNamesCSV;
@@ -94,14 +159,104 @@ export default class Message extends React.Component {
         this.props.navigation.navigate("Messenger", { conversationId: item.id })
     }
     BlockUser = () => {
-        
+
         this.props.navigation.navigate("BlockUser")
     }
 
+    editSetting = () => {
+        this.setState({
+            isModal: !this.state.isModal,
+            registerNo: ''
+        })
+    }
+
+    createGroup = () => {
+        this.editSetting()
+        this.props.navigation.navigate("CreateGroup")
+    }
+
+    searchRegistration = async () => {
+        var registerNo = this.state.registerNo;
+        if (!Utilities.stringIsEmpty(registerNo)) {
+            var response = await vehicleService.searchRegisterNo(registerNo)
+            console.log("response", response);
+            if (response.success) {
+                if (!Utilities.stringIsEmpty(response.vehicle)) {
+                    this.editSetting()
+                    var param = {
+                        userIds: "userIds=" + Storage.userData.userId + "&userIds=" + response.vehicle.userID,
+                        vrm: registerNo,
+                        numberOfResults: 50
+                    }
+                    console.log("param", param);
+                    var messageResponse = await MessagesService.getConversationByUserIds(param)
+                    console.log("messageResponse", messageResponse);
+                    if (messageResponse.success) {
+                        if (messageResponse.conversations.length > 0) {
+                            this.props.navigation.navigate("Messenger", { conversationId: messageResponse.conversations[0].id })
+                        }
+                        else {
+                            this.props.navigation.navigate("Messenger", { conversationId: 0 })
+                        }
+                    }
+                    console.log("messageResponse", messageResponse);
+                }
+                else {
+                    this.editSetting()
+                    Alert.alert(
+                        'Vehicle not found'
+                    )
+                }
+            }
+
+        }
+
+    }
+
+    inviteModal = () => {
+        this.setState({
+            isInviteModal: !this.state.isInviteModal
+        })
+    }
+    confromInvitation = async(id) => {
+        try {
+            this.setState({
+                isLoad: true
+            })
+            var param = {
+                conversationId: this.state.conversationId,
+                inviteStatus: id
+
+            }
+            console.log("param", param);
+            var response = await MessagesService.updateGroupInvite(param)
+            console.log("response", response);
+            if (response.success) {
+                this.getMyConversations()
+            }
+            else {
+                this.setState({
+                    isLoad: true
+                })
+            }
+        }
+        catch (e) {
+            console.log("confromInvitation Exception", e)
+            this.setState({
+                isLoad: true
+            })
+        }
+
+
+    }
     render() {
         return (
             <View style={styles.ParentView}>
-                <Topbar BlockUser={this.BlockUser} ParentPage="Message" navigation={this.props} />
+                <Topbar
+                    BlockUser={this.BlockUser}
+                    editSetting={this.editSetting}
+                    ParentPage="Message"
+                    navigation={this.props} />
 
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
@@ -112,7 +267,263 @@ export default class Message extends React.Component {
                     </View>
                 }
                 <ScrollView style={{ paddingBottom: 0, }}>
-                    <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
+
+                    {this.state.invitedMembers.length > 0 &&
+                        <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
+                            <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> INVITATION</Text>
+                            {this.state.invitedMembers.map((item, index) => {
+                                var inviteCount = [];
+                                var joinedCount = []
+                                var invite = "";
+                                var joinded = "";
+                                joinedCount = item.members.filter(i => i.status.id == 3)
+                                inviteCount = item.members.filter(i => i.status.id == 1)
+                                joinded = this.setMemberNames(joinedCount);
+                                invite = this.setMemberNames(inviteCount);
+                                return (
+                                    <TouchableOpacity onPress={() => {
+                                        this.setState({
+                                            conversationId: item.id
+                                        })
+                                        this.inviteModal()
+                                    }} key={index} style={styles.ChatBoxView}>
+                                        <View style={styles.UserImageView}>
+                                            {
+                                                Utilities.stringIsEmpty(item.owner.thumbUrl) ?
+                                                    <View style={styles.ImageIconView}>
+                                                        <FontAwesome name="user" size={40} color={Apptheme} />
+                                                    </View>
+                                                    :
+                                                    <Image
+                                                        style={styles.UserImage}
+                                                        source={{ uri: item.owner.thumbUrl }}
+                                                    />
+                                            }
+
+                                        </View>
+                                        <View style={{ width: '100%', justifyContent: "center", flex: 1, overflow: 'hidden' }}>
+                                            <Text style={styles.UserNameText}>
+                                                {item.name}
+                                            </Text>
+
+                                            <View style={styles.UserDetailView}>
+
+
+
+                                                {joinedCount.length > 0 &&
+                                                    <Text>
+                                                        <Text style={styles.UserCountText}>
+                                                            {joinedCount.length + ((joinedCount.length > 1) ? " users" : " user") + " joined "}
+                                                            <Text style={styles.UserFriendsText}>
+                                                                {"(" + joinded + ")"}
+                                                            </Text>
+                                                        </Text>
+                                                    </Text>
+
+                                                }
+                                                {inviteCount.length > 0 &&
+                                                    <Text>
+                                                        <Text style={styles.UserCountText}>
+                                                            {inviteCount.length + ((inviteCount.length > 1) ? " users" : " user") + " invited "}
+                                                            <Text style={styles.UserFriendsText}>
+                                                                {"(" + invite + ")"}
+                                                            </Text>
+                                                        </Text>
+                                                    </Text>
+
+                                                }
+                                                {item.numberOfUnreadMessages > 0 &&
+                                                    <View style={styles.MessageCountView}>
+                                                        <Text style={styles.MessageCountText}>
+                                                            {item.numberOfUnreadMessages}
+
+                                                        </Text>
+                                                    </View>
+
+                                                }
+
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
+
+                    }
+
+
+                    {this.state.joinedmember.length > 0 &&
+                        <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
+                            <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> CONVERSATION</Text>
+                            {this.state.joinedmember.map((item, index) => {
+                                var inviteCount = [];
+                                var joinedCount = []
+                                var invite = "";
+                                var joinded = "";
+                                joinedCount = item.members.filter(i => i.status.id == 3)
+                                inviteCount = item.members.filter(i => i.status.id == 1)
+                                joinded = this.setMemberNames(joinedCount);
+                                invite = this.setMemberNames(inviteCount);
+                                return (
+                                    <TouchableOpacity onPress={() => this.viewMessageDetail(item)} key={index} style={styles.ChatBoxView}>
+                                        <View style={styles.UserImageView}>
+                                            {
+                                                Utilities.stringIsEmpty(item.owner.thumbUrl) ?
+                                                    <View style={styles.ImageIconView}>
+                                                        <FontAwesome name="user" size={40} color={Apptheme} />
+                                                    </View>
+                                                    :
+                                                    <Image
+                                                        style={styles.UserImage}
+                                                        source={{ uri: item.owner.thumbUrl }}
+                                                    />
+                                            }
+
+                                        </View>
+                                        <View style={{ width: '100%', justifyContent: 'center', flex: 1, overflow: 'hidden' }}>
+                                            <Text style={styles.UserNameText}>
+                                                {item.name}
+                                            </Text>
+
+                                            <View style={styles.UserDetailView}>
+
+                                                {joinedCount.length > 0 &&
+                                                    <Text>
+                                                        <Text style={styles.UserCountText}>
+                                                            {joinedCount.length + ((joinedCount.length > 1) ? " users" : " user") + " joined "}
+                                                            <Text style={styles.UserFriendsText}>
+                                                                {"(" + joinded + ")"}
+                                                            </Text>
+                                                        </Text>
+                                                    </Text>
+
+                                                }
+                                                {inviteCount.length > 0 &&
+                                                    <Text>
+                                                        <Text style={styles.UserCountText}>
+                                                            {inviteCount.length + ((inviteCount.length > 1) ? " users" : " user") + " invited "}
+                                                            <Text style={styles.UserFriendsText}>
+                                                                {"(" + invite + ")"}
+                                                            </Text>
+                                                        </Text>
+                                                    </Text>
+
+                                                }
+                                                {item.numberOfUnreadMessages > 0 &&
+                                                    <View style={styles.MessageCountView}>
+                                                        <Text style={styles.MessageCountText}>
+                                                            {item.numberOfUnreadMessages}
+
+                                                        </Text>
+                                                    </View>
+
+                                                }
+
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
+
+                    }
+
+                    {this.state.Leftmember.length > 0 &&
+                        <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
+                            <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> LEFT CONVERSATION</Text>
+                            {this.state.Leftmember.map((item, index) => {
+                                var inviteCount = [];
+                                var joinedCount = []
+                                var leftCount = []
+                                var invite = "";
+                                var joinded = "";
+                                var lefted = "";
+                                joinedCount = item.members.filter(i => i.status.id == 3)
+                                inviteCount = item.members.filter(i => i.status.id == 1)
+                                leftCount = item.members.filter(i => i.status.id == 5)
+                                joinded = this.setMemberNames(joinedCount);
+                                invite = this.setMemberNames(inviteCount);
+                                lefted = this.setMemberNames(lefted);
+                                return (
+                                    <TouchableOpacity onPress={() => this.viewMessageDetail(item)} key={index} style={styles.ChatBoxView}>
+                                        <View style={styles.UserImageView}>
+                                            {
+                                                Utilities.stringIsEmpty(item.owner.thumbUrl) ?
+                                                    <View style={styles.ImageIconView}>
+                                                        <FontAwesome name="user" size={40} color={Apptheme} />
+                                                    </View>
+                                                    :
+                                                    <Image
+                                                        style={styles.UserImage}
+                                                        source={{ uri: item.owner.thumbUrl }}
+                                                    />
+                                            }
+
+                                        </View>
+                                        <View style={{ width: '100%', justifyContent: 'center', flex: 1, overflow: 'hidden' }}>
+                                            <Text style={styles.UserNameText}>
+                                                {item.name}
+                                            </Text>
+
+                                            <View style={styles.UserDetailView}>
+
+                                                {leftCount.length > 0 &&
+                                                    <Text>
+                                                        <Text style={styles.UserCountText}>
+                                                            <Text style={[styles.UserFriendsText, { color: "red" }]}>
+                                                                You have left this conversation
+                                                            </Text>
+                                                        </Text>
+                                                    </Text>
+
+                                                }
+
+
+                                                {joinedCount.length > 0 &&
+                                                    <Text>
+                                                        <Text style={styles.UserCountText}>
+                                                            {joinedCount.length + ((joinedCount.length > 1) ? " users" : " user") + " joined "}
+                                                            <Text style={styles.UserFriendsText}>
+                                                                {"(" + joinded + ")"}
+                                                            </Text>
+                                                        </Text>
+                                                    </Text>
+
+                                                }
+                                                {inviteCount.length > 0 &&
+                                                    <Text>
+                                                        <Text style={styles.UserCountText}>
+                                                            {inviteCount.length + ((inviteCount.length > 1) ? " users" : " user") + " invite "}
+                                                            <Text style={styles.UserFriendsText}>
+                                                                {"(" + invite + ")"}
+                                                            </Text>
+                                                        </Text>
+                                                    </Text>
+
+                                                }
+                                                {item.numberOfUnreadMessages > 0 &&
+                                                    <View style={styles.MessageCountView}>
+                                                        <Text style={styles.MessageCountText}>
+                                                            {item.numberOfUnreadMessages}
+
+                                                        </Text>
+                                                    </View>
+
+                                                }
+
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
+
+                    }
+
+
+
+
+                    {/* <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
                         <FlatList
                             data={this.state.myConversation}
                             renderItem={({ item, index }) =>
@@ -131,7 +542,7 @@ export default class Message extends React.Component {
                                         }
 
                                     </View>
-                                    <View style={{ width: '100%', marginTop: 15 }}>
+                                    <View style={{ width: '100%', marginTop: 15, flex: 1, overflow: 'hidden' }}>
                                         <Text style={styles.UserNameText}>
                                             {item.name}
                                         </Text>
@@ -163,8 +574,80 @@ export default class Message extends React.Component {
                             }
                             keyExtractor={(item, index) => index.toString()}
                         />
-                    </View>
+                    </View> */}
                 </ScrollView>
+
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isModal}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.editSetting()
+                    }}
+
+                >
+                    <TouchableOpacity onPress={() => this.editSetting()} style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)', height: '100%', position: 'absolute', width: '100%' }}>
+                    </TouchableOpacity>
+                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 5, top: (this.state.isKeyboard) ? 60 : 150, height: 300, width: '80%', marginHorizontal: "10%", position: 'absolute' }}>
+                        <ScrollView keyboardShouldPersistTaps='handled'>
+                            <View style={{ padding: 10, }}>
+                                <Text style={{ fontSize: 20, color: darkText, fontWeight: 'bold' }}>
+                                    Message a user
+                                    </Text>
+
+                                <Text style={{ fontSize: 16, paddingVertical: 5, color: darkText, }}>
+                                    To message another user, just enter their registration number below.
+                                </Text>
+                            </View>
+                            <View style={{ width: '100%', height: 250, justifyContent: 'flex-start', alignItems: 'center' }}>
+                                <View style={styles.TextFieldView}>
+                                    <TextField
+                                        label='Registration number'
+                                        fontSize={13}
+                                        keyboardType='default'
+                                        tintColor={Apptheme}
+                                        baseColor={Apptheme}
+                                        errorColor="red"
+                                        activeLineWidth={2}
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                        labelFontSize={13}
+                                        value={this.state.registerNo}
+                                        onChangeText={val => {
+                                            this.onChangeText('registerNo', val.trim())
+                                        }}
+                                    />
+                                </View>
+                                <TouchableOpacity disabled={this.state.registerNo.length == 0} onPress={() => this.searchRegistration()} style={styles.Modalbtn}>
+                                    <Text style={[styles.ModalBtnText, { opacity: (this.state.registerNo.length == 0) ? 0.4 : 1 }]}>MESSAGE USER</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => this.createGroup()} style={styles.Modalbtn}>
+                                    <Text style={styles.ModalBtnText}>CREATE GROUP</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => this.editSetting()} style={styles.Modalbtn}>
+                                    <Text style={styles.ModalBtnText}>CANCEL</Text>
+                                </TouchableOpacity>
+                            </View >
+
+                        </ScrollView>
+                    </SafeAreaView>
+                </Modal >
+
+                {this.state.isInviteModal &&
+
+
+                    <InviteGroup
+
+                        inviteModal={this.inviteModal}
+                        confromInvitation={this.confromInvitation}
+
+                    />
+
+                }
+
             </View>
         )
     }
@@ -207,6 +690,9 @@ const styles = StyleSheet.create({
     ChatBoxView: {
         height: 75,
         flexDirection: 'row',
+        borderBottomColor: "#d2d2d2",
+        borderBottomWidth: 1,
+        marginVertical: 5,
     },
     UserImageView: {
         width: '25%',
@@ -219,13 +705,13 @@ const styles = StyleSheet.create({
         borderRadius: 25
     },
     UserDetailView: {
-        flexDirection: 'row',
+        // flexDirection: 'row',
         justifyContent: 'flex-start',
     },
     UserNameText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: darkText
+        color: Apptheme
     },
     UserCountText: {
         fontWeight: 'bold',
@@ -238,7 +724,8 @@ const styles = StyleSheet.create({
         ...CommonStyle.menuLoaderView
     },
     MessageCountView: {
-        marginLeft: 20,
+        position: 'absolute',
+        right: 10,
         minWidth: 20,
         // width: 20,
         height: 20,
@@ -263,5 +750,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '60%',
         borderRadius: 50
+    },
+    TextFieldView: {
+        width: '80%',
+        marginHorizontal: '10%'
+    },
+    Modalbtn: {
+        height: 35, margin: 3, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'
+    },
+    ModalBtnText: {
+        color: Apptheme
     }
 })

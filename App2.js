@@ -44,6 +44,7 @@ import ForgotPassword from './src/screens/ForgotPassword';
 import UsersVehicle from './src/screens/UsersVehicle';
 import Favourites from './src/screens/Favourites';
 import Users from './src/screens/Users';
+import CreateGroup from './src/screens/CreateGroup';
 import ContentComponent from './ContentComponent';
 import LoginScreen from './src/screens/Login'
 import HomeScreen from './src/screens/Home'
@@ -86,6 +87,7 @@ const StackNavigator = createStackNavigator({
     EditVehicleImage: { screen: EditVehicleImage },
     BlockUser: { screen: BlockUser },
     Setting: { screen: Setting },
+    CreateGroup: { screen: CreateGroup },
 
     UsersVehicle: { screen: UsersVehicle },
     Favourites: { screen: Favourites },
@@ -120,6 +122,7 @@ const AppDrawerContainer = createDrawerNavigator({
     EditVehicle: { screen: EditVehicle, },
     BlockUser: { screen: BlockUser, },
     UsersVehicle: { screen: UsersVehicle, },
+    CreateGroup: { screen: CreateGroup, },
     Users: { screen: Users, },
 },
     {

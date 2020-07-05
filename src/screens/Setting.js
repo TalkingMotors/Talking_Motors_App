@@ -8,17 +8,28 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    Switch
+    Modal,
+    Switch,
+    Platform,
+    Dimensions
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
+import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import Storage from '../helpers/Storage';
 import * as Utilities from "../helpers/Utilities";
 import * as UserService from '../services/User';
 import Constants from "../helpers/Constants";
+import PDFView from 'react-native-view-pdf';
+const screen_height = Dimensions.get('window').height
+const resources = {
+
+    file: Platform.OS === 'ios' ? 'downloadedDocument.pdf' : '../images/terms.pdf',
+    url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+    base64: 'JVBERi0xLjMKJcfs...',
+};
 export default class Setting extends React.Component {
     constructor(props) {
         super(props);
@@ -27,7 +38,8 @@ export default class Setting extends React.Component {
             NotificationSound: false,
             NotificationVibrate: false,
             NotificationLed: false,
-            LocationService: false
+            LocationService: false,
+            isModal: false
         }
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
@@ -44,7 +56,11 @@ export default class Setting extends React.Component {
 
 
     }
-   
+    ToggleModal = () => {
+        this.setState({
+            isModal: !this.state.isModal
+        })
+    }
 
     UpdatesUserService = async (userObj) => {
         var userObject = {
@@ -93,6 +109,7 @@ export default class Setting extends React.Component {
         this.setState({ NotificationSound: value })
     }
     render() {
+        const resourceType = 'file';
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Settings" navigation={this.props} />
@@ -151,15 +168,58 @@ export default class Setting extends React.Component {
                             value={this.state.LocationService} />
                     </View>
 
-                    <Text style={{ textAlign: 'center', paddingTop: 20 }}>
+                    <Text onPress={() => this.ToggleModal()} style={{ textAlign: 'center', paddingTop: 20 }}>
                         Terms & Conditions
                 </Text>
 
-               
+
                 </View>
-                <Text style={{ textAlign: 'center',position:'absolute',bottom:10,left:'45%' }}>
-                       1.54
+                <Text style={{ textAlign: 'center', position: 'absolute', bottom: 10, left: '45%' }}>
+                    1.54
                 </Text>
+
+                <Modal
+                    animationType="fade"
+                    transparent={false}
+                    visible={this.state.isModal}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.ToggleModal()
+                    }}
+
+                >
+                    <SafeAreaView style={{ backgroundColor: '#fff', height: '100%', width: '100%', }}>
+                        <View style={{ width: '100%', height: 60, alignItems: 'center', backgroundColor: Apptheme, flexDirection: 'row' }}>
+                            <Feather onPress={() => this.ToggleModal()} name="arrow-left" color={lightText} size={22} style={styles.Icons} />
+                            <Text style={styles.ScreenName}>
+                                Terms & Conditions
+                    </Text>
+                        </View>
+
+
+
+
+                        <ScrollView keyboardShouldPersistTaps='handled'>
+
+                            <View style={{ width: '100%', height: screen_height - 200, }}>
+
+                                <PDFView
+                                    fadeInDuration={250.0}
+                                    style={{ flex: 1 }}
+                                    // source={source}
+                                    resource={resources[resourceType]}
+                                    resourceType={resourceType}
+                                    onLoad={() => console.log(`PDF rendered from ${resourceType}`)}
+                                    onError={(error) => console.log('Cannot render PDF', error)}
+                                />
+
+                            </View >
+
+                        </ScrollView>
+
+
+                    </SafeAreaView>
+                </Modal >
             </View>
         )
     }
@@ -194,6 +254,13 @@ const styles = StyleSheet.create({
     },
     Text: {
         fontSize: 16
-    }
-
+    },
+    ScreenName: {
+        paddingHorizontal: 15,
+        color: lightText,
+        fontSize: 16
+    },
+    Icons: {
+        marginLeft: 10,
+    },
 })

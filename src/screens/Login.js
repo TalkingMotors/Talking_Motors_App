@@ -38,8 +38,10 @@ export default class Login extends React.Component {
             // password: "infobank",
             // username: "Ikm_kbq@hotmail.com",
             // password: "123456789",
-            username: "uuuuu@gmail.com",
-            password: "12345678",
+            // username: "uuuuu@gmail.com",
+            // password: "12345678",
+            username: "",
+            password: "",
             loginFail: false,
             loginFailMessage: "",
             isloader: false,
@@ -50,12 +52,12 @@ export default class Login extends React.Component {
         }
         this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
             if (Object.keys(Storage.userData).length > 0) {
-                
+
                 this.props.navigation.replace("Home")
                 SplashScreen.hide();
-             
+
             }
-            else{
+            else {
                 SplashScreen.hide();
             }
         }
@@ -79,13 +81,13 @@ export default class Login extends React.Component {
     componentDidMount = () => {
         this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
             if (Object.keys(Storage.userData).length > 0) {
-                
+
                 SplashScreen.hide();
                 this.props.navigation.replace("Home")
-             
+
             }
-            else{
-               
+            else {
+
                 SplashScreen.hide();
             }
         }
@@ -118,7 +120,7 @@ export default class Login extends React.Component {
             })
             let params = { "email": this.state.username, "password": this.state.password }
             UserService.login(params).then(response => {
-                console.log("response",response);
+                console.log("response", response);
                 if (response) {
                     if (response.success) {
                         Storage.userData = response.user;

@@ -18,7 +18,7 @@ import Storage from '../helpers/Storage';
 import Labels from "../languages/Labels";
 import Topbar from '../components/Topbar';
 import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText } from '../helpers/CommponStyle';
-var screenheight= Dimensions.get('window').height;
+var screenheight = Dimensions.get('window').height;
 
 export default class BlockUser extends React.Component {
     constructor(props) {
@@ -47,24 +47,24 @@ export default class BlockUser extends React.Component {
         try {
             MessagesService.GetBlockUser().then(respose => {
                 if (respose) {
-                    console.log("respose",respose);
+                    console.log("respose", respose);
                     if (respose.success) {
                         if (respose.users.length > 0) {
-                        this.state.List = respose.users
-                        console.log("List", this.state.List);
-                        this.setState({
-                            List: this.state.List,
-                            isLoad: false
-                        })
-                    }
-                    else{
-                        this.setState({
-                            emptyList: "No blocked users to display",
-                            isLoad: false
-                        })
+                            this.state.List = respose.users
+                            console.log("List", this.state.List);
+                            this.setState({
+                                List: this.state.List,
+                                isLoad: false
+                            })
+                        }
+                        else {
+                            this.setState({
+                                emptyList: "No blocked users to display",
+                                isLoad: false
+                            })
+                        }
                     }
                 }
-            }
             })
         }
         catch (e) {
@@ -76,35 +76,49 @@ export default class BlockUser extends React.Component {
     }
     UnBlockUsers = (user) => {
         try {
+            this.setState({
+                isLoad: true
+            })
             let params = {
                 userId: user.userId
             }
-            console.log("params",params)
+            console.log("params", params)
             MessagesService.UnBlockUsers(params).then(respose => {
+
                 console.log("respose", respose);
                 if (respose) {
                     if (respose.success) {
-                        this.GetBlockUser();
-                        // this.props.navigation.goBack();
+                        // this.GetBlockUser();
+                        this.props.navigation.goBack();
+                        this.setState({
+                            isLoad: false
+                        })
                     }
                 }
+                this.setState({
+                    isLoad: false
+                })
             })
         }
         catch (e) {
             console.log('UnBlockUsers Exception', e);
+            this.setState({
+                isLoad: false
+            })
             this.props.navigation.goBack();
         }
     }
 
     flatListEmptyMessage = () => {
-        if (this.state.List.length == 0 ) {
+        if (this.state.List.length == 0) {
             return (
-            <View style={{justifyContent:'center',alignItems:'center',height:screenheight-120,width:'100%',}}>
-                 <FontAwesome name="user" size={60} color={Apptheme} />
-                    <Text style={{fontSize:24,color:Apptheme,fontWeight:'bold'}}>BLOCKED USERS</Text>
-                 <Text style={styles.noRecordFoundText}>No blocked users to display</Text>
-            </View>
-      ) }
+                <View style={{ justifyContent: 'center', alignItems: 'center', height: screenheight - 120, width: '100%', }}>
+                    <FontAwesome name="user" size={60} color={Apptheme} />
+                    <Text style={{ fontSize: 24, color: Apptheme, fontWeight: 'bold' }}>BLOCKED USERS</Text>
+                    <Text style={styles.noRecordFoundText}>No blocked users to display</Text>
+                </View>
+            )
+        }
     }
     render() {
         return (
@@ -120,7 +134,7 @@ export default class BlockUser extends React.Component {
                     </View>
                 }
                 <ScrollView >
-                    <View style={{ width: '96%',height:screenheight, marginHorizontal: '2%', marginVertical: 10 }}>
+                    <View style={{ width: '96%', height: screenheight, marginHorizontal: '2%', marginVertical: 10 }}>
                         <FlatList
                             data={this.state.List}
                             renderItem={({ item, index }) =>
@@ -158,7 +172,7 @@ export default class BlockUser extends React.Component {
                                     </View>
                                 </TouchableOpacity>
                             }
-                           
+
                             ListEmptyComponent={this.flatListEmptyMessage}
                         />
                     </View>
@@ -174,7 +188,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: lightBg,
-      
+
         // paddingBottom: 50
         // backgroundColor: 'lightgray',
 
@@ -207,8 +221,8 @@ const styles = StyleSheet.create({
     ChatBoxView: {
         height: 75,
         flexDirection: 'row',
-        borderBottomWidth:1,
-        borderBottomColor:"#d2d2d2"
+        borderBottomWidth: 1,
+        borderBottomColor: "#d2d2d2"
     },
     UserImageView: {
         width: '25%',
@@ -257,10 +271,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: "bold"
     },
-    noRecordFoundText :{ 
-        textAlign:'center',
-        fontSize:14,
-        paddingTop:5,
+    noRecordFoundText: {
+        textAlign: 'center',
+        fontSize: 14,
+        paddingTop: 5,
     },
     ImageIconView: {
         borderColor: "#d2d2d2",

@@ -43,7 +43,7 @@ export let GetConversationDetail = async (id) => {
 export let getConversationByUserIds = async (param) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log("!!",APIConstants.GET_CONVERSATION_BY_USER_IDS_ENDPOINT + "?"+ param.userIds + "&vrm=" + param.vrm + "&numberOfResults=50")
+            console.log("!!", APIConstants.GET_CONVERSATION_BY_USER_IDS_ENDPOINT + "?" + param.userIds + "&vrm=" + param.vrm + "&numberOfResults=50")
             let response = await fetch(APIConstants.GET_CONVERSATION_BY_USER_IDS_ENDPOINT + "?" + param.userIds + "&vrm=" + param.vrm + "&numberOfResults=50", {
                 method: 'GET',
                 headers: Utilities.setHeaders()
@@ -61,6 +61,8 @@ export let getConversationByUserIds = async (param) => {
 
 export let sendMessageToConversation = async (params) => {
     try {
+        console.log("!!!!", JSON.stringify(params))
+        console.log("API", APIConstants.SEND_MESSAGE_TO_CONVERSATION_ENDPOINT)
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.SEND_MESSAGE_TO_CONVERSATION_ENDPOINT, {
                 method: 'POST',
@@ -154,7 +156,7 @@ export let sendMessage = async (params) => {
 
 export let updateMessageStatusToRead = async (params) => {
     try {
-       
+
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UPDATE_LAST_READ_ID_ENDPOINT, {
                 method: 'PATCH',
@@ -173,7 +175,7 @@ export let updateMessageStatusToRead = async (params) => {
 }
 export let updateGroupInvite = async (params) => {
     try {
-       
+
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UPDATE_GROUP_INVITE_ENDPOINT, {
                 method: 'PATCH',

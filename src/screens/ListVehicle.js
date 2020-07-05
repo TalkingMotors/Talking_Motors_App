@@ -94,7 +94,7 @@ export default class ListVehicle extends React.Component {
             this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
             this.setState({
                 isloader: false,
-                newVehicle:''
+                newVehicle: ''
 
             })
         }
@@ -183,7 +183,7 @@ export default class ListVehicle extends React.Component {
         })
     }
     render() {
-       return (
+        return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="List Vehicle" navigation={this.props} />
                 {this.state.isloader &&
@@ -204,14 +204,14 @@ export default class ListVehicle extends React.Component {
                                 resizeMode='stretch'
                                 source={require('../images/banner.jpg')}
                             />
-                            <View style={{ position: 'absolute', alignItems: 'center' }}>
-                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                            <View style={{ position: 'absolute', alignItems: 'center', }}>
+                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold', paddingHorizontal: 5 }}>
                                     List your vehicle to chat with friends,
                         </Text>
-                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold', paddingHorizontal: 5 }}>
                                     family and other car enthusiasts.
                         </Text>
-                                <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center' }}>
+                                <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center', paddingHorizontal: 5 }}>
                                     Simple and reliable messaging service to keep in touch and share information
                         </Text>
                             </View>
@@ -225,15 +225,15 @@ export default class ListVehicle extends React.Component {
                                 source={require('../images/background.png')}
                             />
                             <View style={{ position: 'absolute', alignItems: 'center' }}>
-                                <Text style={{textAlign:'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                 Sell your vehicle quickly and
+                                <Text style={{ textAlign: 'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                                    Sell your vehicle quickly and
                                      </Text>
-                                <Text style={{ textAlign:'center',color: lightText, fontSize: 20, fontWeight: 'bold' }}>
+                                <Text style={{ textAlign: 'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
                                     effortlessly with a quick and easy process.
                                     </Text>
-                                <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center' }}>
-                                   Selling has never been easier with our seamless process, you can create am AD in seconds and most
-                                   of all it's FREE for a one month listing with one photo.
+                                <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, paddingHorizontal: 5, textAlign: 'center' }}>
+                                    Selling has never been easier with our seamless process, you can create am AD in seconds and most
+                                    of all it's FREE for a one month listing with one photo.
                                 </Text>
                             </View>
                         </View>

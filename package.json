@@ -32,6 +32,7 @@
     "react-native-screens": "^2.0.0-alpha.34",
     "react-native-splash-screen": "^3.2.0",
     "react-native-vector-icons": "^6.6.0",
+    "react-native-view-pdf": "^0.11.0",
     "react-navigation": "^4.3.8",
     "react-navigation-drawer": "^2.3.4",
     "react-navigation-fluid-transitions": "^0.3.2",

@@ -381,7 +381,7 @@ export default class Messenger extends React.Component {
             }
 
         }
-        catch (e) { 
+        catch (e) {
             console.log("confromRemoveUser Exception", e)
         }
     }
@@ -499,7 +499,7 @@ export default class Messenger extends React.Component {
                     navigation={this.props}
                     conversationDetail={this.state.conversationDetail}
                     conversationId={this.state.conversationId}
-                    groupMembersActive ={this.state.groupMembersActive}
+                    groupMembersActive={this.state.groupMembersActive}
                     membersCount={this.state.membersCount} />
                 {this.state.isLoad &&
                     <View style={styles.menuLoaderView}>
@@ -685,7 +685,8 @@ export default class Messenger extends React.Component {
                                     {(this.state.membersCount.length > 2) ?
                                         <TouchableOpacity onPress={() => {
                                             this.MoreItemsModal()
-                                            this.confromRemoveUser(Storage.userData.userId)}} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                            this.confromRemoveUser(Storage.userData.userId)
+                                        }} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
                                             <AntDesign style={{ paddingHorizontal: 15 }} name="deleteusergroup" size={24} color={Apptheme} />
                                             <Text>Leave group</Text>
                                         </TouchableOpacity>
@@ -704,7 +705,7 @@ export default class Messenger extends React.Component {
                         </SafeAreaView>
                     </Modal >
                 }
-{/* ConversationNamePopup */}
+                {/* ConversationNamePopup */}
                 <Modal
                     animationType="fade"
                     transparent={true}
@@ -793,7 +794,7 @@ export default class Messenger extends React.Component {
                                 <Text style={{ color: Apptheme }} >CANCEL</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => this.clearChatHistoryService()} style={styles.modalFooterButton}>
-                                <Text style={{ color: Apptheme }}  >CLEAR CHAT history</Text>
+                                <Text style={{ color: Apptheme }}  >CLEAR CHAT HISTORY</Text>
                             </TouchableOpacity>
 
                         </View>

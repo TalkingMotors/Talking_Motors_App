@@ -49,16 +49,14 @@ export default class PremiumModal extends Component {
       availableItemsMessage: '',
     }
 
-    this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
-      this.getItems()
-    })
+
 
   }
 
-  // componentWillMount() {
-  //   this.getItems()
+  componentWillMount() {
+    this.getItems()
 
-  // }
+  }
   async componentDidMount() {
     try {
       const result = await RNIap.initConnection();
@@ -106,7 +104,7 @@ export default class PremiumModal extends Component {
       purchaseErrorSubscription.remove();
       purchaseErrorSubscription = null;
     }
-    RNIap.endConnection();
+    // RNIap.endConnection();
   }
   getItems = async () => {
     try {

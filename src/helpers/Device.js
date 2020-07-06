@@ -10,19 +10,12 @@ export let saveUpdateDevice = async (params) => {
   }
 }
 
-export let showAndroidNotification = (notification) => {
+export let showAndroidNotification = (notification, props) => {
   try {
     const data = notification.data
     console.log("data", data);
-    console.log(JSON.stringify(data))
-    let notificationTitle = notification._title != undefined ? notification._title : data.Title;
-    let notificationMessage = notification._body;
-    Alert.alert(
-      notificationTitle,
-      notificationMessage,
-      [{ text: 'OK', onPress: () => { } }],
-      { cancelable: false },
-    )
+    let message = JSON.parse(data.message);
+    props.props.navigation.navigate("Messenger", { conversationId: message.message.conversationId })
   }
   catch (e) {
     console.log(e);

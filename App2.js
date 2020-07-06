@@ -45,6 +45,7 @@ import UsersVehicle from './src/screens/UsersVehicle';
 import Favourites from './src/screens/Favourites';
 import Users from './src/screens/Users';
 import CreateGroup from './src/screens/CreateGroup';
+import NotificationBadges from './src/components/NotificationBadge';
 import ContentComponent from './ContentComponent';
 import LoginScreen from './src/screens/Login'
 import HomeScreen from './src/screens/Home'
@@ -92,6 +93,7 @@ const StackNavigator = createStackNavigator({
     UsersVehicle: { screen: UsersVehicle },
     Favourites: { screen: Favourites },
     Users: { screen: Users },
+    NotificationBadges: { screen: NotificationBadges },
 }, {
     initialRouteName: 'Login',
     headerMode: 'none'
@@ -124,6 +126,7 @@ const AppDrawerContainer = createDrawerNavigator({
     UsersVehicle: { screen: UsersVehicle, },
     CreateGroup: { screen: CreateGroup, },
     Users: { screen: Users, },
+    NotificationBadges: { screen: NotificationBadges, },
 },
     {
         initialRouteName: 'Home',

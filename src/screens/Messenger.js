@@ -38,7 +38,8 @@ import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkT
 import * as vehicleService from '../services/Vehicle';
 import RemoveGroup from '../components/RemoveGroup';
 const image = require('../images/userImage.jpg')
-const screen_height = Dimensions.get('window').height
+const screen_height = Dimensions.get('window').height;
+export var getConverationDetail
 export default class Messenger extends React.Component {
     constructor(props) {
         super(props);
@@ -80,6 +81,10 @@ export default class Messenger extends React.Component {
             this.componentDidAppear()
         })
     }
+
+
+
+
     componentDidAppear() {
         this.state.conversationId = this.props.navigation.state.params.conversationId
         this.state.messageBody = this.props.navigation.state.params.messageBody
@@ -169,10 +174,9 @@ export default class Messenger extends React.Component {
             return null
         }
     }
-    getConverationDetail = (id) => {
+    getConverationDetail = getConverationDetail = (id) => {
         try {
             MessagesService.GetConversationDetail(id).then(respose => {
-                console.log("respose", respose);
                 if (respose) {
                     if (respose.success) {
                         this.state.conversationDetail = respose.conversation
@@ -188,7 +192,7 @@ export default class Messenger extends React.Component {
                         // });
                         //this.state.messages = respose.conversation.messages.reverse()
                         this.state.messages = respose.conversation.messages.sort(function (a, b) {
-                            return a.time.localeCompare(b.time);
+                            return b.time.localeCompare(a.time);
                         });
                         var previousDate = ""
                         this.state.messages.forEach(element => {
@@ -206,7 +210,6 @@ export default class Messenger extends React.Component {
 
                         });
 
-                        console.log("ikm-messages", this.state.messages)
                         if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
                             this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
                         }
@@ -256,8 +259,6 @@ export default class Messenger extends React.Component {
         }
     }
     updateConversationStatus = async (messageId) => {
-        console.log("messageId", messageId)
-        console.log("conversationId", this.state.conversationId)
         var param = {
             conversationId: this.state.conversationId,
             messageId: messageId,
@@ -288,28 +289,40 @@ export default class Messenger extends React.Component {
 
     }
     sendMessageToConversation = () => {
+        Keyboard.dismiss()
         var params = {
             conversationId: this.state.conversationId,
             message: this.state.typeMessage,
             image: null
         }
+        this.setState({
+            isLoad: true,
+
+        })
 
         MessagesService.sendMessageToConversation(params).then(response => {
             this.setState(prevState => ({
                 messages: [...prevState.messages, response.conversationMessage],
-                typeMessage: ""
+                typeMessage: "",
+                isLoad: false,
+                sendButtonVisible: false
             }));
+            this.getConverationDetail(this.state.conversationId)
         })
     }
 
     sendMessageToOwner = () => {
         var params = this.state.messageBody
         params.message = this.state.typeMessage
-
+        this.setState({
+            isLoad: true
+        })
         MessagesService.sendMessage(params).then(response => {
             this.setState(prevState => ({
                 messages: [...prevState.messages, response.conversationMessage],
-                typeMessage: ""
+                typeMessage: "",
+                isLoad: false,
+                sendButtonVisible: false
             }));
         })
     }
@@ -486,7 +499,6 @@ export default class Messenger extends React.Component {
         }
     }
     render() {
-        console.log("this.state", this.state)
         return (
             <View style={styles.ParentView}>
                 <Topbar
@@ -509,19 +521,24 @@ export default class Messenger extends React.Component {
                         />
                     </View>
                 }
-                <ScrollView style={{ marginBottom: 0 }}>
+                <ScrollView ref={ref => this.scrollView = ref}
+                    onContentSizeChange={(contentWidth, contentHeight) => {
+                        this.scrollView.scrollResponderScrollToEnd({ animated: true });
+                    }} style={{ marginBottom: 0 }}>
                     <View >
                         <KeyboardAvoidingView
                             keyboardVerticalOffset="80"
                             enabled>
 
-                            <ScrollView>
+                            <ScrollView >
                                 <ImageBackground style={{ width: '100%' }} source={require('../images/tmmesbackan.png')} >
                                     <View style={styles.MessengerView}>
                                         <View style={styles.MessengerViewList}>
 
                                             <FlatList
+                                                inverted
                                                 data={this.state.messages}
+                                                initialScrollIndex={this.state.messages - 1}
                                                 renderItem={({ item, index }) =>
                                                     <View >
                                                         {
@@ -619,7 +636,7 @@ export default class Messenger extends React.Component {
 
                         <TextInput
                             placeholderTextColor="#333"
-                            style={{ backgroundColor: '#d2d2d2', width: '96%', borderRadius: 60, paddingLeft: 20, height: 40 }}
+                            style={{ backgroundColor: '#d2d2d2', width: '96%', borderRadius: 60, paddingLeft: 20, paddingRight: 60, height: 40 }}
                             placeholder="Write message"
                             value={this.state.typeMessage}
                             onChangeText={val => { this.onChangeText('typeMessage', val) }}

@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 //import react in our code. 
 
-import { StyleSheet, Text, View, Modal, Dimensions, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Modal, Dimensions, TouchableOpacity } from 'react-native';
 //import all the components we are going to use.
 
 import CalendarPicker from 'react-native-calendar-picker';
@@ -22,7 +22,7 @@ export default class CalenderPicker extends Component {
     }
 
     onDateChange(date) {
-      this.setState({
+        this.setState({
             selectedStartDate: date,
         });
     }
@@ -34,9 +34,9 @@ export default class CalenderPicker extends Component {
         this.props.DateModal();
     }
 
-    selectedDate =()=>{
+    selectedDate = () => {
         this.ToggleModal()
-       this.props.doneDate(this.state.selectedStartDate); 
+        this.props.doneDate(this.state.selectedStartDate);
     }
 
     render() {
@@ -52,7 +52,7 @@ export default class CalenderPicker extends Component {
                 transparent={true}
                 visible={this.state.isModal}
                 onRequestClose={() => {
-                     this.ToggleModal()
+                    this.ToggleModal()
                 }}>
                 <View style={styles.container}>
                     <View style={{ width: '100%', backgroundColor: Apptheme, height: 100 }}>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginHorizontal: 10,
         paddingVertical: 10,
-        zIndex:999
+        zIndex: 999
     },
     bottomBtnText: {
         color: Apptheme, fontWeight: 'bold'
@@ -130,6 +130,6 @@ const styles = StyleSheet.create({
         height: 50,
         position: 'absolute',
         bottom: 20,
-        zIndex:2
+        zIndex: 2
     }
 });

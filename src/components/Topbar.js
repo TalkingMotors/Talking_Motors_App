@@ -17,6 +17,8 @@ import * as Utilities from "../helpers/Utilities";
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Storage from '../helpers/Storage';
+import NotificationBadges from './NotificationBadge';
+import { getConverationDetail } from '../screens/Messenger';
 export default class Topbar extends React.Component {
     constructor(props) {
         super(props);
@@ -40,6 +42,7 @@ export default class Topbar extends React.Component {
     }
 
 
+
     render() {
         // this.props.navigation.navigation.openDrawer()
         if (this.props.ParentPage == "Home") {
@@ -50,6 +53,9 @@ export default class Topbar extends React.Component {
                         barStyle="light-content"
                         translucent={false}
                         backgroundColor={Apptheme}
+                    />
+                    <NotificationBadges
+                        isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
                     />
                     <Feather
                         onPress={() => {
@@ -79,6 +85,9 @@ export default class Topbar extends React.Component {
         else if (this.props.ParentPage == "My Dashboard") {
             return (
                 <View style={styles.MainView}>
+                    <NotificationBadges
+                        isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
+                    />
                     <Feather
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
@@ -93,6 +102,9 @@ export default class Topbar extends React.Component {
         else if (this.props.ParentPage == "Detail") {
             return (
                 <View style={styles.MainView}>
+                    <NotificationBadges
+                        isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
+                    />
                     <Feather
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
@@ -111,6 +123,9 @@ export default class Topbar extends React.Component {
         else if (this.props.ParentPage == "Message") {
             return (
                 <View style={styles.MainView}>
+                    <NotificationBadges
+                        isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
+                    />
                     <Feather
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
@@ -123,6 +138,9 @@ export default class Topbar extends React.Component {
         else if (this.props.ParentPage == "Vehicle Type") {
             return (
                 <View style={styles.MainView}>
+                    <NotificationBadges
+                        isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
+                    />
                     <Feather
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
@@ -134,6 +152,9 @@ export default class Topbar extends React.Component {
         else if (this.props.ParentPage == "Create Group") {
             return (
                 <View style={styles.MainView}>
+                    <NotificationBadges
+                        isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
+                    />
                     <Feather
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
@@ -148,6 +169,8 @@ export default class Topbar extends React.Component {
         else if (this.props.ParentPage == "Messenger") {
             return (
                 <View style={styles.MainView}>
+
+
                     <Feather
                         onPress={() => this.props.navigation.navigation.navigate("Message")}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
@@ -200,6 +223,9 @@ export default class Topbar extends React.Component {
         else {
             return (
                 <LinearGradient colors={LinearColor} style={styles.MainView}>
+                    <NotificationBadges
+                        isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
+                    />
                     <Feather
                         onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />

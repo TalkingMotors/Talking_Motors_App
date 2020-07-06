@@ -87,8 +87,8 @@ export default class Message extends React.Component {
                 if (respose) {
                     if (respose.success) {
                         this.state.myConversation = respose.conversations.reverse()
-                        var conversation = this.state.myConversation;
-                        console.log("myConversation", this.state.myConversation);
+                        var conversation = this.state.myConversation.sort((a, b) => new Date(b.mostRecentMessageDate) - new Date(a.mostRecentMessageDate))
+                        this.state.myConversation = conversation
                         var invitedMembers = [];
                         var Leftmember = [];
                         var joinedmember = []
@@ -155,7 +155,6 @@ export default class Message extends React.Component {
     }
 
     viewMessageDetail = (item) => {
-        console.log("item", item);
         this.props.navigation.navigate("Messenger", { conversationId: item.id })
     }
     BlockUser = () => {
@@ -179,7 +178,6 @@ export default class Message extends React.Component {
         var registerNo = this.state.registerNo;
         if (!Utilities.stringIsEmpty(registerNo)) {
             var response = await vehicleService.searchRegisterNo(registerNo)
-            console.log("response", response);
             if (response.success) {
                 if (!Utilities.stringIsEmpty(response.vehicle)) {
                     this.editSetting()
@@ -188,9 +186,7 @@ export default class Message extends React.Component {
                         vrm: registerNo,
                         numberOfResults: 50
                     }
-                    console.log("param", param);
                     var messageResponse = await MessagesService.getConversationByUserIds(param)
-                    console.log("messageResponse", messageResponse);
                     if (messageResponse.success) {
                         if (messageResponse.conversations.length > 0) {
                             this.props.navigation.navigate("Messenger", { conversationId: messageResponse.conversations[0].id })
@@ -199,7 +195,6 @@ export default class Message extends React.Component {
                             this.props.navigation.navigate("Messenger", { conversationId: 0 })
                         }
                     }
-                    console.log("messageResponse", messageResponse);
                 }
                 else {
                     this.editSetting()
@@ -218,7 +213,7 @@ export default class Message extends React.Component {
             isInviteModal: !this.state.isInviteModal
         })
     }
-    confromInvitation = async(id) => {
+    confromInvitation = async (id) => {
         try {
             this.setState({
                 isLoad: true
@@ -228,9 +223,7 @@ export default class Message extends React.Component {
                 inviteStatus: id
 
             }
-            console.log("param", param);
             var response = await MessagesService.updateGroupInvite(param)
-            console.log("response", response);
             if (response.success) {
                 this.getMyConversations()
             }

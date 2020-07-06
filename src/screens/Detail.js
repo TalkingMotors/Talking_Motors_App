@@ -474,7 +474,7 @@ export default class Detail extends React.Component {
 
     toggleSwitch = () => {
         this.setState({
-            saleSwitch: !this.state.saleSwitch
+            forSale: !this.state.forSale
         })
     }
 
@@ -819,9 +819,9 @@ export default class Detail extends React.Component {
                             <Switch
                                 thumbColor={Apptheme}
                                 onValueChange={this.toggleSwitch}
-                                value={this.state.saleSwitch} />
+                                value={this.state.forSale} />
                             :
-                            <Text>{(this.state.saleSwitch) ? "Yes" : "No"}</Text>
+                            <Text>{(this.state.forSale) ? "Yes" : "No"}</Text>
                         }
                     </View>
                     {((this.state.userId != this.state.ownerId) || Utilities.stringIsEmpty(this.state.userId)) &&

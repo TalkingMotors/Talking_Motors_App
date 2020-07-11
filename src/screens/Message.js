@@ -192,7 +192,13 @@ export default class Message extends React.Component {
                             this.props.navigation.navigate("Messenger", { conversationId: messageResponse.conversations[0].id })
                         }
                         else {
-                            this.props.navigation.navigate("Messenger", { conversationId: 0 })
+                            var messageParam = {
+                                "vrm": registerNo,
+                                "userId": response.vehicle.userID,
+                                "vehicleId": response.vehicle.id,
+                                "image": null
+                            }
+                            this.props.navigation.navigate("Messenger", { conversationId: 0,messageBody : messageParam })
                         }
                     }
                 }

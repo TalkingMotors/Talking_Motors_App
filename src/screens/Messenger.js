@@ -324,6 +324,7 @@ export default class Messenger extends React.Component {
                 isLoad: false,
                 sendButtonVisible: false
             }));
+            this.getConverationDetail(response.conversation.id)
         })
     }
 
@@ -489,6 +490,38 @@ export default class Messenger extends React.Component {
                 senderName: this.state.convoname
             })
         })
+    }
+
+    leaveGroup = async () => {
+        try {
+            this.setState({
+                isLoad: true
+            })
+            var param = {
+                conversationId: this.state.conversationId,
+                inviteStatus: 5 //leave group status id
+
+            }
+            var response = await MessagesService.updateGroupInvite(param)
+            if (response.success) {
+                this.setState({
+                    isLoad: false
+                })
+            }
+            else {
+                this.setState({
+                    isLoad: false
+                })
+            }
+        }
+        catch (e) {
+            console.log("confromInvitation Exception", e)
+            this.setState({
+                isLoad: false
+            })
+        }
+
+
     }
 
     navigateToUser = () => {
@@ -702,7 +735,7 @@ export default class Messenger extends React.Component {
                                     {(this.state.membersCount.length > 2) ?
                                         <TouchableOpacity onPress={() => {
                                             this.MoreItemsModal()
-                                            this.confromRemoveUser(Storage.userData.userId)
+                                            this.leaveGroup()
                                         }} style={{ height: 40, margin: 5, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
                                             <AntDesign style={{ paddingHorizontal: 15 }} name="deleteusergroup" size={24} color={Apptheme} />
                                             <Text>Leave group</Text>

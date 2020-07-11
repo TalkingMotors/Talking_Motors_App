@@ -70,7 +70,8 @@ class NotificationBadges extends React.Component {
 			this.StopInterval();
 		}
 		catch (e) {
-			Utilities.logAppException("NotificationBadges", "handlerLongClick", "", "Exception", e.message)
+			console.log("handlerLongClick", e)
+			// Utilities.logAppException("NotificationBadges", "handlerLongClick", "", "Exception", e.message)
 
 		}
 	}
@@ -80,7 +81,8 @@ class NotificationBadges extends React.Component {
 			IntervalStart = undefined;
 		}
 		catch (e) {
-			Utilities.logAppException("NotificationBadges", "StopInterval", "", "Exception", e.message)
+			console.log("StopInterval", e)
+			// Utilities.logAppException("NotificationBadges", "StopInterval", "", "Exception", e.message)
 		}
 	}
 
@@ -89,7 +91,8 @@ class NotificationBadges extends React.Component {
 			myVar = setInterval(this.TimerClock, 5000);
 		}
 		catch (e) {
-			Utilities.logAppException("NotificationBadges", "updateTimerClock", "", "Exception", e.message)
+			console.log("updateTimerClock", e)
+			// Utilities.logAppException("NotificationBadges", "updateTimerClock", "", "Exception", e.message)
 		}
 	}
 
@@ -114,7 +117,8 @@ class NotificationBadges extends React.Component {
 			}
 		}
 		catch (e) {
-			Utilities.logAppException("NotificationBadges", "TimerClock", "", "Exception", e.message)
+			console.log("TimerClock", e)
+			// Utilities.logAppException("NotificationBadges", "TimerClock", "", "Exception", e.message)
 		}
 	}
 
@@ -137,7 +141,8 @@ class NotificationBadges extends React.Component {
 
 		}
 		catch (e) {
-			Utilities.logAppException("NotificationBadges", "progressBar", "", "Exception", e.message)
+			console.log("progressBar", e)
+			// Utilities.logAppException("NotificationBadges", "progressBar", "", "Exception", e.message)
 		}
 	}
 	animate = () => {
@@ -166,7 +171,8 @@ class NotificationBadges extends React.Component {
 			}
 		}
 		catch (e) {
-			Utilities.logAppException("NotificationBadges", "animate", "", "Exception", e.message)
+			console.log("animate", e)
+			// Utilities.logAppException("NotificationBadges", "animate", "", "Exception", e.message)
 		}
 	}
 	animateHide = () => {
@@ -187,7 +193,8 @@ class NotificationBadges extends React.Component {
 				createAnimation(this.animatedValue2, 500, Easing.ease, 0)
 			]).start()
 		} catch (e) {
-			Utilities.logAppException("NotificationBadges", "animateHide", "", "Exception", e.message)
+			console.log("animateHide", e)
+			// Utilities.logAppException("NotificationBadges", "animateHide", "", "Exception", e.message)
 		}
 	}
 	hideBadge = () => {
@@ -208,7 +215,8 @@ class NotificationBadges extends React.Component {
 			})
 			Storage.NotificationObject = {};
 		} catch (e) {
-			Utilities.logAppException("NotificationBadges", "hideBadge", "", "Exception", e.message)
+			console.log("hideBadge", e)
+			// Utilities.logAppException("NotificationBadges", "hideBadge", "", "Exception", e.message)
 		}
 	}
 
@@ -219,13 +227,14 @@ class NotificationBadges extends React.Component {
 			console.log("title", data.title);
 			console.log("message", data.message);
 			let message = JSON.parse(data.message);
-			getConverationDetail(message.message.conversationId)
 			this.setState({
 				title: data.title,
 				message: message
 			})
+			getConverationDetail(message.message.conversationId)
 		} catch (e) {
-			Utilities.logAppException("NotificationBadges", "showNotificationAndroid", "", "Exception", e.message)
+			console.log("showNotificationAndroid", e)
+			// Utilities.logAppException("NotificationBadges", "showNotificationAndroid", "", "Exception", e.message)
 		}
 	}
 	notificationApplyButton = () => {
@@ -235,7 +244,8 @@ class NotificationBadges extends React.Component {
 			clearInterval(myVar);
 
 		} catch (e) {
-			Utilities.logAppException("NotificationBadges", "notificationApplyButton", "", "Exception", e.message)
+			console.log("notificationApplyButton", e)
+			// Utilities.logAppException("NotificationBadges", "notificationApplyButton", "", "Exception", e.message)
 		}
 	}
 	render() {

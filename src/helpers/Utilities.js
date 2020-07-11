@@ -87,7 +87,7 @@ export let FormatDate = (dateTimeValue) => {
 export let FormatTime = (dateTimeValue) => {
     try {
         if (!stringIsEmpty(dateTimeValue)) {
-          var formateDate =  Moment(dateTimeValue).format('HH:mm A')
+          var formateDate =  Moment(dateTimeValue).format('hh:mm A')
         }
             return formateDate;
         }

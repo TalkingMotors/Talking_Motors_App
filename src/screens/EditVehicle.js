@@ -95,7 +95,7 @@ export default class EditVehicle extends React.Component {
                 description: params.description,
                 postCode: params.postcode,
                 price: (params.price > 0) ? params.price : "",
-                saleSwitch: !params.sold,
+                saleSwitch: params.sold,
                 mileage: (!Utilities.stringIsEmpty(params.userMileage) ? params.userMileage : ""),
                 image: sortedImage[0],
                 features: params.features,

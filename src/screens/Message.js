@@ -353,7 +353,7 @@ export default class Message extends React.Component {
 
                     {this.state.joinedmember.length > 0 &&
                         <View style={{ width: '96%', marginHorizontal: '2%', marginVertical: 10 }}>
-                            <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> CONVERSATION</Text>
+                            <Text style={{ color: Apptheme, textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}> CONVERSATIONS</Text>
                             {this.state.joinedmember.map((item, index) => {
                                 var inviteCount = [];
                                 var joinedCount = []

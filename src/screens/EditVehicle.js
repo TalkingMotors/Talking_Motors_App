@@ -47,7 +47,7 @@ export default class EditVehicle extends React.Component {
             image: '',
             allImages: [],
             allData: '',
-            isLoader: false,
+            isLoader: true,
             PremiumDate: 0,
             allfeatures: [],
             features: [],
@@ -59,8 +59,11 @@ export default class EditVehicle extends React.Component {
             insuranceDate: '',
             seletedId: 0,
             isInsurance: false,
-            isLoader: false
+            
         }
+          this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            this.componentDidAppear()
+        })
 
 
     }
@@ -81,7 +84,7 @@ export default class EditVehicle extends React.Component {
         })
 
     }
-    UNSAFE_componentWillMount() {
+    componentDidAppear() {
         try {
             let params = this.props.navigation.state.params.item
             var sortedImage = params.images.sort(function (a, b) { return a.position - b.position });
@@ -105,10 +108,11 @@ export default class EditVehicle extends React.Component {
                 insuranceDueDate: (params.insuranceDueDate == null) ? "" : params.insuranceDueDate,
                 motDueDate: (params.motDueDate == null) ? "" : params.motDueDate,
                 taxDueDate: (params.taxDueDate == null) ? "" : params.taxDueDate,
+                isLoader:false
             })
         }
         catch (e) {
-            console.log("componentWillMount", e)
+            console.log("componentDidAppear", e)
         }
 
     }

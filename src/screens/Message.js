@@ -150,7 +150,7 @@ export default class Message extends React.Component {
             return memberNamesCSV;
         }
         catch (e) {
-            console.log("get conversation error", e.message)
+            // console.log("get conversation error", e.message)
         }
     }
 

@@ -147,7 +147,7 @@ export default class Detail extends React.Component {
                 descrption: vehicleData.description,
                 price: vehicleData.price,
                 saleSwitch: vehicleData.sold,
-                forSale: vehicleData.forSale,
+                forSale: vehicleData.sold,
                 ownerId: vehicleData.userID,
                 derivative: (!Utilities.stringIsEmpty(vehicleData.derivative) ? vehicleData.derivative : ""),
                 PremiumDate: vehicleData.PremiumDate,

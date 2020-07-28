@@ -9,6 +9,7 @@ import {
     TouchableHighlight,
     StyleSheet,
     Modal,
+    StatusBar,
 
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -36,7 +37,7 @@ export default class ContentContainer extends React.Component {
     }
     navigatetoComponent = (pageName) => {
         if (Object.keys(Storage.userData).length > 0) {
-
+            this.props.toggle()
             this.props.navigation.navigate(pageName)
         }
         else {
@@ -46,6 +47,7 @@ export default class ContentContainer extends React.Component {
     }
     render() {
         return (
+            // <ScrollView style={[styles.animatedDrawer]}>
             <View style={styles.ParentView}>
                 <LinearGradient colors={LinearColor} style={styles.SidebarProfileView}>
                     <View style={styles.userProfileView}>
@@ -60,15 +62,16 @@ export default class ContentContainer extends React.Component {
                         }
 
                     </View>
-                    <View style={{width:'50%',}}>
+                    <View style={{ width: '50%', }}>
                         <Text style={styles.userEmail}>
-                            Welcome  {'\n'} {Storage.userData.name} 
+                            Welcome  {'\n'} {Storage.userData.name}
                         </Text>
                     </View>
                 </LinearGradient>
                 <TouchableOpacity onPress={() => {
+                    this.props.toggle()
                     this.props.navigation.navigate('Home')
-                    this.props.navigation.closeDrawer()
+                    // this.props.navigation.closeDrawer()
                 }
                 } style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
@@ -102,7 +105,8 @@ export default class ContentContainer extends React.Component {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => {
-                    this.props.navigation.closeDrawer()
+                    // this.props.navigation.closeDrawer()
+                    this.props.toggle()
                     SearchVehicleModalToggle()
                 }
                 } style={styles.SideMenuItemView}>
@@ -146,7 +150,10 @@ export default class ContentContainer extends React.Component {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => this.props.navigation.navigate('Setting')}
+                    onPress={() => {
+                        this.props.toggle()
+                        this.props.navigation.navigate('Setting')
+                    }}
                     style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
                         <Feather name='settings' style={styles.SideMenuIcon}
@@ -163,6 +170,7 @@ export default class ContentContainer extends React.Component {
                         Utilities.asyncStorage_RemoveKey(Constants.JWT_TOKEN)
                         Utilities.asyncStorage_RemoveKey(Constants.DashboardDisplay)
                         Storage.userData = {}
+                        this.props.toggle()
                         this.props.navigation.navigate('Login')
                     }
                     } style={styles.SideMenuItemView}>
@@ -176,6 +184,7 @@ export default class ContentContainer extends React.Component {
                     </TouchableOpacity>
                     :
                     <TouchableOpacity onPress={() => {
+                        this.props.toggle()
                         this.props.navigation.navigate('Login')
                     }
                     } style={styles.SideMenuItemView}>
@@ -224,6 +233,7 @@ export default class ContentContainer extends React.Component {
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => {
                                             this.ToggleModal()
+                                            this.props.toggle()
                                             this.props.navigation.navigate("Login")
                                         }} style={{ padding: 10, marginHorizontal: 5 }}>
                                             <Text style={{ color: Apptheme, }}>
@@ -239,7 +249,7 @@ export default class ContentContainer extends React.Component {
                     </SafeAreaView>
                 </Modal>
             </View>
-
+            // </ScrollView>
         );
     }
 }
@@ -249,6 +259,15 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: lightBg
+    },
+    animatedDrawer: {
+        backgroundColor: '#ffffff',
+        top: 32,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        width: '100%',
+        marginBottom: 25
     },
     SidebarProfileView: {
         width: '100%',
@@ -292,7 +311,7 @@ const styles = StyleSheet.create({
         backgroundColor: lightText,
     },
     userEmail: {
-       color: lightText,
+        color: lightText,
         paddingHorizontal: 5,
         textAlign: 'center'
     },

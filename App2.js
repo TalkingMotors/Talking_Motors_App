@@ -50,59 +50,24 @@ import ContentComponent from './ContentComponent';
 import LoginScreen from './src/screens/Login'
 import HomeScreen from './src/screens/Home'
 console.disableYellowBox = true;
-export default class App extends React.Component {
-    render() {
-        return <AppDrawer />;
-    }
-}
+// export default class App extends React.Component {
+//     render() {
+//         return <AppDrawer />;
+//     }
+// }
 
-const CustomDrawerComponent = props => {
-    return (
-        <ScrollView>
-            <SafeAreaView >
-                <ContentComponent props={props} />
-            </SafeAreaView>
-        </ScrollView>
+// const CustomDrawerComponent = props => {
+//     return (
+//         <ScrollView>
+//             <SafeAreaView >
+//                 <ContentComponent props={props} />
+//             </SafeAreaView>
+//         </ScrollView>
 
-    );
-}
+//     );
+// }
 
-const StackNavigator = createStackNavigator({
-    Login: { screen: Login },
-    Register: { screen: Register },
-    ForgotPassword: { screen: ForgotPassword },
-    Home: { screen: Home },
-    Profile: { screen: Profile },
-    Search: { screen: Search },
-    Dashboard: { screen: Dashboard },
-    Detail: { screen: Detail },
-    Message: { screen: Message },
-    ListVehicle: { screen: ListVehicle },
-    ListingType: { screen: ListingType },
-    VehicleType: { screen: VehicleType },
-    ChangePassword: { screen: ChangePassword },
-    ResetPassword: { screen: ResetPassword },
-    Messenger: { screen: Messenger },
-    SearchResultVehicle: { screen: SearchResultVehicle },
-    EditVehicle: { screen: EditVehicle },
-    EditVehicleImage: { screen: EditVehicleImage },
-    BlockUser: { screen: BlockUser },
-    Setting: { screen: Setting },
-    CreateGroup: { screen: CreateGroup },
-
-    UsersVehicle: { screen: UsersVehicle },
-    Favourites: { screen: Favourites },
-    Users: { screen: Users },
-    NotificationBadges: { screen: NotificationBadges },
-}, {
-    initialRouteName: 'Login',
-    headerMode: 'none'
-});
-
-
-
-
-const AppDrawerContainer = createDrawerNavigator({
+const AppNavigator = createStackNavigator({
     Login: { screen: Login },
     Home: { screen: Home },
     Profile: { screen: Profile },
@@ -126,25 +91,88 @@ const AppDrawerContainer = createDrawerNavigator({
     UsersVehicle: { screen: UsersVehicle, },
     CreateGroup: { screen: CreateGroup, },
     Users: { screen: Users, },
-    NotificationBadges: { screen: NotificationBadges, },
+    ForgotPassword: { screen: ForgotPassword, },
+    NotificationBadges: { screen: NotificationBadges, }
+
 },
     {
-        initialRouteName: 'Home',
-        contentComponent: ContentComponent,
-        // contentComponent: CustomDrawerComponent,
-        drawerWidth: '75%',
-        drawerPosition: 'left',
+        headerMode: 'none',
+        mode: 'modal',
+        defaultNavigationOptions: {
+            gesturesEnabled: false,
+        },
+        transitionConfig: () => ({
+            transitionSpec: {
+                duration: 0,
+                timing: Animated.timing,
+            },
+            screenInterpolator: sceneProps => {
+                const { layout, position, scene } = sceneProps;
+                const { index } = scene;
+
+                const height = layout.initHeight;
+                const translateY = position.interpolate({
+                    inputRange: [index - 1, index, index + 1],
+                    outputRange: [height, 0, 0],
+                });
+
+                const opacity = position.interpolate({
+                    inputRange: [index - 1, index - 0.99, index],
+                    outputRange: [0, 1, 1],
+                });
+
+                return { opacity, transform: [{ translateY }] };
+            },
+        }),
     }
 );
 
-const AppSwitchNavigator = createSwitchNavigator({
-    Home: { screen: AppDrawerContainer },
-    Login: { screen: StackNavigator },
+const TalkingMotors = createAppContainer(AppNavigator)
+export default TalkingMotors
 
-}, {
-    initialRouteName: 'Login',
-});
+// const AppDrawerContainer = createDrawerNavigator({
+// Login: { screen: Login },
+// Home: { screen: Home },
+// Profile: { screen: Profile },
+// Dashboard: { screen: Dashboard },
+// Search: { screen: Search },
+// ListVehicle: { screen: ListVehicle, },
+// Message: { screen: Message },
+// Setting: { screen: Setting, },
+// Favourites: { screen: Favourites, },
+// Messenger: { screen: Messenger, },
+// Register: { screen: Register },
+// ListingType: { screen: ListingType, },
+// Detail: { screen: Detail },
+// VehicleType: { screen: VehicleType, },
+// ChangePassword: { screen: ChangePassword, },
+// ResetPassword: { screen: ResetPassword, },
+// SearchResultVehicle: { screen: SearchResultVehicle, },
+// EditVehicleImage: { screen: EditVehicleImage, },
+// EditVehicle: { screen: EditVehicle, },
+// BlockUser: { screen: BlockUser, },
+// UsersVehicle: { screen: UsersVehicle, },
+// CreateGroup: { screen: CreateGroup, },
+// Users: { screen: Users, },
+// NotificationBadges: { screen: NotificationBadges, },
+// },
+//     {
+//         initialRouteName: 'Home',
+//         contentComponent: ContentComponent,
+//         // contentComponent: CustomDrawerComponent,
+//         drawerWidth: '75%',
+//         drawerPosition: 'left',
+//     }
+// );
 
-const AppContainer = createAppContainer(AppSwitchNavigator);
+// const AppSwitchNavigator = createSwitchNavigator({
+//     Home: { screen: AppDrawerContainer },
+//     Login: { screen: StackNavigator },
 
-const AppDrawer = createAppContainer(AppContainer);
+// }, {
+//     initialRouteName: 'Login',
+// });
+
+// const AppContainer = createAppContainer(AppSwitchNavigator);
+
+// const AppDrawer = createAppContainer(AppContainer);

@@ -37,7 +37,9 @@ import Labels from "../languages/Labels";
 import CommonStyle, { Apptheme, lightText, lightBg, darkText, LinearColor, linkText, GreenBg } from '../helpers/CommponStyle';
 import * as vehicleService from '../services/Vehicle';
 import RemoveGroup from '../components/RemoveGroup';
+import ImagePicker from 'react-native-image-crop-picker';
 const image = require('../images/userImage.jpg')
+const win = Dimensions.get('window');
 const screen_height = Dimensions.get('window').height;
 export var getConverationDetail
 export default class Messenger extends React.Component {
@@ -72,6 +74,7 @@ export default class Messenger extends React.Component {
             isremoveModal: false,
             isGroupOwner: false,
             groupMembersActive: 0,
+            isCameraModal: false
         }
         this.MoreItemsModal = this.MoreItemsModal.bind(this);
         this._keyboardDidShow = this._keyboardDidShow.bind(this);
@@ -79,6 +82,82 @@ export default class Messenger extends React.Component {
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.componentDidAppear()
+        })
+    }
+    cameraModal = () => {
+        this.setState({
+            isCameraModal: !this.state.isCameraModal
+        })
+    }
+
+    openCamera = () => {
+        try {
+            ImagePicker.clean();
+            this.cameraModal();
+            ImagePicker.openCamera({
+                width: 200,
+                height: 200,
+                cropping: true,
+                includeBase64: true,
+                useFrontCamera: true
+            }).then(imageDetail => {
+                if (Object.keys(imageDetail).length > 0) {
+                    var base64Image = `${imageDetail.data}`
+
+                    this.sendMessageToImage(base64Image)
+                }
+
+            });
+        }
+        catch (e) {
+            console.log("openCamera Exception EditVehicleImage", e)
+        }
+    }
+    openGallery = () => {
+        try {
+            ImagePicker.clean();
+            this.setState({
+                isCameraModal: !this.state.isCameraModal
+            }, () => {
+                ImagePicker.openPicker({
+                    width: 200,
+                    height: 200,
+                    cropping: true,
+                    includeBase64: true,
+                }).then(imageDetail => {
+                    if (Object.keys(imageDetail).length > 0) {
+                        var base64Image = `${imageDetail.data}`
+                        this.sendMessageToImage(base64Image)
+                    }
+
+                });
+            }
+            )
+        } catch (e) {
+            console.log("openGallery EditVehicleImage", e)
+        }
+    }
+
+      sendMessageToImage = (image) => {
+        Keyboard.dismiss()
+        var params = {
+            conversationId: this.state.conversationId,
+            message: null,
+            image: image
+        }
+        this.setState({
+            isLoad: true,
+
+        })
+
+        MessagesService.sendMessageToConversation(params).then(response => {
+            this.setState(prevState => ({
+                messages: [...prevState.messages, response.conversationMessage],
+                typeMessage: "",
+                isLoad: false,
+                sendButtonVisible: false
+            }));
+            this.getConverationDetail(this.state.conversationId)
         })
     }
 
@@ -599,9 +678,19 @@ export default class Messenger extends React.Component {
                                                                                     {item.time}
                                                                                 </Text>
                                                                             </Text>
-                                                                            <Text style={styles.ReceivedMessageText}>
-                                                                                {item.message}
-                                                                            </Text>
+                                                                            {item.message != null &&
+                                                                                <Text style={styles.ReceivedMessageText}>
+                                                                                    {item.message}
+                                                                                </Text>
+                                                                            }
+                                                                            {item.imageUrl != null &&
+                                                                               <Image
+                                                                                // resizeMode="center"
+                                                                                  resizeMode="stretch"
+                                                                                style={{width:150,height:260,marginBottom:10,}}
+                                                                                source={{ uri: item.imageUrl }}
+                                                                            />
+                                                                            }
                                                                         </View>
                                                                     </View>
                                                                 </View>
@@ -621,9 +710,23 @@ export default class Messenger extends React.Component {
                                                                             <Text style={styles.SendMessageTextTime}>
                                                                                 {item.time}
                                                                             </Text>
-                                                                            <Text style={styles.SendMessageText}>
-                                                                                {item.message}
-                                                                            </Text>
+                                                                            
+
+                                                                             {item.message != null &&
+                                                                                <Text style={styles.SendMessageTextTime}>
+                                                                                    {item.message}
+                                                                                </Text>
+                                                                            }
+                                                                            {item.imageUrl != null &&
+                                                                               
+                                                                              <Image
+                                                                                // resizeMode="center"
+                                                                                  resizeMode="stretch"
+                                                                                style={{width:150,height:260,marginBottom:10,}}
+                                                                                source={{ uri: item.imageUrl }}
+                                                                            />
+
+                                                                            }
                                                                             {(item.allRead || item.id < this.state.lastReadMessageId) ?
                                                                                 <FontAwesome5 name="check-double" color={"#4FC3F7"} style={{ position: 'absolute', right: 5, bottom: 5 }} size={10} />
                                                                                 :
@@ -662,7 +765,9 @@ export default class Messenger extends React.Component {
                     </View>
                 </ScrollView>
                 <View style={{ flexDirection: 'row', width: '100%', height: 55, }}>
-                    <TouchableOpacity style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity
+                        onPress={() => this.cameraModal()}
+                        style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
                         <FontAwesome name="camera" size={22} color={Apptheme} />
                     </TouchableOpacity>
                     <View style={{ width: '85%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
@@ -685,6 +790,52 @@ export default class Messenger extends React.Component {
 
 
                 </View>
+
+                {this.state.isCameraModal &&
+                    <View style={{ position: 'absolute', top:'25%', height:260, width: '80%',marginHorizontal:'10%' }}>
+                        <SafeAreaView style={{borderColor:Apptheme,borderWidth:2, borderRadius: 10, height: '100%', width: '96%', marginHorizontal: '2%', backgroundColor: "#fff" }}>
+                               <View style={{margin:10,}}>
+                                 <Text style={{fontWeight:'bold',textAlign:'center',fontSize:18,color:darkText}}>
+                                     Edit main picture
+                                </Text>
+                               </View>
+                            
+                            <View style={styles.ModalMainRow}>
+                            <View style={styles.ModalSubRow}>
+                                    <TouchableOpacity
+                                        onPress={() => this.openCamera()}
+                                        style={styles.ModalButton}>
+
+                                        <FontAwesome name="camera" color={Apptheme} style={{ fontSize: 30, }} />
+                                        <Text style={styles.ModalText}>
+                                            TAKE A PHOTO
+                                             </Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                            <View style={styles.ModalSubRow}>
+                                <TouchableOpacity
+                                    onPress={() => this.openGallery()}
+                                    style={styles.ModalButton}>
+                                    <FontAwesome name="photo" color={Apptheme} style={{ fontSize: 30, }} />
+                                    <Text style={styles.ModalText}>
+                                        GALLERY
+                                             </Text>
+                                </TouchableOpacity>
+                            </View>
+                            </View>
+                            {/* <View style={{ justifyContent: 'center', alignItems: 'center',marginTop:10 }}> */}
+                                <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: 40, }} activeOpacity={1} onPress={() => this.cameraModal()} >
+                                    <View style={styles.headerModalView}>
+                                        <Text style={{ fontSize: 20, color:darkText }}>
+                                            CANCEL
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            {/* </View> */}
+                        </SafeAreaView>
+                    </View>
+                }
                 {this.state.isPopup &&
 
                     <Modal
@@ -1084,5 +1235,25 @@ const styles = StyleSheet.create({
         marginHorizontal: '3%',
         height: 45,
 
+    },
+        ModalMainRow: {
+        marginHorizontal: '5%',
+        marginTop: 4,
+        flexDirection: 'column',
+        width: '90%',
+        // height: '60%'
+    },
+    ModalSubRow:{
+        width: '100%', 
+         marginVertical: 20
+    },
+    ModalButton:{
+        paddingLeft:20,
+        flexDirection:'row' 
+    },
+    ModalText: {
+        fontSize: 18
+        , color: Apptheme,
+        paddingLeft: 20
     }
 })

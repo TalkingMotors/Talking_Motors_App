@@ -12,6 +12,7 @@ import {
     BackHandler,
     StyleSheet,
     ImageBackground,
+    Dimensions,
     TouchableOpacity
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -33,6 +34,8 @@ import AndroidNotification from '../components/AndroidNotification';
 import IOSNotification from '../components/IOSNotification';
 export var SearchVehicleModalToggle;
 import { NavigationEvents } from 'react-navigation';
+import Sidebar from '../../ContentComponent';
+import SideMenu from 'react-native-side-menu';
 export default class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -47,9 +50,13 @@ export default class Home extends React.Component {
             parent: '',
             isTalkModal: false,
             isModal: false,
-            check: true
+            check: true,
+            isOpen: false,
         }
         this.updateTopBar = this.updateTopBar.bind(this)
+        this.toggle = this.toggle.bind(this)
+        this.updateMenuState = this.updateMenuState.bind(this)
+        this.onMenuItemSelected = this.onMenuItemSelected.bind(this)
         // this.backAndroidHandler=this.backAndroidHandler.bind(this);
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
@@ -72,6 +79,20 @@ export default class Home extends React.Component {
 
     }
 
+
+    toggle() {
+        this.setState({
+            isOpen: !this.state.isOpen,
+        });
+    }
+    updateMenuState(isOpen) {
+        this.setState({ isOpen });
+    }
+    onMenuItemSelected = item =>
+        this.setState({
+            isOpen: false,
+            selectedItem: item,
+        });
     updateTopBar = () => {
         this.setState({
             check: !this.state.check
@@ -94,12 +115,18 @@ export default class Home extends React.Component {
         }
 
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
-             // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
+            // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
+            // this.setState({
+            //     isOpen: false
+            // })
         })
 
     }
     componentWillUnmount() {
         console.log("componentWillUnmount")
+        // this.setState({
+        //     isOpen: false
+        // })
         // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
     }
     getUserBy = (userId) => {
@@ -155,214 +182,233 @@ export default class Home extends React.Component {
         })
     }
     render() {
+        const { navigation } = this.props;
+        this.props.navigation.state.params = { title: 'Home' };
+
+        const menu = <Sidebar navigation={this.props.navigation}
+            toggle={this.toggle}
+        />;
         return (
-            <View style={styles.ParentView}>
+            <SideMenu
+                menu={menu}
+                menuPosition={'left'}
+                disableGestures={true}
+                openMenuOffset={Dimensions.get('window').width * (2 / 2.35)}
+                isOpen={this.state.isOpen}
+                onChange={(isOpen) => {
+                    this.updateMenuState(isOpen)
+                }}
 
-                <Topbar
-                    updateTopBar={this.updateTopBar}
-                    Dashboard={this.navigateToDashboard}
-                    Profile={this.navigateToProfile}
-                    ParentPage="Home"
-                    navigation={this.props} />
+            >
+                <View style={styles.ParentView}>
 
-                <View style={styles.BoxView}>
-                    <View style={styles.BoxParent}>
-                        <TouchableHighlight
-                            activeOpacity={1}
-                            underlayColor="transparent"
-                            onPressIn={() => this.setState({ Text1: Apptheme })}
-                            onPressOut={() => this.setState({ Text1: darkText })}
-                            onPress={() => {
-                                if (Object.keys(Storage.userData).length > 0) {
-                                    this.props.navigation.navigate("ListVehicle");
-                                }
-                                else {
-                                    this.ToggleModal();
-                                }
-                            }}
-                            style={styles.ButtonView}>
-                            <View style={styles.BoxTitleView}>
-                                <Text style={[styles.BoxTitleText, { color: this.state.Text1 }]}>
-                                    ADD A VEHICLE
+                    <Topbar
+                        toggle={this.toggle}
+                        updateTopBar={this.updateTopBar}
+                        Dashboard={this.navigateToDashboard}
+                        Profile={this.navigateToProfile}
+                        ParentPage="Home"
+                        navigation={this.props} />
+
+                    <View style={styles.BoxView}>
+                        <View style={styles.BoxParent}>
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                underlayColor="transparent"
+                                onPressIn={() => this.setState({ Text1: Apptheme })}
+                                onPressOut={() => this.setState({ Text1: darkText })}
+                                onPress={() => {
+                                    if (Object.keys(Storage.userData).length > 0) {
+                                        this.props.navigation.navigate("ListVehicle");
+                                    }
+                                    else {
+                                        this.ToggleModal();
+                                    }
+                                }}
+                                style={styles.ButtonView}>
+                                <View style={styles.BoxTitleView}>
+                                    <Text style={[styles.BoxTitleText, { color: this.state.Text1 }]}>
+                                        ADD A VEHICLE
                         </Text>
-                                <Text style={styles.BoxListText}>
-                                    list your vehicle to join the community
+                                    <Text style={styles.BoxListText}>
+                                        list your vehicle to join the community
                         </Text>
-                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
-                            </View>
-                        </TouchableHighlight>
-                    </View>
-
-                    <View style={styles.BoxParent}>
-                        <TouchableHighlight
-                            activeOpacity={1}
-                            underlayColor="transparent"
-                            onPressIn={() => this.setState({ Text2: Apptheme })}
-                            onPressOut={() => this.setState({ Text2: lightText })}
-                            onPress={() => {
-                                this.setState({
-                                    parent: "talk"
-                                })
-                                this.TalkModalToggle()
-                            }}
-                            style={styles.ButtonViewImage}>
-                            <View style={styles.ImageView}>
-                                <Image
-                                    source={require('../images/third.png')}
-                                    style={styles.Image}
-                                />
-                                <View style={{ position: 'absolute' }}>
-                                    <Text style={[styles.BoxTitleText, { color: this.state.Text2 }]}>
-                                        TALK
-                                     </Text>
-                                    <Text style={{ textAlign: 'center', color: lightText }}>
-                                        message other Talking Motors users
-                                    </Text>
+                                    <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
                                 </View>
-                                <FontAwesome5 name="angle-right" size={24} color={lightText} style={styles.BoxIcon} />
-                            </View>
-                        </TouchableHighlight>
-                    </View>
+                            </TouchableOpacity>
+                        </View>
 
-                    <View style={styles.BoxParent}>
-                        <TouchableHighlight
-                            activeOpacity={1}
-                            underlayColor="transparent"
-                            onPressIn={() => this.setState({ Text3: Apptheme })}
-                            onPressOut={() => this.setState({ Text3: darkText })}
-                            onPress={() => this.props.navigation.navigate("ListingType")}
-                            style={styles.ButtonView}>
-                            <View style={styles.BoxTitleView}>
-
-                                <Text style={[styles.BoxTitleText, { color: this.state.Text3 }]}>
-                                    SELL
-                        </Text>
-                                <Text style={styles.BoxListText}>
-                                    advertise your vehicle for sale
-                        </Text>
-                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
-                            </View>
-                        </TouchableHighlight>
-                    </View>
-
-                    <View style={styles.BoxParent}>
-                        <TouchableHighlight
-                            activeOpacity={1}
-                            // underlayColor="transparent"
-                            onPressIn={() => this.setState({ Text4: Apptheme })}
-                            onPressOut={() => this.setState({ Text4: lightText })}
-                            onPress={() => this.SearchVehicleModalToggle()}
-                            style={styles.ButtonViewImage}>
-                            <View style={styles.ImageView}>
-                                <Image
-                                    source={require('../images/second.png')}
-                                    style={styles.Image}
-                                />
-                                <View style={{ position: 'absolute' }}>
-                                    <Text style={[styles.BoxTitleText, { color: this.state.Text4 }]}>
-                                        SEARCH
+                        <View style={styles.BoxParent}>
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                underlayColor="transparent"
+                                onPressIn={() => this.setState({ Text2: Apptheme })}
+                                onPressOut={() => this.setState({ Text2: lightText })}
+                                onPress={() => {
+                                    this.setState({
+                                        parent: "talk"
+                                    })
+                                    this.TalkModalToggle()
+                                }}
+                                style={styles.ButtonViewImage}>
+                                <View style={styles.ImageView}>
+                                    <Image
+                                        source={require('../images/third.png')}
+                                        style={styles.Image}
+                                    />
+                                    <View style={{ position: 'absolute' }}>
+                                        <Text style={[styles.BoxTitleText, { color: this.state.Text2 }]}>
+                                            TALK
                                      </Text>
-                                    <Text style={{ textAlign: 'center', color: lightText }}>
-                                        browse all vehicles that are available now
+                                        <Text style={{ textAlign: 'center', color: lightText }}>
+                                            message other Talking Motors users
                                     </Text>
-                                </View>
-                                <FontAwesome5 name="angle-right" size={24} color={lightText} style={styles.BoxIcon} />
-                            </View>
-                        </TouchableHighlight>
-                    </View>
-
-
-                    <View style={styles.BoxParent}>
-                        <TouchableHighlight
-                            activeOpacity={1}
-                            underlayColor="transparent"
-                            onPressIn={() => this.setState({ Text5: Apptheme })}
-                            onPressOut={() => this.setState({ Text5: darkText })}
-                            onPress={() => {
-                                this.setState({
-                                    parent: "vehicle_Check"
-                                })
-                                this.TalkModalToggle()
-                            }}
-                            style={styles.ButtonView}>
-                            <View style={styles.BoxTitleView}>
-
-                                <Text style={[styles.BoxTitleText, { color: this.state.Text5 }]}>
-                                    VEHICLE CHECK
-                        </Text>
-                                <Text style={styles.BoxListText}>
-                                    perform an official DVLA vehicle check
-                        </Text>
-                                <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
-                            </View>
-                        </TouchableHighlight>
-                    </View>
-
-
-
-                </View>
-                {
-                    Platform.OS == "ios" ? <IOSNotification props={this.props} />
-                        :
-                        <AndroidNotification props={this.props} />
-                }
-
-                {this.state.isTalkModal &&
-                    <TalkModal parent={this.state.parent} navigation={this.props.navigation} TalkModalToggle={this.TalkModalToggle} />
-                }
-                {this.state.isSearchVehicleModal &&
-                    <SearchVehicleModal navigateToVehicleType={this.navigateToVehicleType} TalkModalToggle={this.TalkModalToggle} SearchVehicleModalToggle={this.SearchVehicleModalToggle} />
-                }
-
-                <Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={this.state.isModal}
-                    onRequestClose={() => {
-                        console.warn("Modal has been closed.");
-                        this.ToggleModal()
-                    }}
-
-                >
-                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '40%', height: '20%', width: '86%', marginHorizontal: '7%', }}>
-                        <View style={{ width: '100%', height: '100%' }}>
-                            <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', }}>
-                                <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0, paddingLeft: 10, fontSize: 20, fontWeight: 'bold' }]}>
-                                    Add a vehicle
-                            </Text>
-                            </View>
-                            <View style={{ height: '78%', }}>
-                                <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
-
-                                    <Text style={{ fontSize: 14, color: "black", paddingHorizontal: 10 }}>
-                                        You need to be logged in to add a vehicle.
-                                    </Text>
-                                    <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: "flex-end" }}>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                this.ToggleModal()
-                                            }} style={{ padding: 10, marginHorizontal: 5 }}>
-                                            <Text style={{ color: Apptheme, }}>
-                                                CANCEL
-                                        </Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => {
-                                            this.ToggleModal()
-                                            this.props.navigation.replace("Login")
-                                        }} style={{ padding: 10, marginHorizontal: 5 }}>
-                                            <Text style={{ color: Apptheme, }}>
-                                                LOGIN
-                                        </Text>
-                                        </TouchableOpacity>
                                     </View>
-
-
+                                    <FontAwesome5 name="angle-right" size={24} color={lightText} style={styles.BoxIcon} />
                                 </View>
-                            </View>
-                        </View >
-                    </SafeAreaView>
-                </Modal>
-            </View>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.BoxParent}>
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                underlayColor="transparent"
+                                onPressIn={() => this.setState({ Text3: Apptheme })}
+                                onPressOut={() => this.setState({ Text3: darkText })}
+                                onPress={() => this.props.navigation.navigate("ListingType")}
+                                style={styles.ButtonView}>
+                                <View style={styles.BoxTitleView}>
+
+                                    <Text style={[styles.BoxTitleText, { color: this.state.Text3 }]}>
+                                        SELL
+                        </Text>
+                                    <Text style={styles.BoxListText}>
+                                        advertise your vehicle for sale
+                        </Text>
+                                    <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.BoxParent}>
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                // underlayColor="transparent"
+                                onPressIn={() => this.setState({ Text4: Apptheme })}
+                                onPressOut={() => this.setState({ Text4: lightText })}
+                                onPress={() => this.SearchVehicleModalToggle()}
+                                style={styles.ButtonViewImage}>
+                                <View style={styles.ImageView}>
+                                    <Image
+                                        source={require('../images/second.png')}
+                                        style={styles.Image}
+                                    />
+                                    <View style={{ position: 'absolute' }}>
+                                        <Text style={[styles.BoxTitleText, { color: this.state.Text4 }]}>
+                                            SEARCH
+                                     </Text>
+                                        <Text style={{ textAlign: 'center', color: lightText }}>
+                                            browse all vehicles that are available now
+                                    </Text>
+                                    </View>
+                                    <FontAwesome5 name="angle-right" size={24} color={lightText} style={styles.BoxIcon} />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
+
+                        <View style={styles.BoxParent}>
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                underlayColor="transparent"
+                                onPressIn={() => this.setState({ Text5: Apptheme })}
+                                onPressOut={() => this.setState({ Text5: darkText })}
+                                onPress={() => {
+                                    this.setState({
+                                        parent: "vehicle_Check"
+                                    })
+                                    this.TalkModalToggle()
+                                }}
+                                style={styles.ButtonView}>
+                                <View style={styles.BoxTitleView}>
+
+                                    <Text style={[styles.BoxTitleText, { color: this.state.Text5 }]}>
+                                        VEHICLE CHECK
+                        </Text>
+                                    <Text style={styles.BoxListText}>
+                                        perform an official DVLA vehicle check
+                        </Text>
+                                    <FontAwesome5 name="angle-right" size={24} color={Apptheme} style={styles.BoxIcon} />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
+
+
+                    </View>
+                    {
+                        Platform.OS == "ios" ? <IOSNotification props={this.props} />
+                            :
+                            <AndroidNotification props={this.props} />
+                    }
+
+                    {this.state.isTalkModal &&
+                        <TalkModal parent={this.state.parent} navigation={this.props.navigation} TalkModalToggle={this.TalkModalToggle} />
+                    }
+                    {this.state.isSearchVehicleModal &&
+                        <SearchVehicleModal navigateToVehicleType={this.navigateToVehicleType} TalkModalToggle={this.TalkModalToggle} SearchVehicleModalToggle={this.SearchVehicleModalToggle} />
+                    }
+
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={this.state.isModal}
+                        onRequestClose={() => {
+                            console.warn("Modal has been closed.");
+                            this.ToggleModal()
+                        }}
+
+                    >
+                        <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '40%', height: '20%', width: '86%', marginHorizontal: '7%', }}>
+                            <View style={{ width: '100%', height: '100%' }}>
+                                <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', }}>
+                                    <Text style={[styles.headerModalText, { color: darkText, paddingTop: 0, paddingLeft: 10, fontSize: 20, fontWeight: 'bold' }]}>
+                                        Add a vehicle
+                            </Text>
+                                </View>
+                                <View style={{ height: '78%', }}>
+                                    <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
+
+                                        <Text style={{ fontSize: 14, color: "black", paddingHorizontal: 10 }}>
+                                            You need to be logged in to add a vehicle.
+                                    </Text>
+                                        <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: "flex-end" }}>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    this.ToggleModal()
+                                                }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                                <Text style={{ color: Apptheme, }}>
+                                                    CANCEL
+                                        </Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => {
+                                                this.ToggleModal()
+                                                this.props.navigation.replace("Login")
+                                            }} style={{ padding: 10, marginHorizontal: 5 }}>
+                                                <Text style={{ color: Apptheme, }}>
+                                                    LOGIN
+                                        </Text>
+                                            </TouchableOpacity>
+                                        </View>
+
+
+                                    </View>
+                                </View>
+                            </View >
+                        </SafeAreaView>
+                    </Modal>
+                </View>
+            </SideMenu>
         )
     }
 }
@@ -372,6 +418,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: lightBg,
+        // zIndex: -1
         // backgroundColor: 'lightgray',
 
     },

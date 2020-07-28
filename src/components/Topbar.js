@@ -25,9 +25,12 @@ export default class Topbar extends React.Component {
         this.state = {
             ParentPage: ''
         }
-        console.log("props", this.props)
+        // console.log("props", this.props)
     }
-
+    menuPress = () => {
+        Storage.Homepage = true;
+        this.props.toggle();
+    }
     favIcon = () => {
         if (this.props.isFavourite != undefined) {
             if (this.props.isFavourite) {
@@ -58,10 +61,11 @@ export default class Topbar extends React.Component {
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
                     />
                     <Feather
-                        onPress={() => {
-                            this.props.navigation.navigation.dispatch(DrawerActions.openDrawer())
-                            this.props.updateTopBar()
-                        }}
+                        // onPress={() => {
+                        //     this.props.navigation.navigation.dispatch(DrawerActions.openDrawer())
+                        //     this.props.updateTopBar()
+                        // }}
+                        onPress={this.menuPress}
                         name="menu" color={lightText} size={22} style={styles.Icons} />
                     <View style={{ justifyContent: 'center', alignItems: 'center', width: '75%' }}>
                         <Image

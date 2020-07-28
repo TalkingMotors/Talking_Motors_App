@@ -132,7 +132,7 @@ export default class Login extends React.Component {
                         this.setState({
                             isloader: false
                         })
-                        this.props.navigation.navigate("Home")
+                        this.props.navigation.replace("Home")
                     }
                     else {
                         this.setState({

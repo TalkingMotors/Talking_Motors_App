@@ -27,7 +27,7 @@ const screen_height = Dimensions.get('window').height
 const resources = {
 
     file: Platform.OS === 'ios' ? 'downloadedDocument.pdf' : '../images/terms.pdf',
-    url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+    url: 'https://talking-motors.s3-eu-west-1.amazonaws.com/profile/terms.pdf',
     base64: 'JVBERi0xLjMKJcfs...',
 };
 export default class Setting extends React.Component {
@@ -39,7 +39,8 @@ export default class Setting extends React.Component {
             NotificationVibrate: false,
             NotificationLed: false,
             LocationService: false,
-            isModal: false
+            isModal: false,
+            pdfError: false
         }
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
@@ -109,7 +110,8 @@ export default class Setting extends React.Component {
         this.setState({ NotificationSound: value })
     }
     render() {
-        const resourceType = 'file';
+        // const resourceType = 'file';
+        const resourceType = 'url';
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Settings" navigation={this.props} />
@@ -201,17 +203,34 @@ export default class Setting extends React.Component {
 
                         <ScrollView keyboardShouldPersistTaps='handled'>
 
-                            <View style={{ width: '100%', height: screen_height - 200, }}>
+                            <View style={{ width: '100%', height: screen_height - 100, }}>
+                                {!this.state.pdfError &&
+                                    <PDFView
+                                        fadeInDuration={250.0}
+                                        style={{ flex: 1 }}
+                                        // source={source}
+                                        resource={resources[resourceType]}
+                                        resourceType={resourceType}
+                                        onLoad={() => console.log(`PDF rendered from ${resourceType}`)}
+                                        onError={(error) => {
+                                            console.log('Cannot render PDF', error)
+                                            this.state.pdfError = true
+                                            this.setState({
+                                                pdfError: this.state.pdfError
+                                            })
+                                            console.log('this.state.pdfError', this.state.pdfError)
+                                        }}
+                                    />
+                                }
 
-                                <PDFView
-                                    fadeInDuration={250.0}
-                                    style={{ flex: 1 }}
-                                    // source={source}
-                                    resource={resources[resourceType]}
-                                    resourceType={resourceType}
-                                    onLoad={() => console.log(`PDF rendered from ${resourceType}`)}
-                                    onError={(error) => console.log('Cannot render PDF', error)}
-                                />
+                                {this.state.pdfError &&
+                                    <View>
+                                        <Text style={{ textAlign: 'center', fontSize: 20, color: "black", paddingTop: 20 }}>
+                                            No Load from PDF file
+                                 </Text>
+                                    </View>
+
+                                }
 
                             </View >
 

@@ -98,6 +98,7 @@ export default class EditVehicleImage extends React.Component {
     openCamera = () => {
         try {
             ImagePicker.clean();
+                this.ToggleModal();
             ImagePicker.openCamera({
                 width: 200,
                 height: 200,
@@ -107,6 +108,7 @@ export default class EditVehicleImage extends React.Component {
             }).then(imageDetail => {
                 if (Object.keys(imageDetail).length > 0) {
                     var base64Image = `${imageDetail.data}`
+                 
                     this.InsertVehicleImage(base64Image)
                 }
 

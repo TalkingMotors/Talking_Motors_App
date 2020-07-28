@@ -4,7 +4,7 @@ import {
     SafeAreaView,
     Keyboard,
     KeyboardAvoidingView,
-    Alert ,
+    Alert,
     Modal, ImageBackground
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -70,22 +70,22 @@ export default class Talk extends Component {
                         "Vehicle not found",
                         "this vehicle has not been found in the DVLA database.",
                         [
-                          {
-                            text: "CLOSE",
-                            onPress: () => console.log("Cancel Pressed"),
-                            style: "cancel"
-                          },
-                         
+                            {
+                                text: "CLOSE",
+                                onPress: () => console.log("Cancel Pressed"),
+                                style: "cancel"
+                            },
+
                         ],
                         { cancelable: false }
-                      );
+                    );
                 }
             }
             else {
-                 response = await VehicleService.searchRegisterNo(registerNo)
-                if (!Utilities.stringIsEmpty(response.vehicle) && response.success ) {
+                response = await VehicleService.searchRegisterNo(registerNo)
+                if (!Utilities.stringIsEmpty(response.vehicle) && response.success) {
                     this.TalkModalToggle();
-                       this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+                    this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
                 }
                 else {
                     this.TalkModalToggle();
@@ -93,22 +93,22 @@ export default class Talk extends Component {
                         "Vehicle not found",
                         "this vehicle has not been found in the DVLA database.",
                         [
-                          {
-                            text: "CLOSE",
-                            onPress: () => console.log("Cancel Pressed"),
-                            style: "cancel"
-                          },
-                         
+                            {
+                                text: "CLOSE",
+                                onPress: () => console.log("Cancel Pressed"),
+                                style: "cancel"
+                            },
+
                         ],
                         { cancelable: false }
-                      );
+                    );
                 }
 
             }
-         }
-  }
+        }
+    }
     render() {
-         return (
+        return (
             <Modal
                 animationType="fade"
                 transparent={true}

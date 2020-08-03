@@ -12,6 +12,7 @@ import {
     TextInput,
     StatusBar,
     StyleSheet,
+    Dimensions,
     TouchableOpacity
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -26,6 +27,7 @@ import * as VehicleService from '../services/Vehicle';
 import VehicleImage from '../components/VehicleImage';
 const moment = require('moment-timezone');
 import * as VehicleLooks from '../services/SearchVehicleType';
+const screen_width = Dimensions.get('window').width;
 export default class SearchResultVehicle extends React.Component {
     constructor(props) {
         super(props);
@@ -57,24 +59,41 @@ export default class SearchResultVehicle extends React.Component {
 
     seletedItem = async (item) => {
         this.ToggleModal();
-        console.log("item", item);
         this.state.selectedsort = item.id
         this.setState({
             selectedsort: item.id
         })
         this.state.filterparam.orderBy = this.state.selectedsort
-        console.log("this.state.filterparam", this.state.filterparam)
         var response = await VehicleLooks.SearchVehicleTypes(this.state.filterparam)
-        console.log("response", response);
-        this.setState({
+        for (var i = 0; i < response.vehicles.length; i++) {
+
+            response.vehicles[i].PremiumDate = this.PremiumPackgedDateChecked(response.vehicles[i].premiumListingExpires)
+        }
+         this.setState({
             list: response.vehicles,
             result: response.numberOfResults,
         })
     }
-
+ PremiumPackgedDateChecked(premiumDate) {
+        var seconds = 0
+        if (!Utilities.stringIsEmpty(premiumDate)) {
+            var dateNow = moment.tz('Europe/London').format('ll LTS');
+            var momentdate = moment(premiumDate, "YYYY/MM/DD H:mm:ss").format('ll LTS');
+            seconds = Math.floor((moment(momentdate) - moment(dateNow)) / 1000);
+            if (seconds < 0) {
+                seconds = 0
+            }
+        }
+        return seconds;
+    }
     componentWillMount() {
+        var response=this.props.navigation.state.params.listVehicle
+           for (var i = 0; i < response.length; i++) {
+
+            response[i].PremiumDate = this.PremiumPackgedDateChecked(response[i].premiumListingExpires)
+        }
         this.setState({
-            list: this.props.navigation.state.params.listVehicle,
+            list: response,
             result: this.props.navigation.state.params.resultcount,
             filterparam: this.props.navigation.state.params.filterparam,
         })
@@ -211,10 +230,13 @@ export default class SearchResultVehicle extends React.Component {
                                             <TouchableOpacity
                                                 onPress={this.detail.bind(this, item, index)}
                                                 style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                <View style={{ width: '35%', alignItems: 'center', justifyContent: 'center' }}>
+                                                <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' ,height:120}}>
+                                                   {item.PremiumDate > 0 &&
+                                                        <Text style={{ zIndex: 2, position: 'absolute', top: 13, color: '#fefefe', fontSize: 10, right: 70, borderRadius: 3, backgroundColor: Apptheme, padding: 2, rotation: -40 }}>Premium</Text>
+                                                    }
                                                     <VehicleImage param={item.images} />
                                                 </View>
-                                                <View style={{ width: '65%', justifyContent: 'center' }}>
+                                                <View style={{  width: screen_width - 140, justifyContent: 'center' }}>
                                                 <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
 
                                                     {this.mainTitle(item)}

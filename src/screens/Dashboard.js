@@ -10,13 +10,14 @@ import {
     TextInput,
     StatusBar,
     StyleSheet,
+    Dimensions,
     Modal,
     TouchableOpacity
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
+import { Apptheme, lightText, darkText, LinearColor, lightBg, TooltipBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
@@ -25,6 +26,8 @@ import VehicleImage from '../components/VehicleImage';
 import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
 const moment = require('moment-timezone');
+const screen_height = Dimensions.get('window').height;
+const screen_width = Dimensions.get('window').width;
 export default class Dashboard extends React.Component {
     constructor(props) {
         super(props);
@@ -32,11 +35,17 @@ export default class Dashboard extends React.Component {
             list: [],
             emptyList: '',
             isModal: false,
-            display: Storage.dashboardDisplay
+            display: Storage.dashboardDisplay,
+            toolTipVisible: false,
 
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.myVehicle();
+            if (this.state.list.length == 0) {
+                this.setState({
+                    toolTipVisible: true
+                })
+            }
 
         })
 
@@ -55,17 +64,6 @@ export default class Dashboard extends React.Component {
             if (seconds < 0) {
                 seconds = 0
             }
-
-            // var minutes = Math.floor(seconds / 60);
-            // var hours = Math.floor(minutes / 60);
-            // var days = Math.floor(hours / 24);
-            // hours = hours = hours - (days * 24);
-            // minutes = minutes - (days * 24 * 60) - (hours * 60);
-            // seconds = seconds - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
-            // console.log("days",days);
-            // console.log("hours",hours);
-            // console.log("minutes",minutes);
-            // console.log("seconds",seconds);
         }
         return seconds;
     }
@@ -84,7 +82,7 @@ export default class Dashboard extends React.Component {
             }
             else {
                 this.setState({
-                    emptyList: "No records found"
+                    emptyList: "You do not have any vehicles to display"
                 })
             }
         }
@@ -166,7 +164,13 @@ export default class Dashboard extends React.Component {
     }
     flatListEmptyMessage = () => {
         if (this.state.list.length == 0) {
-            return (<Text style={styles.noRecordFoundText}>{this.state.emptyList}</Text>)
+            return (
+                <View style={{ justifyContent: 'center', alignItems: 'center', height: screen_height - 250 }}>
+                    <FontAwesome name="dashboard" color={Apptheme} size={70} style={[styles.Icons,]} />
+                    <Text style={{ color: Apptheme, fontSize: 24, fontWeight: 'bold', paddingVertical: 10 }}>MY DASHBOARD</Text>
+                    <Text style={styles.noRecordFoundText}>{this.state.emptyList}</Text>
+                </View>
+            )
         }
     }
 
@@ -181,7 +185,7 @@ export default class Dashboard extends React.Component {
         this.setState({
             display: param
         })
-        Storage.dashboardDisplay=param
+        Storage.dashboardDisplay = param
         Utilities.asyncStorage_SaveKey(Constants.DashboardDisplay, JSON.stringify(param))
     }
 
@@ -191,16 +195,27 @@ export default class Dashboard extends React.Component {
                 <Topbar
                     ToggleModal={this.ToggleModal}
                     ParentPage="My Dashboard" navigation={this.props} />
-                <ScrollView>
-                
-                {this.state.display == 1 &&
-
-                    <Text style={{paddingVertical:10,paddingHorizontal:20,fontSize:16,fontWeight:'bold',color:darkText}}>
-                        Keep track of your vehicle's important dates, and setup reminders
-                    </Text>
+                {this.state.toolTipVisible &&
+                    <View style={{ width: 100, height: 35, borderRadius: 5, position: 'absolute', top: 60, right: 5, backgroundColor: TooltipBg, justifyContent: 'center', alignItems: 'center' }}>
+                        <FontAwesome name="caret-up"
+                            size={26}
+                            color={TooltipBg}
+                            style={{ position: 'absolute', top: -18, right: 10 }}
+                        />
+                        <Text style={{ color: lightText }}>Add a vehicle</Text>
+                    </View>
                 }
 
-                    <View style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10,paddingBottom:0, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+                <ScrollView>
+
+                    {this.state.display == 1 &&
+
+                        <Text style={{ paddingVertical: 10, paddingHorizontal: 20, fontSize: 14, color: darkText }}>
+                            Keep track of your vehicle's important dates, and setup reminders
+                    </Text>
+                    }
+
+                    <View style={{ marginHorizontal: '2%', borderRadius: 5, paddingVertical: 10, paddingBottom: 0, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
                         <Text style={{ fontSize: 18, color: Apptheme, fontWeight: 'bold' }}>
                             YOUR VEHICLES
                         </Text>
@@ -224,13 +239,13 @@ export default class Dashboard extends React.Component {
                                             <TouchableOpacity
                                                 onPress={this.detail.bind(this, item, index)}
                                                 style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                <View style={{ width: '35%', alignItems: 'center', justifyContent: 'center' }}>
+                                                <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
                                                     {item.PremiumDate > 0 &&
                                                         <Text style={{ zIndex: 2, position: 'absolute', top: 13, color: '#fefefe', fontSize: 10, right: 70, borderRadius: 3, backgroundColor: Apptheme, padding: 2, rotation: -40 }}>Premium</Text>
                                                     }
                                                     <VehicleImage param={item.images} />
                                                 </View>
-                                                <View style={{ width: '65%', justifyContent: 'center' }}>
+                                                <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
                                                     <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
 
                                                         {this.mainTitle(item)}
@@ -251,36 +266,36 @@ export default class Dashboard extends React.Component {
                                             <TouchableOpacity
                                                 onPress={this.detail.bind(this, item, index)}
                                                 style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                <View style={{ width: '35%', alignItems: 'center', justifyContent: 'center' }}>
+                                                <View style={{ width: screen_width - 140, alignItems: 'center', justifyContent: 'center' }}>
                                                     {item.PremiumDate > 0 &&
-                                                        <Text style={{ zIndex: 2, position: 'absolute', top: 2, color: '#fefefe', fontSize: 20, left:3,   }}>P</Text>
+                                                        <Text style={{ zIndex: 2, position: 'absolute', top: 2, color: '#fefefe', fontSize: 20, left: 3, }}>P</Text>
                                                     }
-                                                    <VehicleImage  display={2}  param={item.images} />
+                                                    <VehicleImage display={2} param={item.images} />
                                                 </View>
-                                                <View style={{ width: '65%', justifyContent: 'center' }}>
-                                                    <Text style={{ paddingHorizontal:2,color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
+                                                <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
+                                                    <Text style={{ paddingHorizontal: 2, color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
 
                                                         {this.mainTitle(item)}
                                                     </Text>
-                                                  
 
-                                                    <View style={{ flexDirection: 'row',marginVertical:2 }}>
+
+                                                    <View style={{ flexDirection: 'row', marginVertical: 2 }}>
                                                         <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
-                                                        MOT Due 
+                                                            MOT Due
                                                   </Text>
                                                         <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.motDueDate != null) ? moment(item.motDueDate).format('L') : " - "}</Text>
                                                     </View>
-                                                    
 
-                                                    <View style={{ flexDirection: 'row',marginVertical:2 }}>
+
+                                                    <View style={{ flexDirection: 'row', marginVertical: 2 }}>
                                                         <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
-                                                        TAX Due
+                                                            TAX Due
                                                   </Text>
                                                         <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.taxDueDate != null) ? moment(item.taxDueDate).format('L') : " - "}</Text>
                                                     </View>
 
 
-                                                    <View style={{ flexDirection: 'row',marginVertical:2 }}>
+                                                    <View style={{ flexDirection: 'row', marginVertical: 2 }}>
                                                         <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
                                                             Insurance Due
                                                   </Text>

@@ -19,7 +19,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme, lightText, darkText, LinearColor, lightBg } from '../helpers/CommponStyle';
+import { Apptheme,GreenBg, lightText, darkText, LinearColor, lightBg ,TooltipBg} from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import TalkModal from '../components/Talk';
 import SearchVehicleModal from '../components/SearchVehicle';
@@ -52,6 +52,7 @@ export default class Home extends React.Component {
             isModal: false,
             check: true,
             isOpen: false,
+            toolTipVisible: false,
         }
         this.updateTopBar = this.updateTopBar.bind(this)
         this.toggle = this.toggle.bind(this)
@@ -61,6 +62,13 @@ export default class Home extends React.Component {
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.updateTopBar()
+            if (Object.keys(Storage.userData).length > 0) {
+                this.setState({
+                    toolTipVisible: (Storage.userData.thumbUrl != null) ? false : true
+                })
+
+            }
+            
         })
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
@@ -156,7 +164,9 @@ export default class Home extends React.Component {
 
     navigateToProfile = () => {
         if (Object.keys(Storage.userData).length > 0) {
+
             this.props.navigation.navigate("Profile")
+
         }
         else {
             this.props.navigation.navigate("Login")
@@ -210,7 +220,24 @@ export default class Home extends React.Component {
                         ParentPage="Home"
                         navigation={this.props} />
 
+
+
+
+
+
+                    {Object.keys(Storage.userData).length > 0 && this.state.toolTipVisible &&
+                        <View style={{ width: 150, height: 40,borderRadius:5, position: 'absolute', top: 60,  right: 5, backgroundColor: TooltipBg, justifyContent: 'center', alignItems: 'center' }}>
+                            <FontAwesome name="caret-up"
+                                size={26}
+                                color={TooltipBg}
+                                style={{ position: 'absolute', top: -18 }}
+                            />
+                            <Text style={{ color: lightText }}>Add a profile image</Text>
+                        </View>
+                    }
                     <View style={styles.BoxView}>
+
+                        
                         <View style={styles.BoxParent}>
                             <TouchableOpacity
                                 activeOpacity={1}

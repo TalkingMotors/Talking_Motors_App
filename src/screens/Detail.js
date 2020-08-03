@@ -35,6 +35,7 @@ import Storage from '../helpers/Storage';
 import Slider from './Slider';
 import * as VehicleLooks from '../services/SearchVehicleType';
 import * as VehicleService from '../services/Vehicle';
+
 import RNIap, {
     InAppPurchase,
     PurchaseError,
@@ -63,6 +64,7 @@ const itemSkus = Platform.select({
 
 let purchaseUpdateSubscription;
 let purchaseErrorSubscription;
+const moment = require('moment-timezone');
 export default class Detail extends React.Component {
     constructor(props) {
         super(props);
@@ -127,6 +129,19 @@ export default class Detail extends React.Component {
             console.warn(err.code, err.message);
         }
     };
+
+    PremiumPackgedDateChecked(premiumDate) {
+        var seconds = 0
+        if (!Utilities.stringIsEmpty(premiumDate)) {
+            var dateNow = moment.tz('Europe/London').format('ll LTS');
+            var momentdate = moment(premiumDate, "YYYY/MM/DD H:mm:ss").format('ll LTS');
+            seconds = Math.floor((moment(momentdate) - moment(dateNow)) / 1000);
+            if (seconds < 0) {
+                seconds = 0
+            }
+        }
+        return seconds;
+    }
     stateupdate = (vehicleData) => {
         try {
             console.log("vehicleData", vehicleData);
@@ -150,11 +165,11 @@ export default class Detail extends React.Component {
                 forSale: vehicleData.sold,
                 ownerId: vehicleData.userID,
                 derivative: (!Utilities.stringIsEmpty(vehicleData.derivative) ? vehicleData.derivative : ""),
-                PremiumDate: vehicleData.PremiumDate,
                 features: vehicleData.features,
                 userMileage: vehicleData.userMileage,
                 postcode: vehicleData.postcode,
                 vehicleData: vehicleData,
+
 
                 isLoader: false,
                 shareLoader: false
@@ -351,6 +366,8 @@ export default class Detail extends React.Component {
 
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;
+        this.state.vehicleData.PremiumDate=this.PremiumPackgedDateChecked(this.state.vehicleData.premiumListingExpires)
+
         this.props.navigation.navigate("EditVehicle", {
             item: this.state.vehicleData,
             allfeatures: this.state.allfeatures

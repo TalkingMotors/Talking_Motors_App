@@ -41,7 +41,7 @@ export default class Dashboard extends React.Component {
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.myVehicle();
-            if (this.state.list.length == 0) {
+            if (this.state.list.length == 0  && this.state.emptyList !="") {
                 this.setState({
                     toolTipVisible: true
                 })
@@ -77,12 +77,14 @@ export default class Dashboard extends React.Component {
                     response.vehicles[i].PremiumDate = this.PremiumPackgedDateChecked(response.vehicles[i].premiumListingExpires)
                 }
                 this.setState({
-                    list: response.vehicles
+                    list: response.vehicles,
+                    toolTipVisible:false
                 })
             }
             else {
                 this.setState({
-                    emptyList: "You do not have any vehicles to display"
+                    emptyList: "You do not have any vehicles to display",
+                    toolTipVisible:true
                 })
             }
         }
@@ -163,7 +165,7 @@ export default class Dashboard extends React.Component {
 
     }
     flatListEmptyMessage = () => {
-        if (this.state.list.length == 0) {
+       if (this.state.list.length == 0) {
             return (
                 <View style={{ justifyContent: 'center', alignItems: 'center', height: screen_height - 250 }}>
                     <FontAwesome name="dashboard" color={Apptheme} size={70} style={[styles.Icons,]} />
@@ -266,7 +268,7 @@ export default class Dashboard extends React.Component {
                                             <TouchableOpacity
                                                 onPress={this.detail.bind(this, item, index)}
                                                 style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                <View style={{ width: screen_width - 140, alignItems: 'center', justifyContent: 'center' }}>
+                                                <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
                                                     {item.PremiumDate > 0 &&
                                                         <Text style={{ zIndex: 2, position: 'absolute', top: 2, color: '#fefefe', fontSize: 20, left: 3, }}>P</Text>
                                                     }

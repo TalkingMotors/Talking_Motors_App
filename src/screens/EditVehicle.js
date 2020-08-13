@@ -42,7 +42,8 @@ export default class EditVehicle extends React.Component {
             postCode: '',
             price: '',
             mileage: '',
-            description: '',
+            // description: '',
+            description: this.props.navigation.state.params.item.description,
             saleSwitch: false,
             image: '',
             allImages: [],
@@ -110,6 +111,7 @@ export default class EditVehicle extends React.Component {
                 taxDueDate: (params.taxDueDate == null) ? "" : params.taxDueDate,
                 isLoader:false
             })
+             this.onChangeText('description', params.description)
         }
         catch (e) {
             console.log("componentDidAppear", e)
@@ -187,6 +189,8 @@ export default class EditVehicle extends React.Component {
                 isLoader: false
             })
             console.log("confirmChange EditVehicle", e);
+            this.props.navigation.goBack();
+         
         }
     }
 
@@ -258,6 +262,9 @@ export default class EditVehicle extends React.Component {
     }
 
     render() {
+        console.log("this.state",this.state);
+        let description=this.state.description;
+        console.log("description",description);
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Edit Your Vehicle" navigation={this.props} />
@@ -354,7 +361,7 @@ export default class EditVehicle extends React.Component {
                             autoCapitalize="none"
                             autoCorrect={false}
                             labelFontSize={13}
-                            value={this.state.description}
+                            value={description}
                             onChangeText={val => {
                                 this.onChangeText('description', val)
                             }}

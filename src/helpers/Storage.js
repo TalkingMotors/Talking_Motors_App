@@ -5,7 +5,8 @@ const Storage = {
     dashboardDisplay: 0,
     lastemail: '',
     hasNewNotification: false,
-    NotificationObject: {}
+    NotificationObject: {},
+    AllDataId:0,
 }
 
 export default Storage;

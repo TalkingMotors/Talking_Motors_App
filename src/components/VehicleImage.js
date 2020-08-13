@@ -21,7 +21,7 @@ export default function VehicleImage(item) {
             <Transition >
                 <Image
                     resizeMode='cover'
-                    style={{ marginLeft: 5, borderRadius: 240, width: '100%', height: '98%', }}
+                    style={{ marginLeft: 5, borderRadius: 240, width: '100%', height: '100%', }}
                     source={{ uri: item.param[0].url }}
                 />
             </Transition>

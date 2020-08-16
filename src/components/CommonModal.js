@@ -18,8 +18,7 @@ export default class CommonModal extends Component {
             isModal: true,
             seletedItem: this.props.ModalSeleted
         }
-
-    }
+   }
    
      ToggleModal = () => {
         this.setState({
@@ -54,11 +53,12 @@ export default class CommonModal extends Component {
                     <View style={{ width: '100%', height: '100%' }}>
                         <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', alignItems: 'center' }}>
                             <Text style={[styles.headerModalText, { paddingTop: 0 }]}>
-                                {this.props.ModalTitle}
+                                {this.props.ModalTitle}  
                             </Text>
                         </View>
                         <ScrollView keyboardShouldPersistTaps='handled'>
                             <View style={{ width: '98%', marginHorizontal: '1%', justifyContent: 'center' }}>
+                            {this.props.ModalTitle!="Sort by" &&
                             <TouchableOpacity onPress={() => this.seletedItem({id:0 ,name:"Any"})} style={{ width: '100%', marginVertical: 10, marginHorizontal: 1 }} >
                                             <Text style={{ paddingHorizontal: 10, color: "#333", fontSize: 14 }}>Any</Text>
                                             {(this.state.seletedItem == 0) ?
@@ -67,6 +67,7 @@ export default class CommonModal extends Component {
                                                 <MaterialIcons name="radio-button-unchecked" style={{ position: 'absolute', right: 25 }} size={20} color={Apptheme} />
                                             }
                                         </TouchableOpacity>
+    }
                                 {this.props.ModalData.map((item, index) => {
                                     return (
                                         <TouchableOpacity onPress={() => this.seletedItem(item)} style={{ width: '100%', marginVertical: 10, marginHorizontal: 1 }} key={index}>

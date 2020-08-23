@@ -106,7 +106,8 @@ export default class ListVehicle extends React.Component {
     }
 
     searchVehicleBy = async () => {
-        let { registerNo } = this.state
+        //let { registerNo } = this.state
+        var  registerNo  = this.state.registerNo.replace(/ /g,'')
         this.setState({
             isloader: true
         })

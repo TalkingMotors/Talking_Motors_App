@@ -361,8 +361,7 @@ export default class Detail extends React.Component {
             allfeatures: allfeatures,
 
         })
-
-    }
+  }
 
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;

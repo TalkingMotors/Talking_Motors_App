@@ -12,6 +12,9 @@ import {
     StyleSheet,
     Dimensions,
     Modal,
+    Alert,
+    ActivityIndicator,
+    TouchableHighlight,
     TouchableOpacity
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -25,9 +28,14 @@ import * as VehicleService from '../services/Vehicle';
 import VehicleImage from '../components/VehicleImage';
 import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
+import Swipeable from 'react-native-swipeable';
 const moment = require('moment-timezone');
 const screen_height = Dimensions.get('window').height;
 const screen_width = Dimensions.get('window').width;
+import * as VehicleLooks from '../services/SearchVehicleType';
+const leftContent = <Text></Text>;
+
+
 export default class Dashboard extends React.Component {
     constructor(props) {
         super(props);
@@ -37,11 +45,23 @@ export default class Dashboard extends React.Component {
             isModal: false,
             display: Storage.dashboardDisplay,
             toolTipVisible: false,
+            features: [],
+            allfeatures: [],
+            isLoader: true,
+            swipeable: null
 
         }
+        this.onSwipLeft = this.onSwipLeft.bind(this);
+        this.editVehicle = this.editVehicle.bind(this);
+        this.deleteItem = this.deleteItem.bind(this);
+        this.deleteVehicle = this.deleteVehicle.bind(this);
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            this.setState({
+                 isLoader: true,
+            })
+            console.log("didFocus")
             this.myVehicle();
-            if (this.state.list.length == 0  && this.state.emptyList !="") {
+            if (this.state.list.length == 0 && this.state.emptyList != "") {
                 this.setState({
                     toolTipVisible: true
                 })
@@ -50,6 +70,7 @@ export default class Dashboard extends React.Component {
         })
 
     }
+
 
     componentWillMount() {
         this.myVehicle();
@@ -70,6 +91,7 @@ export default class Dashboard extends React.Component {
 
     myVehicle = async () => {
         var response = await VehicleService.myVehicle()
+        console.log("myVehicle",response)
         if (!Utilities.stringIsEmpty(response.vehicles) || response.success) {
             if (response.vehicles.length > 0) {
                 for (var i = 0; i < response.vehicles.length; i++) {
@@ -78,18 +100,24 @@ export default class Dashboard extends React.Component {
                 }
                 this.setState({
                     list: response.vehicles,
-                    toolTipVisible:false
+                    toolTipVisible: false,
+                    isLoader: false
                 })
             }
             else {
                 this.setState({
                     emptyList: "You do not have any vehicles to display",
-                    toolTipVisible:true
+                    toolTipVisible: true,
+                    isLoader: false,
+                    list: []
                 })
             }
         }
         else if (!response.success) {
             alert("invalid operation");
+            this.setState({
+                isLoader: false,
+            })
         }
     }
 
@@ -165,7 +193,7 @@ export default class Dashboard extends React.Component {
 
     }
     flatListEmptyMessage = () => {
-       if (this.state.list.length == 0) {
+        if (this.state.list.length == 0) {
             return (
                 <View style={{ justifyContent: 'center', alignItems: 'center', height: screen_height - 250 }}>
                     <FontAwesome name="dashboard" color={Apptheme} size={70} style={[styles.Icons,]} />
@@ -191,6 +219,85 @@ export default class Dashboard extends React.Component {
         Utilities.asyncStorage_SaveKey(Constants.DashboardDisplay, JSON.stringify(param))
     }
 
+    onSwipLeft = (item, index) => {
+        console.log("item", item);
+        console.log("index", index);
+    }
+
+    VehicleLookupAllFeatures = async (data) => {
+        var response = await VehicleLooks.VehicleLookupAllFeatures()
+        var allfeatures = response.features
+        for (var i = 0; i < allfeatures.length; i++) {
+            allfeatures[i].checkBox = false
+            for (var j = 0; j < this.state.features.length; j++) {
+                if (allfeatures[i].id == this.state.features[j].id) {
+                    allfeatures[i].checkBox = true
+                }
+            }
+        }
+        this.setState({
+            allfeatures: allfeatures,
+        }, () => {
+            this.props.navigation.navigate("EditVehicle", {
+                item: data,
+                allfeatures: this.state.allfeatures
+            })
+        })
+    }
+
+    editVehicle = (data) => {
+        try {
+            console.log("data", data)
+            this.setState({
+                features: data.features
+            }, () => {
+                data.PremiumDate = this.PremiumPackgedDateChecked(data.premiumListingExpires)
+                this.VehicleLookupAllFeatures(data)
+            })
+
+        } catch (e) {
+            console.log("editVehicle Exception", e)
+        }
+    }
+
+    deleteItem = async (item) => {
+        let obj = {
+            id: item.id
+        }
+        this.setState({
+            isLoader: true
+        })
+        var response = await VehicleService.deleteVehicle(obj)
+        if (response.success) {
+            this.myVehicle();
+        }
+    }
+    deleteVehicle = (item) => {
+        try {
+            Alert.alert(
+                "Delete",
+                "Are you sure you want to delete?",
+                [
+                    {
+                        text: "No",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel"
+                    },
+                    { text: "YES", onPress: () => this.deleteItem(item) }
+                ],
+                { cancelable: false }
+            );
+
+
+
+        } catch (e) {
+            console.log("deleteVehicle Exception", e)
+        }
+    }
+
+    handleUserBeganScrollingParentView() {
+        this.swipeable.recenter();
+    }
     render() {
         return (
             <View style={styles.ParentView}>
@@ -205,6 +312,15 @@ export default class Dashboard extends React.Component {
                             style={{ position: 'absolute', top: -18, right: 10 }}
                         />
                         <Text style={{ color: lightText }}>Add a vehicle</Text>
+                    </View>
+                }
+
+                {this.state.isLoader &&
+                    <View style={styles.menuLoaderView}>
+                        <ActivityIndicator
+                            color="#ed0000"
+                            size="large"
+                        />
                     </View>
                 }
 
@@ -232,83 +348,96 @@ export default class Dashboard extends React.Component {
                         renderItem={({ item, index }) =>
                             (
                                 <View key={index}>
-                                    {(this.state.display == 0) ?
-
-
-
-                                        <LinearGradient
-                                            colors={LinearColor} style={{ borderRadius: 10, borderWidth: 1, borderColor: Apptheme, elevation: 3, marginVertical: 10, width: '94%', marginHorizontal: '3%', }}>
+                                    <Swipeable
+                                        onLeftActionRelease={() => this.editVehicle(item)}
+                                        rightButtons={[
                                             <TouchableOpacity
-                                                onPress={this.detail.bind(this, item, index)}
-                                                style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
-                                                    {item.PremiumDate > 0 &&
-                                                        <Text style={{ zIndex: 2, position: 'absolute', top: 13, color: '#fefefe', fontSize: 10, right: 70, borderRadius: 3, backgroundColor: Apptheme, padding: 2, rotation: -40 }}>Premium</Text>
-                                                    }
-                                                    <VehicleImage param={item.images} />
-                                                </View>
-                                                <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
-                                                    <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
-
-                                                        {this.mainTitle(item)}
-                                                    </Text>
-                                                    <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                        {this.subTitle(item)}
-
-                                                    </Text>
-                                                    <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                        {this.detailText(item)}
-                                                    </Text>
-                                                </View>
-                                            </TouchableOpacity>
-                                        </LinearGradient>
-                                        :
-                                        <LinearGradient
-                                            colors={LinearColor} style={{ borderRadius: 10, borderWidth: 1, borderColor: Apptheme, elevation: 3, marginVertical: 10, width: '94%', marginHorizontal: '3%', }}>
+                                                onPress={() => this.editVehicle(item)}
+                                                style={{ width: 100, height: 100, marginTop: 20, backgroundColor: Apptheme, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }}
+                                            ><Text style={{ color: '#fff', fontSize: 16 }}>Edit</Text></TouchableOpacity>,
                                             <TouchableOpacity
-                                                onPress={this.detail.bind(this, item, index)}
-                                                style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
-                                                    {item.PremiumDate > 0 &&
-                                                        <Text style={{ zIndex: 2, position: 'absolute', top: 2, color: '#fefefe', fontSize: 20, left: 3, }}>P</Text>
-                                                    }
-                                                    <VehicleImage display={2} param={item.images} />
-                                                </View>
-                                                <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
-                                                    <Text style={{ paddingHorizontal: 2, color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
-
-                                                        {this.mainTitle(item)}
-                                                    </Text>
+                                                onPress={() => this.deleteVehicle(item)}
+                                                style={{ width: 100, height: 100, backgroundColor: 'red', marginTop: 20, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }}
+                                            ><Text style={{ color: '#fff', fontSize: 16 }}>Delete</Text></TouchableOpacity>
+                                        ]}>
+                                        {(this.state.display == 0) ?
 
 
-                                                    <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-                                                        <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
-                                                            MOT Due
-                                                  </Text>
-                                                        <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.motDueDate != null) ? moment(item.motDueDate).format('L') : " - "}</Text>
+
+                                            <LinearGradient
+                                                colors={LinearColor} style={{ borderRadius: 10, borderWidth: 1, borderColor: Apptheme, elevation: 3, marginVertical: 10, width: '94%', marginHorizontal: '3%', }}>
+                                                <TouchableOpacity
+                                                    onPress={this.detail.bind(this, item, index)}
+                                                    style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
+                                                    <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
+                                                        {item.PremiumDate > 0 &&
+                                                            <Text style={{ zIndex: 2, position: 'absolute', top: 13, color: '#fefefe', fontSize: 10, right: 70, borderRadius: 3, backgroundColor: Apptheme, padding: 2, rotation: -40 }}>Premium</Text>
+                                                        }
+                                                        <VehicleImage param={item.images} />
                                                     </View>
+                                                    <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
+                                                        <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
 
+                                                            {this.mainTitle(item)}
+                                                        </Text>
+                                                        <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
+                                                            {this.subTitle(item)}
 
-                                                    <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-                                                        <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
-                                                            TAX Due
-                                                  </Text>
-                                                        <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.taxDueDate != null) ? moment(item.taxDueDate).format('L') : " - "}</Text>
+                                                        </Text>
+                                                        <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
+                                                            {this.detailText(item)}
+                                                        </Text>
                                                     </View>
-
-
-                                                    <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-                                                        <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
-                                                            Insurance Due
-                                                  </Text>
-                                                        <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.insuranceDueDate != null) ? moment(item.insuranceDueDate).format('L') : " - "}</Text>
+                                                </TouchableOpacity>
+                                            </LinearGradient>
+                                            :
+                                            <LinearGradient
+                                                colors={LinearColor} style={{ borderRadius: 10, borderWidth: 1, borderColor: Apptheme, elevation: 3, marginVertical: 10, width: '94%', marginHorizontal: '3%', }}>
+                                                <TouchableOpacity
+                                                    onPress={this.detail.bind(this, item, index)}
+                                                    style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
+                                                    <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
+                                                        {item.PremiumDate > 0 &&
+                                                            <Text style={{ zIndex: 2, position: 'absolute', top: 2, color: '#fefefe', fontSize: 20, left: 3, }}>P</Text>
+                                                        }
+                                                        <VehicleImage display={2} param={item.images} />
                                                     </View>
+                                                    <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
+                                                        <Text style={{ paddingHorizontal: 2, color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
+
+                                                            {this.mainTitle(item)}
+                                                        </Text>
 
 
-                                                </View>
-                                            </TouchableOpacity>
-                                        </LinearGradient>
-                                    }
+                                                        <View style={{ flexDirection: 'row', marginVertical: 2 }}>
+                                                            <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
+                                                                MOT Due
+                                                  </Text>
+                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.motDueDate != null) ? moment(item.motDueDate).format('L') : " - "}</Text>
+                                                        </View>
+
+
+                                                        <View style={{ flexDirection: 'row', marginVertical: 2 }}>
+                                                            <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
+                                                                TAX Due
+                                                  </Text>
+                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.taxDueDate != null) ? moment(item.taxDueDate).format('L') : " - "}</Text>
+                                                        </View>
+
+
+                                                        <View style={{ flexDirection: 'row', marginVertical: 2 }}>
+                                                            <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
+                                                                Insurance Due
+                                                  </Text>
+                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.insuranceDueDate != null) ? moment(item.insuranceDueDate).format('L') : " - "}</Text>
+                                                        </View>
+
+
+                                                    </View>
+                                                </TouchableOpacity>
+                                            </LinearGradient>
+                                        }
+                                    </Swipeable>
                                 </View>
                             )}
                         ListEmptyComponent={this.flatListEmptyMessage}
@@ -456,5 +585,16 @@ const styles = StyleSheet.create({
     noRecordFoundText: {
         textAlign: 'center',
         fontSize: 14
-    }
+    },
+    menuLoaderView: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255, 0.7)',
+        // backgroundColor: 'red',
+        zIndex: 10000,
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 60
+    },
 })

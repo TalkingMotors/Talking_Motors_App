@@ -2,6 +2,28 @@ import APIConstants from '../helpers/APIConstants';
 import * as Utilities from "../helpers/Utilities";
 import Storage from '../helpers/Storage';
 
+export let deleteVehicle = async (params) => {
+    try {
+        if (Storage.networkStatus.isConnected) {
+           console.log(APIConstants.VEHICLE_ENDPOINT)
+            let response = await fetch(APIConstants.VEHICLE_ENDPOINT, {
+                method: 'DELETE',
+                crossDomain: true,
+                headers: Utilities.setHeaders(),
+                body: JSON.stringify(params)
+            })
+            let result = response.json()
+            console.log("deleteVehicle result",result);
+            return result;
+        } else {
+            return null
+        }
+    }
+     catch (e) {
+        console.log(e.message)
+        return null
+    }
+}
 export let favorites = async () => {
     try {
         if (Storage.networkStatus.isConnected) {

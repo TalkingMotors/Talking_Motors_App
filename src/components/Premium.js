@@ -25,8 +25,8 @@ import RNIap, {
 
 const itemSkus = Platform.select({
   ios: [
-    'com.cooni.point1000',
-    'com.cooni.point5000', // dooboolab
+    'uk.co.talkingMotors.talkingMotors.iapPremiumListing',
+    'uk.co.talkingMotors.talkingMotors.iapPremiumListing2Month', // dooboolab
   ],
   android: [
     // 'android.test.purchased', // subscription
@@ -71,14 +71,14 @@ export default class PremiumModal extends Component {
         const receipt = purchase.transactionReceipt;
         if (receipt) {
           try {
-            // if (Platform.OS === 'ios') {
-            //   finishTransactionIOS(purchase.transactionId);
-            // } else if (Platform.OS === 'android') {
-            //   // If consumable (can be purchased again)
-            //   consumePurchaseAndroid(purchase.purchaseToken);
-            //   // If not consumable
-            //   acknowledgePurchaseAndroid(purchase.purchaseToken);
-            // }
+           if (Platform.OS === 'ios') {
+               finishTransactionIOS(purchase.transactionId);
+            } else if (Platform.OS === 'android') {
+             // If consumable (can be purchased again)
+              consumePurchaseAndroid(purchase.purchaseToken);
+              // If not consumable
+               acknowledgePurchaseAndroid(purchase.purchaseToken);
+             }
             const ackResult = await finishTransaction(purchase);
           } catch (ackErr) {
           }

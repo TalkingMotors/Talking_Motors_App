@@ -15,20 +15,56 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
-import { SearchVehicleModalToggle } from './src/screens/Home';
+import { SearchVehicleModalToggle ,TalkModalToggle} from './src/screens/Home';
 import CommponStyle, { Apptheme, lightText, lightBg, darkText, LinearColor } from './src/helpers/CommponStyle';
-
+import GeneralStatusBarColor from './src/components/GeneralStautsBar';
 import * as Utilities from "./src/helpers/Utilities";
 import Constants from "./src/helpers/Constants";
 import Storage from './src/helpers/Storage';
-
+import * as VehicleService from './src/services/Vehicle';
+const moment = require('moment-timezone');
 export default class ContentContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isModal: false
+            isModal: false,
+            myVehcile:false,
+            list:[],
+            isSearch:false
         }
+        Utilities.asyncStorage_GetKey(Constants.JWT_TOKEN).then(response => {
+            Storage.jwt_Token = JSON.parse(response)
+            this.myVehicle();
+        })
+      
 
+    }
+
+    myVehicle = async () => {
+        var response = await VehicleService.myVehicle()
+        console.log("myVehicle",response)
+        if (!Utilities.stringIsEmpty(response.vehicles) || response.success) {
+            for (var i = 0; i < response.vehicles.length; i++) {
+
+                response.vehicles[i].PremiumDate = this.PremiumPackgedDateChecked(response.vehicles[i].premiumListingExpires)
+            }
+            if (response.vehicles.length > 0) {
+                this.setState({
+                    list: response.vehicles,
+                })
+            }
+            else {
+                this.setState({
+                    emptyList: "You do not have any vehicles to display",
+                    list: []
+                })
+            }
+        }
+        else if (!response.success) {
+            this.setState({
+                isLoader: false,
+            })
+        }
     }
     ToggleModal = () => {
         this.setState({
@@ -45,9 +81,31 @@ export default class ContentContainer extends React.Component {
             // this.props.navigation.navigate("Login")
         }
     }
+    PremiumPackgedDateChecked(premiumDate) {
+        var seconds = 0
+        if (!Utilities.stringIsEmpty(premiumDate)) {
+            var dateNow = moment.tz('Europe/London').format('ll LTS');
+            var momentdate = moment(premiumDate, "YYYY/MM/DD H:mm:ss").format('ll LTS');
+            seconds = Math.floor((moment(momentdate) - moment(dateNow)) / 1000);
+            if (seconds < 0) {
+                seconds = 0
+            }
+        }
+        return seconds;
+    }
+
+    detail = (item, index) => {
+        this.props.toggle()
+        this.setState({
+            myVehcile:!this.state.myVehcile
+        })
+        this.props.navigation.navigate('Detail', { item: item, index: index, parent: "talk" });
+    }
     render() {
         return (
-            // <ScrollView style={[styles.animatedDrawer]}>
+           <View style={{flex:1}}>
+                  <GeneralStatusBarColor backgroundColor={Apptheme}
+			barStyle="light-content"/>
             <View style={styles.ParentView}>
                 <LinearGradient colors={LinearColor} style={styles.SidebarProfileView}>
                     <View style={styles.userProfileView}>
@@ -106,8 +164,11 @@ export default class ContentContainer extends React.Component {
 
                 <TouchableOpacity onPress={() => {
                     // this.props.navigation.closeDrawer()
-                    this.props.toggle()
-                    SearchVehicleModalToggle()
+                    // this.props.toggle()
+                    // SearchVehicleModalToggle()
+                  this.setState({
+                    isSearch:!this.state.isSearch
+                    })
                 }
                 } style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
@@ -117,7 +178,47 @@ export default class ContentContainer extends React.Component {
                     <Text style={styles.SideMenuText}>
                         Search
                     </Text>
+                    <FontAwesome name={this.state.isSearch?"caret-up":"caret-down"}
+                                size={20}
+                                color={Apptheme}
+                                style={{ position: 'absolute',zIndex:2, right:50 }}
+                            />
                 </TouchableOpacity>
+                {this.state.isSearch &&
+                  <View style={{ backgroundColor: "#f9f9f9" }}>
+                         <TouchableOpacity
+                          onPress={()=>{
+                            this.props.toggle()
+                            this.props.navigation.navigate('VehicleType')
+                            }}
+                         style={[styles.SideMenuItemView, { marginLeft: 20 }]}>
+                              <View style={styles.IconView}>
+                                  <Feather name='truck' style={styles.SideMenuIcon}
+                                  />
+                              </View>
+                              <Text style={styles.SideMenuText}>
+                                  Vehicle Type
+                              </Text>
+                          </TouchableOpacity>
+                         
+                          <TouchableOpacity
+                          
+                         onPress={()=>{
+                            this.props.toggle()
+                            TalkModalToggle();
+                            }}
+                              style={[styles.SideMenuItemView, { marginLeft: 20 }]}>
+                              <View style={styles.IconView}>
+                                  <Feather name='minus' style={styles.SideMenuIcon}
+                                  />
+                              </View>
+                        <Text style={styles.SideMenuText}>
+                            Registration
+                        </Text>
+                          </TouchableOpacity>
+                    
+              </View>
+                }
 
                 <TouchableOpacity onPress={() => this.navigatetoComponent('ListingType')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
@@ -128,6 +229,46 @@ export default class ContentContainer extends React.Component {
                         Sell your Vehicle
                     </Text>
                 </TouchableOpacity>
+                {Storage.jwt_Token !='' &&
+                <TouchableOpacity 
+                onPress={() => this.setState({
+                    myVehcile:!this.state.myVehcile
+                })} 
+                style={styles.SideMenuItemView}>
+                    <View style={styles.IconView}>
+                        <FontAwesome name='car' style={styles.SideMenuIcon}
+                        />
+                    </View>
+                    <Text style={styles.SideMenuText}>
+                         Your Vehicle
+                    </Text>
+                    <FontAwesome name={this.state.myVehcile?"caret-up":"caret-down"}
+                                size={20}
+                                color={Apptheme}
+                                style={{ position: 'absolute',zIndex:2, right:50 }}
+                            />
+                </TouchableOpacity>
+    }
+                {(this.state.list.length > 0 && this.state.myVehcile) &&
+                    <View style={{ backgroundColor: "#f9f9f9" }}>
+                        {this.state.list.map((item, index) => {
+                            return (
+                                <TouchableOpacity
+                                key={index}
+                                onPress={()=>this.detail(item,index)}
+                                    style={[styles.SideMenuItemView, { marginLeft: 20 }]}>
+                                    <View style={styles.IconView}>
+                                        <Feather name='message-circle' style={styles.SideMenuIcon}
+                                        />
+                                    </View>
+                                    <Text style={styles.SideMenuText}>
+                                        {item.registrationNumber}
+                                    </Text>
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </View>
+                }
 
                 <TouchableOpacity onPress={() => this.navigatetoComponent('Message')} style={styles.SideMenuItemView}>
                     <View style={styles.IconView}>
@@ -249,7 +390,7 @@ export default class ContentContainer extends React.Component {
                     </SafeAreaView>
                 </Modal>
             </View>
-            // </ScrollView>
+           </View>
         );
     }
 }

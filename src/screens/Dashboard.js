@@ -455,7 +455,7 @@ export default class Dashboard extends React.Component {
                     }}
 
                 >
-                    <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '30%', height: '40%', width: '86%', marginHorizontal: '7%', }}>
+                                <SafeAreaView style={{ elevation: 10, backgroundColor: '#fff', borderRadius: 10, top: '35%', height: '30%', width: '70%', marginHorizontal: '15%', }}>
                         <View style={{ width: '100%', height: '100%' }}>
                             <View style={{ margin: 5, marginVertical: 5, padding: 5, justifyContent: 'center', }}>
                                 <Text style={[styles.headerModalText, { color: darkText, paddingTop: 10, paddingLeft: 10, fontSize: 20, fontWeight: 'bold' }]}>

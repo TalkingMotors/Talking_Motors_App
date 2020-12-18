@@ -55,6 +55,7 @@ export default class ListVehicle extends React.Component {
 
 
     addVehicle = async () => {
+        try{
         this.setState({
             isloader: true
         })
@@ -89,20 +90,23 @@ export default class ListVehicle extends React.Component {
             stolen: true,
             transmissionTypeID: data.transmissionTypeId,
         }
-        var response = await VehicleService.addNewVehicle(obj)
-        if (response.success) {
-            this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
+        // var response = await VehicleService.addNewVehicle(obj)
+        // if (response.success) {
+            this.props.navigation.navigate('AddVehicle', { item:obj });
             this.setState({
                 isloader: false,
                 newVehicle: ''
 
             })
-        }
-        else {
-            this.setState({
-                isloader: false
-            })
-        }
+        // }
+        // else {
+        //     this.setState({
+        //         isloader: false
+        //     })
+        // }
+    }catch(e){
+        console.log("addVehicle Exception",e);
+    }
     }
 
     searchVehicleBy = async () => {
@@ -195,7 +199,7 @@ export default class ListVehicle extends React.Component {
                         />
                     </View>
                 }
-
+             <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <ScrollView style={{ width: '100%' }}>
                     {(this.state.param == 0) ?
                         <View style={{ width: '100%', height: 200, justifyContent: 'center', alignItems: 'center' }}>
@@ -281,17 +285,17 @@ export default class ListVehicle extends React.Component {
                             </View>
                             <View style={{ backgroundColor: "#ebebeb" }}>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.make}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                <Text style={styles.textValue}>
                                         {this.state.newVehicle.model}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                <Text style={styles.textValue}>
                                         {this.state.newVehicle.colour}
                                     </Text>
                                 </View>
@@ -341,10 +345,9 @@ export default class ListVehicle extends React.Component {
 
 const styles = StyleSheet.create({
     ParentView: {
-        alignItems: 'center',
         width: '100%',
         height: '100%',
-        backgroundColor: lightBg
+        backgroundColor: lightBg,
     },
     TextFieldView: {
         width: '92%',
@@ -384,4 +387,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         top: 60
     },
+    textValue:{
+        color:"#000"
+    }
 })

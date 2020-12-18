@@ -19,6 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Storage from '../helpers/Storage';
 import NotificationBadges from './NotificationBadge';
 import { getConverationDetail } from '../screens/Messenger';
+import GeneralStatusBarColor from './GeneralStautsBar';
 export default class Topbar extends React.Component {
     constructor(props) {
         super(props);
@@ -50,13 +51,11 @@ export default class Topbar extends React.Component {
         // this.props.navigation.navigation.openDrawer()
         if (this.props.ParentPage == "Home") {
             return (
+                <View >
+                    <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <View style={styles.MainView}>
 
-                    <StatusBar
-                        barStyle="light-content"
-                        translucent={false}
-                        backgroundColor={Apptheme}
-                    />
+                    
                     <NotificationBadges
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
                     />
@@ -83,12 +82,15 @@ export default class Topbar extends React.Component {
                         <FontAwesome onPress={() => this.props.Profile()} name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 60 }]} />
                     }
                 </View>
+            </View>
             )
         }
 
         else if (this.props.ParentPage == "My Dashboard") {
             return (
-                <View style={styles.MainView}>
+                <View >
+                    <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
+                 <View style={styles.MainView}>
                     <NotificationBadges
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
                     />
@@ -101,10 +103,13 @@ export default class Topbar extends React.Component {
                         onPress={() => this.props.navigation.navigation.navigate("ListVehicle")}
                         name="plus" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
+               </View>
             )
         }
         else if (this.props.ParentPage == "Detail") {
             return (
+                <View >
+                    <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <View style={styles.MainView}>
                     <NotificationBadges
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
@@ -122,10 +127,13 @@ export default class Topbar extends React.Component {
                     {this.favIcon()}
                     <Feather name="share-2" onPress={() => this.props.shareAction()} color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
+                </View>
             )
         }
         else if (this.props.ParentPage == "Message") {
             return (
+                <View >
+                    <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <View style={styles.MainView}>
                     <NotificationBadges
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
@@ -137,10 +145,13 @@ export default class Topbar extends React.Component {
                     <Feather onPress={() => this.props.editSetting()} name="edit" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                     <FontAwesome onPress={() => this.props.BlockUser()} name="user-times" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 50 }]} />
                 </View>
+                </View>
             )
         }
         else if (this.props.ParentPage == "Vehicle Type") {
             return (
+                <View >
+                <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <View style={styles.MainView}>
                     <NotificationBadges
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
@@ -151,10 +162,13 @@ export default class Topbar extends React.Component {
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
                     <FontAwesome onPress={() => this.props.resetAllFields()} name="eraser" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 10 }]} />
                 </View>
+                </View>
             )
         }
         else if (this.props.ParentPage == "Create Group") {
             return (
+                <View >
+                    <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <View style={styles.MainView}>
                     <NotificationBadges
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
@@ -168,10 +182,13 @@ export default class Topbar extends React.Component {
                         <FontAwesome onPress={() => this.props.isgroupModal()} name="check" color={lightText} size={22} style={[styles.Icons, { position: 'absolute', right: 60 }]} />
                     }
                 </View>
+                </View>
             )
         }
         else if (this.props.ParentPage == "Messenger") {
             return (
+                <View >
+                    <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <View style={styles.MainView}>
 
 
@@ -207,10 +224,13 @@ export default class Topbar extends React.Component {
 
                     }
                 </View>
+                </View>
             )
         }
         else if (this.props.ParentPage == "Blocked User") {
             return (
+                <View >
+                <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <LinearGradient colors={LinearColor} style={styles.MainView}>
                     <Feather
                         onPress={() => {
@@ -221,11 +241,14 @@ export default class Topbar extends React.Component {
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
                 </LinearGradient>
+                </View>
             )
         }
 
         else {
             return (
+                <View >
+                    <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <LinearGradient colors={LinearColor} style={styles.MainView}>
                     <NotificationBadges
                         isActive={Object.keys(Storage.NotificationObject).length > 0 ? true : false}
@@ -235,6 +258,7 @@ export default class Topbar extends React.Component {
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     <Text style={styles.ScreenName}>{this.props.ParentPage}</Text>
                 </LinearGradient>
+                </View>
             )
         }
     }

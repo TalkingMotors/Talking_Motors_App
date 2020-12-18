@@ -12,6 +12,7 @@ import {
     StyleSheet,
     Linking,
     Switch,
+    Platform,
     Share,
     Alert,
     Dimensions,
@@ -50,8 +51,8 @@ import RNIap, {
 export var GetSpecificVehicle;
 const itemSkus = Platform.select({
     ios: [
-        'com.cooni.point1000',
-        'com.cooni.point5000', // dooboolab
+        'uk.co.talkingMotors.talkingMotors.iapFinanceCheck',
+        'uk.co.talkingMotors.talkingMotors.iapMotAndMileageCheck', // dooboolab
     ],
     android: [
         // 'android.test.purchased', // subscription
@@ -250,14 +251,14 @@ export default class Detail extends React.Component {
                 if (receipt) {
                     try {
                         console.log("receipt", receipt);
-                        // if (Platform.OS === 'ios') {
-                        //   finishTransactionIOS(purchase.transactionId);
-                        // } else if (Platform.OS === 'android') {
-                        //   // If consumable (can be purchased again)
-                        //   consumePurchaseAndroid(purchase.purchaseToken);
-                        //   // If not consumable
-                        //   acknowledgePurchaseAndroid(purchase.purchaseToken);
-                        // }
+                         if (Platform.OS === 'ios') {
+                           finishTransactionIOS(purchase.transactionId);
+                         } else if (Platform.OS === 'android') {
+                           // If consumable (can be purchased again)
+                           consumePurchaseAndroid(purchase.purchaseToken);
+                           // If not consumable
+                           acknowledgePurchaseAndroid(purchase.purchaseToken);
+                         }
                         const ackResult = await finishTransaction(purchase);
                     } catch (ackErr) {
                     }
@@ -491,6 +492,10 @@ export default class Detail extends React.Component {
     toggleSwitch = () => {
         this.setState({
             forSale: !this.state.forSale
+        },()=>{
+            if(this.state.forSale){
+                this.EditVehicle();
+            }
         })
     }
 
@@ -565,6 +570,7 @@ export default class Detail extends React.Component {
                     EditVehicle={this.EditVehicle}
                     parent={this.state.parent}
                     navigation={this.props} />
+                  
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -573,7 +579,7 @@ export default class Detail extends React.Component {
                         />
                     </View>
                 }
-                <ScrollView style={{ paddingBottom: 20 }}>
+                <ScrollView style={{ paddingBottom: 20,marginBottom:(Platform.OS === 'ios')?50:0 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
                         {!Utilities.stringIsEmpty(this.state.image[0]) ?
                             <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>

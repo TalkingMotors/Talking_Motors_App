@@ -19,7 +19,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme,GreenBg, lightText, darkText, LinearColor, lightBg ,TooltipBg} from '../helpers/CommponStyle';
+import { Apptheme, GreenBg, lightText, darkText, LinearColor, lightBg, TooltipBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import TalkModal from '../components/Talk';
 import SearchVehicleModal from '../components/SearchVehicle';
@@ -33,9 +33,12 @@ import Constants from "../helpers/Constants";
 import AndroidNotification from '../components/AndroidNotification';
 import IOSNotification from '../components/IOSNotification';
 export var SearchVehicleModalToggle;
+export var TalkModalToggle;
 import { NavigationEvents } from 'react-navigation';
 import Sidebar from '../../ContentComponent';
 import SideMenu from 'react-native-side-menu';
+var  headerHeight =50; 
+let screenheight = Dimensions.get('window').height;
 export default class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -68,7 +71,7 @@ export default class Home extends React.Component {
                 })
 
             }
-            
+
         })
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
@@ -173,7 +176,7 @@ export default class Home extends React.Component {
         }
     }
 
-    TalkModalToggle = (parent) => {
+    TalkModalToggle = TalkModalToggle = (parent) => {
         this.setState({
             isTalkModal: !this.state.isTalkModal,
 
@@ -198,35 +201,37 @@ export default class Home extends React.Component {
         const menu = <Sidebar navigation={this.props.navigation}
             toggle={this.toggle}
         />;
-        return (
-            <SideMenu
-                menu={menu}
-                menuPosition={'left'}
-                disableGestures={true}
-                openMenuOffset={Dimensions.get('window').width * (2 / 2.35)}
-                isOpen={this.state.isOpen}
-                onChange={(isOpen) => {
-                    this.updateMenuState(isOpen)
-                }}
+      return (
+          <SideMenu
+              menu={menu}
+              menuPosition={'left'}
+              disableGestures={true}
+              openMenuOffset={Dimensions.get('window').width * (2 / 2.35)}
+              isOpen={this.state.isOpen}
+              onChange={(isOpen) => {
+                  this.updateMenuState(isOpen)
+              }}
 
-            >
-                <View style={styles.ParentView}>
+          >
 
-                    <Topbar
-                        toggle={this.toggle}
-                        updateTopBar={this.updateTopBar}
-                        Dashboard={this.navigateToDashboard}
-                        Profile={this.navigateToProfile}
-                        ParentPage="Home"
-                        navigation={this.props} />
+              <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
 
-
-
-
+              <View onLayout={event => {
+                  const layout = event.nativeEvent.layout;
+                  headerHeight = layout.height
+              }}>
+                        <Topbar
+                            toggle={this.toggle}
+                            updateTopBar={this.updateTopBar}
+                            Dashboard={this.navigateToDashboard}
+                            Profile={this.navigateToProfile}
+                            ParentPage="Home"
+                            navigation={this.props} />
+                
 
 
                     {Object.keys(Storage.userData).length > 0 && this.state.toolTipVisible &&
-                        <View style={{ width: 150, height: 40,borderRadius:5, position: 'absolute', top: 60,  right: 5, backgroundColor: TooltipBg, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ width: 150, height: 40, borderRadius: 5, position: 'absolute', top: 60, right: 5, backgroundColor: TooltipBg, justifyContent: 'center', alignItems: 'center' }}>
                             <FontAwesome name="caret-up"
                                 size={26}
                                 color={TooltipBg}
@@ -235,9 +240,11 @@ export default class Home extends React.Component {
                             <Text style={{ color: lightText }}>Add a profile image</Text>
                         </View>
                     }
+                        </View>
+                     <View style={styles.ParentView}>
                     <View style={styles.BoxView}>
 
-                        
+
                         <View style={styles.BoxParent}>
                             <TouchableOpacity
                                 activeOpacity={1}
@@ -450,10 +457,10 @@ const styles = StyleSheet.create({
 
     },
     BoxView: {
-        height: '93%', flexDirection: 'column', width: '100%'
+        height: screenheight-headerHeight, flexDirection: 'column', width: '100%'
     },
     BoxParent: {
-        width: '100%', height: '20%'
+        width: '100%',height:'19%'
     },
     ButtonView: {
         width: '100%',

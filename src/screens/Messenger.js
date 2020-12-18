@@ -63,7 +63,7 @@ export default class Messenger extends React.Component {
             isPopup: false,
             isGroup: false,
             isAdduser: false,
-            isKeyboard: false,
+            f: false,
             convoname: '',
             isChangeConversationNamePopup: false,
             isclearHostoryPopup: false,
@@ -178,10 +178,16 @@ export default class Messenger extends React.Component {
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide)
     }
     _keyboardDidShow() {
+        try{
 
         this.setState({
             isKeyboard: true
         })
+        this.scrollView.scrollResponderScrollToEnd({ animated: true });
+    }
+    catch(e){
+        console.log("Excetopn _keyboardDidShow",e)
+    }
     }
 
     _keyboardDidHide() {
@@ -290,7 +296,7 @@ export default class Messenger extends React.Component {
                         });
 
                         if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
-                            this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
+                            this.updateConversationStatus(this.state.messages[0].id);
                         }
 
                         this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId
@@ -633,14 +639,22 @@ export default class Messenger extends React.Component {
                         />
                     </View>
                 }
+                 <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : null}
+                keyboardVerticalOffset="0"
+                style={{ flex: 1 }}
+            >
                 <ScrollView ref={ref => this.scrollView = ref}
+                  showsVerticalScrollIndicator={false}
+                  onScroll={Keyboard.dismiss} keyboardDismissMode='interactive' keyboardShouldPersistTaps='handled'
+                onScroll={this.handleScroll}
                     onContentSizeChange={(contentWidth, contentHeight) => {
                         this.scrollView.scrollResponderScrollToEnd({ animated: true });
                     }} style={{ marginBottom: 0 }}>
                     <View >
-                        <KeyboardAvoidingView
+                        {/* <KeyboardAvoidingView
                             keyboardVerticalOffset="80"
-                            enabled>
+                            enabled> */}
 
                             <ScrollView >
                                 <ImageBackground style={{ width: '100%' }} source={require('../images/tmmesbackan.png')} >
@@ -760,11 +774,11 @@ export default class Messenger extends React.Component {
                                     </View>
                                 </ImageBackground>
                             </ScrollView>
-                        </KeyboardAvoidingView>
+                        {/* </KeyboardAvoidingView> */}
 
                     </View>
                 </ScrollView>
-                <View style={{ flexDirection: 'row', width: '100%', height: 55, }}>
+                <View style={{ flexDirection: 'row', width: '100%', height: 55,marginBottom:12 }}>
                     <TouchableOpacity
                         onPress={() => this.cameraModal()}
                         style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
@@ -790,6 +804,7 @@ export default class Messenger extends React.Component {
 
 
                 </View>
+                </KeyboardAvoidingView>
 
                 {this.state.isCameraModal &&
                     <View style={{ position: 'absolute', top:'25%', height:260, width: '80%',marginHorizontal:'10%' }}>
@@ -1125,7 +1140,7 @@ const styles = StyleSheet.create({
     },
     MessengerView: {
         width: '100%',
-        height: screen_height - 130,
+        height: screen_height - 160,
         justifyContent: 'flex-end'
     },
     MessengerViewList: {

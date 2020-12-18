@@ -160,6 +160,7 @@ export default class Login extends React.Component {
                     translucent={false}
                     backgroundColor={Apptheme}
                 />
+                 <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator

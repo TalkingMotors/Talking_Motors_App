@@ -9,8 +9,9 @@ export default class IOSNotifiction extends Component {
   componentDidMount() {
     if (Storage.networkStatus.isConnected) {
       PushNotificationIOS.addEventListener('register', apnsToken => {
+        console.log("token", apnsToken);
         let udid = DeviceInfo.getUniqueID();
-        let params = { udid : udid, deviceType : 2, token : apnsToken }
+        let params = { udid : udid, deviceType : 1, token : apnsToken }
         DeviceHelper.saveUpdateDevice(params)
       })
     } else {

@@ -84,6 +84,8 @@ export default class Profile extends React.Component {
     }
 
     openCamera = () => {
+        try{
+        ImagePicker.clean();
         this.setState({
             ModalOpen: false
         })
@@ -100,8 +102,15 @@ export default class Profile extends React.Component {
             }
 
         });
+    }catch(e){
+        console.log("Exception  openCamera",e)
     }
+    }
+
+
+    
     openGallery = () => {
+        try{
         ImagePicker.clean();
         this.setState({
             ModalOpen: !this.state.ModalOpen
@@ -120,6 +129,9 @@ export default class Profile extends React.Component {
             });
         }
         )
+    }catch(e){
+        console.log("Exception openGallery",e)
+    }
     }
     updateUser = () => {
         try {

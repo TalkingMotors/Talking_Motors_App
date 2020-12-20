@@ -62,7 +62,13 @@ export default class AddVehicle extends React.Component {
             seletedId: 0,
             isInsurance: false,
             imageData: '',
+            param: this.props.navigation.state.params.param,
+            display:false
 
+
+        }
+        if(this.state.param == 1){
+            this.state.saleSwitch = true
         }
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.componentDidAppear()
@@ -101,7 +107,7 @@ export default class AddVehicle extends React.Component {
                 description: params.description,
                 postCode: params.postcode,
                 price: (params.price > 0) ? params.price : "",
-                saleSwitch: params.sold,
+                // saleSwitch: params.sold,
                 mileage: (!Utilities.stringIsEmpty(params.userMileage) ? params.userMileage : ""),
                 image: '',
                 features: params.features,
@@ -351,20 +357,54 @@ export default class AddVehicle extends React.Component {
                     </View>
 
                     <View style={styles.TextFieldView}>
-                        {this.state.saleSwitch &&
+                        {!this.state.display &&
                             <View>
-
-                                <TextField
-                                    label='Postcode'
-                                    fontSize={13}
+                            <TextField
+                                label='Description'
+                                fontSize={15}
+                                keyboardType='default'
+                                tintColor={Apptheme}
+                                baseColor={darkText}
+                                style={{fontWeight:'bold'}}
+                                errorColor="red"
+                                activeLineWidth={2}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                labelFontSize={15}
+                                value={description}
+                                onChangeText={val => {
+                                    this.onChangeText('description', val)
+                                }}
+                            />
+                             <TextField
+                                    label='Mileage'
+                                    fontSize={15}
                                     keyboardType='default'
                                     tintColor={Apptheme}
                                     baseColor={darkText}
+                                    style={{fontWeight:'bold'}}
                                     errorColor="red"
                                     activeLineWidth={2}
                                     autoCapitalize="none"
                                     autoCorrect={false}
-                                    labelFontSize={13}
+                                    labelFontSize={15}
+                                    value={this.state.mileage}
+                                    onChangeText={val => {
+                                        this.onChangeText('mileage', val)
+                                    }}
+                                />
+                                <TextField
+                                    label='Postcode'
+                                    fontSize={15}
+                                    keyboardType='default'
+                                    tintColor={Apptheme}
+                                    baseColor={darkText}
+                                    errorColor="red"
+                                    style={{fontWeight:'bold'}}
+                                    activeLineWidth={2}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    labelFontSize={15}
                                     value={this.state.postCode}
                                     onChangeText={val => {
                                         this.onChangeText('postCode', val)
@@ -374,7 +414,8 @@ export default class AddVehicle extends React.Component {
 
                                 <TextField
                                     label='Price'
-                                    fontSize={13}
+                                    fontSize={15}
+                                     style={{fontWeight:'bold'}}
                                     keyboardType='default'
                                     tintColor={Apptheme}
                                     baseColor={darkText}
@@ -382,47 +423,17 @@ export default class AddVehicle extends React.Component {
                                     activeLineWidth={2}
                                     autoCapitalize="none"
                                     autoCorrect={false}
-                                    labelFontSize={13}
+                                    labelFontSize={15}
                                     value={this.state.price}
                                     onChangeText={val => {
                                         this.onChangeText('price', val)
 
                                     }}
                                 />
-                                <TextField
-                                    label='Mileage'
-                                    fontSize={13}
-                                    keyboardType='default'
-                                    tintColor={Apptheme}
-                                    baseColor={darkText}
-                                    errorColor="red"
-                                    activeLineWidth={2}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                    labelFontSize={13}
-                                    value={this.state.mileage}
-                                    onChangeText={val => {
-                                        this.onChangeText('mileage', val)
-                                    }}
-                                />
+                               
                             </View>
                         }
-                        <TextField
-                            label='Description'
-                            fontSize={13}
-                            keyboardType='default'
-                            tintColor={Apptheme}
-                            baseColor={darkText}
-                            errorColor="red"
-                            activeLineWidth={2}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            labelFontSize={13}
-                            value={description}
-                            onChangeText={val => {
-                                this.onChangeText('description', val)
-                            }}
-                        />
+                       
 
 
                         {/* {this.state.PremiumDate > 0 &&
@@ -437,7 +448,7 @@ export default class AddVehicle extends React.Component {
                             </View>
                         } */}
 
-                        {!this.state.saleSwitch &&
+                        {this.state.display &&
                             <View>
                                 <View>
                                     <Text style={{ color: Apptheme, fontSize: 20, textAlign: 'center', fontWeight: 'bold' }}>IMPORTANT DATES</Text>
@@ -518,9 +529,10 @@ export default class AddVehicle extends React.Component {
                             </TouchableOpacity>
                         </View>
 
+                        {
+                            (this.state.param == 0)?
 
-
-                        <View style={styles.LoginButtonView}>
+                            <View style={styles.LoginButtonView}>
                             <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.confirmChange() }} >
                                 <LinearGradient colors={LinearColor} style={[styles.GradientButtonView, { height: 55 }]}>
                                     <Text style={styles.ButtonInnerText}>
@@ -532,6 +544,20 @@ export default class AddVehicle extends React.Component {
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>
+                            
+                            :
+                            <View style={styles.LoginButtonView}>
+                            <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.confirmChange() }} >
+                                <LinearGradient colors={LinearColor} style={[styles.GradientButtonView, ]}>
+                                    <Text style={styles.ButtonInnerText}>
+                                        SELL VEHICLE
+                                </Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                        }
+
+                        
                     </View>
 
                 </ScrollView>

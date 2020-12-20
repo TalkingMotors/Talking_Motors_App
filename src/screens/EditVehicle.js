@@ -262,9 +262,8 @@ export default class EditVehicle extends React.Component {
     }
 
     render() {
-        console.log("this.state",this.state);
         let description=this.state.description;
-        console.log("description",description);
+      
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Edit Your Vehicle" navigation={this.props} />
@@ -331,7 +330,7 @@ export default class EditVehicle extends React.Component {
                                         this.onChangeText('price', val)
 
                                     }}
-                                />
+                                 />
                                 <TextField
                                     label='Mileage'
                                     fontSize={13}

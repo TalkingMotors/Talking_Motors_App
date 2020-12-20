@@ -9,7 +9,8 @@ import {
     StyleSheet,
     Picker,
     Switch,
-    Image
+    Image,
+    Alert
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -412,6 +413,31 @@ export default class VehicleType extends React.Component {
     }
 
     searchVehicle = async () => {
+        if (this.state.postcode != "") {
+            var tweet = this.state.postcode.toUpperCase();
+            var postcode_regex = /[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}/g;
+
+            var postcodes = tweet.match(postcode_regex);
+            console.log("postcodes", postcodes);
+if(postcodes ==null){
+    Alert.alert(
+        "Post code Error",
+        "Please enter a full valid UK postcode including a space between the first part and second part.",
+        [
+            {
+                text: "CLOSE",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+            },
+
+        ],
+        { cancelable: false }
+    );
+    return
+}
+
+console.log("postcodes",postcodes);
+        }
         let param = {
             makeID: this.state.selectedmakes,
             modelID: this.state.selectedmodels,
@@ -454,9 +480,7 @@ export default class VehicleType extends React.Component {
             }
         });
 
-        console.log("filterparam",filterparam);
         var response = await VehicleLooks.SearchVehicleTypes(filterparam)
-        console.log("response", response);
         this.props.navigation.navigate("SearchResultVehicle",
         {
         listVehicle:response.vehicles,
@@ -504,7 +528,7 @@ export default class VehicleType extends React.Component {
                                     baseColor={Apptheme}
                                     errorColor="red"
                                     activeLineWidth={2}
-                                    autoCapitalize="none"
+                                    autoCapitalize="characters"
                                     autoCorrect={false}
                                     labelFontSize={13}
                                     value={this.state.postcode}

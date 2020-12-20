@@ -639,6 +639,8 @@ export default class Messenger extends React.Component {
                         />
                     </View>
                 }
+                   <ImageBackground style={{ width: '100%',position:'absolute',zIndex:-1,height:screen_height }} source={require('../images/tmmesbackan.png')} >
+                                   
                  <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : null}
                 keyboardVerticalOffset="0"
@@ -657,7 +659,7 @@ export default class Messenger extends React.Component {
                             enabled> */}
 
                             <ScrollView >
-                                <ImageBackground style={{ width: '100%' }} source={require('../images/tmmesbackan.png')} >
+                                {/* <ImageBackground style={{ width: '100%' }} source={require('../images/tmmesbackan.png')} > */}
                                     <View style={styles.MessengerView}>
                                         <View style={styles.MessengerViewList}>
 
@@ -772,13 +774,14 @@ export default class Messenger extends React.Component {
 
                                         </View>
                                     </View>
-                                </ImageBackground>
+                                {/* </ImageBackground> */}
                             </ScrollView>
                         {/* </KeyboardAvoidingView> */}
 
                     </View>
                 </ScrollView>
-                <View style={{ flexDirection: 'row', width: '100%', height: 55,marginBottom:12 }}>
+               
+                <View style={{ flexDirection: 'row', width: '100%', height: 55,marginBottom:(this.state.isKeyboard)?0:10 }}>
                     <TouchableOpacity
                         onPress={() => this.cameraModal()}
                         style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
@@ -805,7 +808,7 @@ export default class Messenger extends React.Component {
 
                 </View>
                 </KeyboardAvoidingView>
-
+                </ImageBackground>
                 {this.state.isCameraModal &&
                     <View style={{ position: 'absolute', top:'25%', height:260, width: '80%',marginHorizontal:'10%' }}>
                         <SafeAreaView style={{borderColor:Apptheme,borderWidth:2, borderRadius: 10, height: '100%', width: '96%', marginHorizontal: '2%', backgroundColor: "#fff" }}>
@@ -1140,7 +1143,7 @@ const styles = StyleSheet.create({
     },
     MessengerView: {
         width: '100%',
-        height: screen_height - 160,
+        height: screen_height - 60,
         justifyContent: 'flex-end'
     },
     MessengerViewList: {

@@ -53,6 +53,8 @@ import LoginScreen from './src/screens/Login'
 import HomeScreen from './src/screens/Home';
 import AddVehicle from './src/screens/AddVehicle';
 import AddVehicleImage from './src/screens/AddVehicleImage';
+import DvlaDetails from './src/screens/DvlaDetails';
+
 console.disableYellowBox = true;
 // export default class App extends React.Component {
 //     render() {
@@ -102,7 +104,9 @@ const AppNavigator = createStackNavigator({
     ForgotPassword: { screen: ForgotPassword, },
     AddVehicle: { screen: AddVehicle },
     AddVehicleImage: { screen: AddVehicleImage },
-    NotificationBadges: { screen: NotificationBadges, }
+    NotificationBadges: { screen: NotificationBadges, },
+    DvlaDetails: { screen: DvlaDetails, }
+    
 
 },
     {

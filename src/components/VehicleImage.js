@@ -10,7 +10,7 @@ export default function VehicleImage(item) {
             <Transition >
                 <Image
                     resizeMode='cover'
-                    style={{ marginLeft: 5, borderRadius: 240, width: '100%', height: '100%', }}
+                    style={{ marginLeft: 0, borderRadius: 0, width: '100%', height: '100%', }}
                     source={{ uri: item.param[0].url }}
                 />
             </Transition>
@@ -21,7 +21,7 @@ export default function VehicleImage(item) {
             <Transition >
                 <Image
                     resizeMode='cover'
-                    style={{ marginLeft: 5, borderRadius: 240, width: '100%', height: '100%', }}
+                    style={{ marginLeft: 0, borderRadius: 0, width: '100%', height: '100%', }}
                     source={{ uri: item.param[0].url }}
                 />
             </Transition>
@@ -29,14 +29,14 @@ export default function VehicleImage(item) {
     }
     else if(item.display!=undefined){
         return (
-        <View style={{ width: '100%', height: '100%', marginLeft: 5, borderRadius: 240, alignItems: 'center', justifyContent: 'center', backgroundColor: "#fff" }}>
+        <View style={{ width: '100%', height: '100%', marginLeft: 0, borderRadius: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: "#fff" }}>
         <FontAwesome name="car" size={80} color={Apptheme} />
     </View>
         )
     }
     else {
         return (
-            <View style={{ width: '100%', height: '100%',marginLeft: 5, borderRadius: 240, alignItems: 'center', justifyContent: 'center', backgroundColor: "#fff" }}>
+            <View style={{ width: '100%', height: '100%',marginLeft: 0, borderRadius: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: "#fff" }}>
                 <FontAwesome name="car" size={80} color={Apptheme} />
             </View>
         )

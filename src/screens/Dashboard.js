@@ -147,16 +147,23 @@ export default class Dashboard extends React.Component {
     }
 
     subTitle = (item) => {
+        let price = ""
+        
+        if (!Utilities.stringIsEmpty(item.price) || item.price > 0) {
+            price = "£" + item.price.toFixed(2) + " ";
+        }
+        return price 
+    }
+    postCode = (item) => {
         let postcode = "";
         let price = ""
         if (!Utilities.stringIsEmpty(item.postcode) || item.postcode > 0) {
             postcode = item.postcode + " ";
         }
-        if (!Utilities.stringIsEmpty(item.price) || item.price > 0) {
-            price = "£" + item.price.toFixed(2) + " ";
-        }
-        return price + postcode
+        
+        return postcode
     }
+    
 
 
     detailText = (item) => {
@@ -364,78 +371,117 @@ export default class Dashboard extends React.Component {
 
 
 
-                                            <LinearGradient
-                                                colors={LinearColor} style={{ borderRadius: 10, borderWidth: 1, borderColor: Apptheme, elevation: 3, marginVertical: 10, width: '94%', marginHorizontal: '3%', }}>
+                                            <View
+                                                style={{ borderRadius: 0, borderWidth: 1, borderColor: '#777', elevation: 3, marginVertical: 4, width: '100%', marginHorizontal: 0, }}>
                                                 <TouchableOpacity
                                                     onPress={this.detail.bind(this, item, index)}
-                                                    style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                    <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
+                                                    style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 100, }}>
+                                                    <View style={{ width: 100, alignItems: 'center', justifyContent: 'center',}}>
                                                         {item.PremiumDate > 0 &&
-                                                            <Text style={{ zIndex: 2, position: 'absolute', top: 13, color: '#fefefe', fontSize: 10, right: 70, borderRadius: 3, backgroundColor: Apptheme, padding: 2, rotation: -40 }}>Premium</Text>
+                                                        <View 
+                                                        style={{ width: 0,
+                                                            borderTopWidth: 0,
+                                                            borderRightWidth: 0,
+                                                            borderBottomWidth: 80 / 2.0,
+                                                            borderLeftWidth: 40,
+                                                            borderTopColor: 'transparent',
+                                                            borderRightColor: 'transparent',
+                                                            borderBottomColor: 'transparent',
+                                                            borderLeftColor: Apptheme,
+                                                            justifyContent:'center',
+                                                            alignItems:'center',
+                                                            position:'absolute',zIndex:2,top:0,
+                                                            left:0
+                                                           }}
+                                                        >
+                                                            <Text style={{ color: '#fff',position:'absolute',right:20,zIndex:3,fontWeight:'bold',fontSize:14,top:5  }}>P</Text>
+                                                            </View>
                                                         }
                                                         <VehicleImage param={item.images} />
                                                     </View>
-                                                    <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
-                                                        <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
+                                                    <View style={{ width: screen_width - 102, justifyContent: 'center' }}>
+                                                        <Text style={{ color: '#000', textAlign: 'left',paddingHorizontal:5, fontSize: 14, fontWeight: 'bold' }}>
 
                                                             {this.mainTitle(item)}
                                                         </Text>
-                                                        <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
+                                                        <Text style={{ color: Apptheme, fontSize: 12,fontWeight:'bold', textAlign: 'left', paddingHorizontal: 5 }}>
                                                             {this.subTitle(item)}
 
+                                                        <Text style={{color:darkText}}>
+                                                            {this.postCode(item)}
                                                         </Text>
-                                                        <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
+                                                        </Text>
+                                                        <Text style={{ color: darkText, fontSize: 12, textAlign: 'center', paddingHorizontal: 5 }}>
                                                             {this.detailText(item)}
                                                         </Text>
                                                     </View>
                                                 </TouchableOpacity>
-                                            </LinearGradient>
+                                            </View>
                                             :
-                                            <LinearGradient
-                                                colors={LinearColor} style={{ borderRadius: 10, borderWidth: 1, borderColor: Apptheme, elevation: 3, marginVertical: 10, width: '94%', marginHorizontal: '3%', }}>
+                                            <View
+                                                style={{ borderRadius: 0, borderWidth: 1, borderColor: "#777",borderLeftWidth:0,borderRightWidth:0, elevation: 3, marginVertical: 10, width: '96%', marginHorizontal: '2%', }}>
                                                 <TouchableOpacity
                                                     onPress={this.detail.bind(this, item, index)}
-                                                    style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                                    <View style={{ width: 120, alignItems: 'center', justifyContent: 'center' }}>
+                                                    style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 110, }}>
+                                                    <View style={{ width: 110, alignItems: 'center', justifyContent: 'center',marginLeft:12 }}>
                                                         {item.PremiumDate > 0 &&
-                                                            <Text style={{ zIndex: 2, position: 'absolute', top: 2, color: '#fefefe', fontSize: 20, left: 3, }}>P</Text>
+                                                         <View 
+                                                         style={{ width: 0,
+                                                             borderTopWidth: 0,
+                                                             borderRightWidth: 0,
+                                                             borderBottomWidth: 80 / 2.0,
+                                                             borderLeftWidth: 40,
+                                                             borderTopColor: 'transparent',
+                                                             borderRightColor: 'transparent',
+                                                             borderBottomColor: 'transparent',
+                                                             borderLeftColor: Apptheme,
+                                                             justifyContent:'center',
+                                                             alignItems:'center',
+                                                             position:'absolute',zIndex:2,top:0,
+                                                             left:0
+                                                            }}
+                                                         >
+                                                             <Text style={{ color: '#fff',position:'absolute',right:20,zIndex:3,fontWeight:'bold',fontSize:14,top:5  }}>P</Text>
+                                                             </View>
                                                         }
                                                         <VehicleImage display={2} param={item.images} />
                                                     </View>
-                                                    <View style={{ width: screen_width - 140, justifyContent: 'center' }}>
-                                                        <Text style={{ paddingHorizontal: 2, color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
+                                                    <View style={{ width: screen_width - 112, justifyContent: 'center' }}>
+                                                        <Text style={{ paddingHorizontal: 5,paddingLeft:10, color: "#000", textAlign: 'left', fontSize: 14, fontWeight: 'bold' ,maxWidth :screen_width-175,}}>
 
                                                             {this.mainTitle(item)}
                                                         </Text>
 
+                                                        <Text style={{justifyContent:'flex-end',color:Apptheme,position:'absolute',right:5,top:15}}>{this.postCode(item)}</Text>
+
 
                                                         <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-                                                            <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
+                                                            <Text style={{ color: darkText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
                                                                 MOT Due
                                                   </Text>
-                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.motDueDate != null) ? moment(item.motDueDate).format('L') : " - "}</Text>
+                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 25, color: darkText, fontSize: 12, }}>{(item.motDueDate != null) ? moment(item.motDueDate).format('L') : " - "}</Text>
                                                         </View>
 
 
                                                         <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-                                                            <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
+                                                            <Text style={{ color: darkText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
                                                                 TAX Due
                                                   </Text>
-                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.taxDueDate != null) ? moment(item.taxDueDate).format('L') : " - "}</Text>
+                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 25, color: darkText, fontSize: 12, }}>{(item.taxDueDate != null) ? moment(item.taxDueDate).format('L') : " - "}</Text>
                                                         </View>
 
 
                                                         <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-                                                            <Text style={{ color: lightText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
+                                                            <Text style={{ color: darkText, fontSize: 12, textAlign: 'left', paddingHorizontal: 10 }}>
                                                                 Insurance Due
                                                   </Text>
-                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 5, color: lightText, fontSize: 12, }}>{(item.insuranceDueDate != null) ? moment(item.insuranceDueDate).format('L') : " - "}</Text>
+                                                            <Text style={{ textAlign: 'right', position: 'absolute', right: 25, color: darkText, fontSize: 12, }}>{(item.insuranceDueDate != null) ? moment(item.insuranceDueDate).format('L') : " - "}</Text>
                                                         </View>
 
 
                                                     </View>
                                                 </TouchableOpacity>
-                                            </LinearGradient>
+                                            </View>
                                         }
                                     </Swipeable>
                                 </View>

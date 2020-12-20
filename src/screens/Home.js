@@ -65,9 +65,12 @@ export default class Home extends React.Component {
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.updateTopBar()
+            this.setState({
+                parent:''
+            })
             if (Object.keys(Storage.userData).length > 0) {
                 this.setState({
-                    toolTipVisible: (Storage.userData.thumbUrl != null) ? false : true
+                    toolTipVisible: (Storage.userData.thumbUrl != null) ? false : true,
                 })
 
             }
@@ -279,8 +282,9 @@ export default class Home extends React.Component {
                                 onPressIn={() => this.setState({ Text2: Apptheme })}
                                 onPressOut={() => this.setState({ Text2: lightText })}
                                 onPress={() => {
+                                    this.state.parent ="talk"
                                     this.setState({
-                                        parent: "talk"
+                                        parent: this.state.parent
                                     })
                                     this.TalkModalToggle()
                                 }}
@@ -330,7 +334,12 @@ export default class Home extends React.Component {
                                 // underlayColor="transparent"
                                 onPressIn={() => this.setState({ Text4: Apptheme })}
                                 onPressOut={() => this.setState({ Text4: lightText })}
-                                onPress={() => this.SearchVehicleModalToggle()}
+                                onPress={() => {
+                                    this.state.parent ="talk"
+                                    this.setState({
+                                        parent: this.state.parent
+                                    })
+                                    this.SearchVehicleModalToggle()}}
                                 style={styles.ButtonViewImage}>
                                 <View style={styles.ImageView}>
                                     <Image
@@ -358,8 +367,10 @@ export default class Home extends React.Component {
                                 onPressIn={() => this.setState({ Text5: Apptheme })}
                                 onPressOut={() => this.setState({ Text5: darkText })}
                                 onPress={() => {
+                                   
+                                    this.state.parent ="vehicle_Check"
                                     this.setState({
-                                        parent: "vehicle_Check"
+                                        parent: this.state.parent
                                     })
                                     this.TalkModalToggle()
                                 }}

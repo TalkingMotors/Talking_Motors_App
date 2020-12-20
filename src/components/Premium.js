@@ -108,7 +108,9 @@ export default class PremiumModal extends Component {
   }
   getItems = async () => {
     try {
+      console.log("getItems !!!")
       const products = await RNIap.getProducts(itemSkus);
+      console.log("products",products);
       // const products = await RNIap.getSubscriptions(itemSkus);
       this.setState({ productList: products });
     } catch (err) {

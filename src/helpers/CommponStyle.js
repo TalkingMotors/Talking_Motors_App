@@ -7,7 +7,9 @@ export const darkText = '#333';
 export const lightBg = '#fff';
 export const darkBg = '#333';
 export const linkText = '#03A9F4';
-export const GreenBg = '#A5DD00';
+// export const GreenBg = '#A5DD00';
+export const GreenBg = '#A3D837';
+
 export const TooltipBg = 'rgba(165, 221, 0, 0.6)';
 // export const LinearColor=['#ff6b00', '#f57f17', '#ff8f00']
 // export const LinearColor = ['#FFA12C', '#FF872C', '#FE612C']

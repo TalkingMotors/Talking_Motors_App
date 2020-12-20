@@ -92,7 +92,7 @@ export default class ListVehicle extends React.Component {
         }
         // var response = await VehicleService.addNewVehicle(obj)
         // if (response.success) {
-            this.props.navigation.navigate('AddVehicle', { item:obj });
+            this.props.navigation.navigate('AddVehicle', { item:obj,param:this.state.param });
             this.setState({
                 isloader: false,
                 newVehicle: ''
@@ -231,10 +231,10 @@ export default class ListVehicle extends React.Component {
                             />
                             <View style={{ position: 'absolute', alignItems: 'center' }}>
                                 <Text style={{ textAlign: 'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                    Sell your vehicle quickly and
+                                    Sell your vehicle quickly and effortlessly
                                      </Text>
                                 <Text style={{ textAlign: 'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                    effortlessly with a quick and easy process.
+                                     with a quick and easy process.
                                     </Text>
                                 <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, paddingHorizontal: 5, textAlign: 'center' }}>
                                     Selling has never been easier with our seamless process, you can create am AD in seconds and most
@@ -300,27 +300,27 @@ export default class ListVehicle extends React.Component {
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                <Text style={styles.textValue}>
                                         {this.state.newVehicle.fuelType}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                <Text style={styles.textValue}>
                                         {this.state.newVehicle.engineSizeLitre + "0 Liter"}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                <Text style={styles.textValue}>
                                         {this.state.newVehicle.gearCount + " Gears"}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                <Text style={styles.textValue}>
                                         {this.state.newVehicle.doorCount + " Doors"}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                <Text style={styles.textValue}>
                                         {this.state.newVehicle.seatCount + " Seats"}
                                     </Text>
                                 </View>
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         paddingVertical: 10,
-        color: darkText
+        color: "#000"
     },
     menuLoaderView: {
         position: 'absolute',
@@ -388,6 +388,7 @@ const styles = StyleSheet.create({
         top: 60
     },
     textValue:{
-        color:"#000"
+        color:"#000",
+        fontWeight:'bold'
     }
 })

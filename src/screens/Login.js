@@ -201,7 +201,7 @@ export default class Login extends React.Component {
                     <View style={styles.TextFieldView}>
                         <TextField
                             label='Enter Email'
-                            fontSize={13}
+                            fontSize={15}
                             keyboardType='email-address'
                             tintColor={Apptheme}
                             baseColor={Apptheme}
@@ -209,7 +209,7 @@ export default class Login extends React.Component {
                             activeLineWidth={2}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            labelFontSize={13}
+                            labelFontSize={15}
                             value={this.state.username}
                             onChangeText={val => {
                                 this.onChangeText('username', val.trim())
@@ -231,14 +231,14 @@ export default class Login extends React.Component {
                             <TextField
                                 label='Enter Password'
                                 keyboardType='default'
-                                fontSize={13}
+                                fontSize={15}
                                 tintColor={Apptheme}
                                 baseColor={Apptheme}
                                 errorColor="red"
                                 activeLineWidth={2}
                                 autoCapitalize="none"
                                 autoCorrect={false}
-                                labelFontSize={13}
+                                labelFontSize={15}
                                 secureTextEntry={this.state.secureTextEntry}
                                 value={this.state.password}
                                 onChangeText={val => {

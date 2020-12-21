@@ -366,7 +366,7 @@ export default class Detail extends React.Component {
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;
         this.state.vehicleData.PremiumDate=this.PremiumPackgedDateChecked(this.state.vehicleData.premiumListingExpires)
-
+        
         this.props.navigation.navigate("EditVehicle", {
             item: this.state.vehicleData,
             allfeatures: this.state.allfeatures
@@ -491,6 +491,10 @@ export default class Detail extends React.Component {
     toggleSwitch = () => {
         this.setState({
             forSale: !this.state.forSale
+        },()=>{
+            if(this.state.forSale){
+                this.EditVehicle();
+            }
         })
     }
 

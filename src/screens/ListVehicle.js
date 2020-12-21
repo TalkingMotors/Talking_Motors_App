@@ -55,6 +55,7 @@ export default class ListVehicle extends React.Component {
 
 
     addVehicle = async () => {
+        try{
         this.setState({
             isloader: true
         })
@@ -89,20 +90,23 @@ export default class ListVehicle extends React.Component {
             stolen: true,
             transmissionTypeID: data.transmissionTypeId,
         }
-        var response = await VehicleService.addNewVehicle(obj)
-        if (response.success) {
-            this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
+        // var response = await VehicleService.addNewVehicle(obj)
+        // if (response.success) {
+            this.props.navigation.navigate('AddVehicle', { item:obj });
             this.setState({
                 isloader: false,
                 newVehicle: ''
 
             })
-        }
-        else {
-            this.setState({
-                isloader: false
-            })
-        }
+        // }
+        // else {
+        //     this.setState({
+        //         isloader: false
+        //     })
+        // }
+    }catch(e){
+        console.log("addVehicle Exception",e);
+    }
     }
 
     searchVehicleBy = async () => {

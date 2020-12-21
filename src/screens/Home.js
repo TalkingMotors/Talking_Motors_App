@@ -33,6 +33,7 @@ import Constants from "../helpers/Constants";
 import AndroidNotification from '../components/AndroidNotification';
 import IOSNotification from '../components/IOSNotification';
 export var SearchVehicleModalToggle;
+export var TalkModalToggle;
 import { NavigationEvents } from 'react-navigation';
 import Sidebar from '../../ContentComponent';
 import SideMenu from 'react-native-side-menu';
@@ -143,8 +144,7 @@ export default class Home extends React.Component {
                 if (respose) {
                     if (respose.success) {
                         Storage.userData = respose.user;
-                        console.log(" Storage.userData", Storage.userData);
-                        Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
+                       Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
                     }
                 }
             })
@@ -173,7 +173,7 @@ export default class Home extends React.Component {
         }
     }
 
-    TalkModalToggle = (parent) => {
+    TalkModalToggle =  TalkModalToggle = (parent) => {
         this.setState({
             isTalkModal: !this.state.isTalkModal,
 
@@ -210,6 +210,7 @@ export default class Home extends React.Component {
                 }}
 
             >
+                 <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <View style={styles.ParentView}>
 
                     <Topbar

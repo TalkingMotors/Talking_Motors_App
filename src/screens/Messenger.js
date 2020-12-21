@@ -290,7 +290,9 @@ export default class Messenger extends React.Component {
                         });
 
                         if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
-                            this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
+                            this.updateConversationStatus(this.state.messages[0].id);
+                            
+                            // this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
                         }
 
                         this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId

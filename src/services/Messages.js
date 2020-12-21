@@ -156,8 +156,7 @@ export let sendMessage = async (params) => {
 
 export let updateMessageStatusToRead = async (params) => {
     try {
-
-        if (Storage.networkStatus.isConnected) {
+      if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UPDATE_LAST_READ_ID_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),

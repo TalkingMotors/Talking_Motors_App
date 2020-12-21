@@ -26,9 +26,11 @@ import ForgotPassword from './src/screens/ForgotPassword';
 import UsersVehicle from './src/screens/UsersVehicle';
 import Favourites from './src/screens/Favourites';
 import Users from './src/screens/Users';
+import AddVehicle from './src/screens/AddVehicle';
 
 const MyStackNavigator = createStackNavigator(
     {
+        AddVehicle: { screen: AddVehicle },
         Login: { screen: Login },
         Register: { screen: Register },
         Home: { screen: Home },

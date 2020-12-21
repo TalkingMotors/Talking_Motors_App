@@ -59,7 +59,7 @@ export default class Message extends React.Component {
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
             this.setState({
                 isLoad: true,
-                myConversation: []
+                myConversation: [],
             })
         })
     }
@@ -155,6 +155,7 @@ export default class Message extends React.Component {
     }
 
     viewMessageDetail = (item) => {
+        console.log("viewMessageDetail",item);
         this.props.navigation.navigate("Messenger", { conversationId: item.id })
     }
     BlockUser = () => {

@@ -193,7 +193,8 @@ export default class Topbar extends React.Component {
 
 
                     <Feather
-                        onPress={() => this.props.navigation.navigation.navigate("Message")}
+                        // onPress={() => this.props.navigation.navigation.navigate("Message")}
+                        onPress={() => this.props.navigation.navigation.goBack()}
                         name="arrow-left" color={lightText} size={22} style={styles.Icons} />
                     {Utilities.stringIsEmpty(this.props.image) ?
                         <View style={{ marginLeft: 15, width: 35, height: 35, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', borderRadius: 50, }}>
@@ -234,7 +235,6 @@ export default class Topbar extends React.Component {
                 <LinearGradient colors={LinearColor} style={styles.MainView}>
                     <Feather
                         onPress={() => {
-                            console.log("this.props.", this.props.navigation);
                             this.props.navigation.navigation.navigate("Message")
                         }
                         }

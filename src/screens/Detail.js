@@ -36,7 +36,7 @@ import Storage from '../helpers/Storage';
 import Slider from './Slider';
 import * as VehicleLooks from '../services/SearchVehicleType';
 import * as VehicleService from '../services/Vehicle';
-
+import * as MessagesService from '../services/Messages';
 import RNIap, {
     InAppPurchase,
     PurchaseError,
@@ -106,6 +106,8 @@ export default class Detail extends React.Component {
             financeDetail: [],
             userMileage: '',
             postcode: '',
+            myConversation: [],
+            conversationId:0
         }
         this.AddFavourite = this.AddFavourite.bind(this);
         this.RemoveFavourite = this.RemoveFavourite.bind(this);
@@ -176,6 +178,7 @@ export default class Detail extends React.Component {
                 shareLoader: false
             }, () => {
                 this.favIcon();
+                this.getMyConversations();
             })
         }
         catch (e) {
@@ -363,6 +366,52 @@ export default class Detail extends React.Component {
 
         })
   }
+      getMyConversations = () => {
+        try {
+            MessagesService.MyConversations().then(respose => {
+                if (respose) {
+                    if (respose.success) {
+                        this.state.myConversation = respose.conversations.reverse()
+                        var conversation = this.state.myConversation.sort((a, b) => new Date(b.mostRecentMessageDate) - new Date(a.mostRecentMessageDate))
+                        this.state.myConversation = conversation
+                        if (this.state.ownerId != this.state.userId) {
+                            let conversationId = 0
+                            for (let index = 0; index < conversation.length; index++) {
+                               for (let j = 0; j < conversation[index].members.length; j++) {
+                                    if (this.state.ownerId == conversation[index].members[j].user.userId) {
+                                        conversationId = conversation[index]
+                                        this.state.conversationId = conversationId.id
+                                        this.setState({
+                                            conversationId: conversationId.id
+                                        })
+                                     
+                                        return
+                                    }
+                                }
+                            }
+                        }
+
+
+
+
+
+
+                    }
+                }
+                else {
+                    this.setState({
+                        isLoad: false
+                    })
+                }
+            })
+        }
+        catch (e) {
+            this.setState({
+                isLoad: false
+            })
+            console.log("get conversation error", e.message)
+        }
+    }
 
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;

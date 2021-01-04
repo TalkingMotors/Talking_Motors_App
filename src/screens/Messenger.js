@@ -403,12 +403,15 @@ export default class Messenger extends React.Component {
             isLoad: true
         })
         MessagesService.sendMessage(params).then(response => {
+            this.state.conversationId = response.conversation.id
             this.setState(prevState => ({
                 messages: [...prevState.messages, response.conversationMessage],
                 typeMessage: "",
                 isLoad: false,
-                sendButtonVisible: false
+                sendButtonVisible: false,
+                conversationId:response.response.conversation.id
             }));
+            
             this.getConverationDetail(response.conversation.id)
         })
     }

@@ -124,6 +124,8 @@ const styles = StyleSheet.create({
     },
     Icons: {
         marginLeft: 10,
+        backgroundColor:'blue',
+        paddingHorizontal:20,
     },
     ScreenName: {
         paddingHorizontal: 15,

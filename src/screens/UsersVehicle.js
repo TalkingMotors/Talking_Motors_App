@@ -23,6 +23,7 @@ import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
 import * as VehicleService from '../services/Vehicle';
 import VehicleImage from '../components/VehicleImage';
+const screen_width = Dimensions.get('window').width;
 const moment = require('moment-timezone');
 export default class UsersVehicle extends React.Component {
     constructor(props) {

@@ -276,6 +276,8 @@ const styles = StyleSheet.create({
     },
     Icons: {
         marginLeft: 10,
+        paddingHorizontal:10,
+        paddingVertical:5
     },
     ScreenName: {
         paddingHorizontal: 15,

@@ -815,7 +815,7 @@ console.log("postcodes",postcodes);
                         <Text >For Sale? </Text>
                         <Switch
                             // style={{ marginTop: 30 }}
-                            thumbColor={Apptheme}
+                            thumbColor={lightText}
                             onValueChange={this.toggleSwitch}
                             value={this.state.switchValue} />
                     </View>

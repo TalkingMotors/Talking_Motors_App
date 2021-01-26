@@ -283,7 +283,7 @@ export default class EditVehicle extends React.Component {
                     <View style={[styles.ButtonView, { alignItems: 'center', justifyContent: 'center', marginTop: 20, flexDirection: 'row', }]}>
                         <Text >For Sale? </Text>
                         <Switch
-                            thumbColor={Apptheme}
+                            thumbColor={lightText}
                             onValueChange={this.toggleSwitch}
                             value={this.state.saleSwitch} />
                     </View>
@@ -408,7 +408,7 @@ export default class EditVehicle extends React.Component {
                                         }
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
                                     this.DateModal()
@@ -426,7 +426,7 @@ export default class EditVehicle extends React.Component {
                                         }
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
                                     this.DateModal()
@@ -444,7 +444,7 @@ export default class EditVehicle extends React.Component {
 
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 {this.state.isInsurance &&
                                     <CalenderPicker
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
         height: 50,
     },
     dateHeading: {
-        paddingLeft: 10, color: Apptheme, fontWeight: "bold"
+        paddingLeft: 10, color: darkText, fontWeight: "bold"
     },
     menuLoaderView: {
         position: 'absolute',

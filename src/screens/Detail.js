@@ -49,6 +49,7 @@ import RNIap, {
     purchaseUpdatedListener,
 } from 'react-native-iap';
 export var GetSpecificVehicle;
+var screen_height = Dimensions.get('window').height
 const itemSkus = Platform.select({
     ios: [
         'uk.co.talkingMotors.talkingMotors.iapFinanceCheck',
@@ -107,9 +108,11 @@ export default class Detail extends React.Component {
             userMileage: '',
             postcode: '',
             myConversation: [],
-            conversationId:0
+            conversationId:0,
+            isImageFull:false
         }
         this.AddFavourite = this.AddFavourite.bind(this);
+        this.imageFullModal = this.imageFullModal.bind(this);
         this.RemoveFavourite = this.RemoveFavourite.bind(this);
         this.shareAction = this.shareAction.bind(this);
         this.onShare = this.onShare.bind(this);
@@ -121,6 +124,11 @@ export default class Detail extends React.Component {
     ToggleModal = () => {
         this.setState({
             isModal: !this.state.isModal
+        })
+    }
+    imageFullModal = () => {
+        this.setState({
+            isImageFull: !this.state.isImageFull
         })
     }
     getItems = async () => {
@@ -634,16 +642,24 @@ export default class Detail extends React.Component {
                             <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
                                 {(this.state.image.length > 1) ?
                                     <View>
-
-                                        <Text style={{ zIndex: 2, position: 'absolute', top: 22, color: '#fefefe', fontSize: 14, rotation: -40, left: 4, borderRadius: 3, backgroundColor: Apptheme, paddingVertical: 2, paddingHorizontal: 5, }}>Premium</Text>
+                                         <Text style={{ zIndex: 2, position: 'absolute', top: 22, color: '#fefefe', fontSize: 14, rotation: -40, left: 4, borderRadius: 3, backgroundColor: Apptheme, paddingVertical: 2, paddingHorizontal: 5, }}>Premium</Text>
                                         <Slider Image={this.state.image} />
                                     </View>
                                     :
+                                    <TouchableOpacity activeOpacity={1}  style={{width:'100%',height:'100%'}}
+                                        onPress={() => {
+                                            if (this.state.image[0].url != undefined) {
+                                                this.imageFullModal()
+                                            }
+                                        }}
+                                        > 
                                     <Image
+                                       
                                         resizeMode='cover'
                                         style={{ width: '100%', height: '100%' }}
                                         source={{ uri: this.state.image[0].url }}
                                     />
+                                   </TouchableOpacity>
                                 }
                             </Transition>
                             :
@@ -888,7 +904,7 @@ export default class Detail extends React.Component {
                         <Text >For Sale: </Text>
                         {(this.state.userId == this.state.ownerId) ?
                             <Switch
-                                thumbColor={Apptheme}
+                                thumbColor={lightText}
                                 onValueChange={this.toggleSwitch}
                                 value={this.state.forSale} />
                             :
@@ -1104,6 +1120,50 @@ export default class Detail extends React.Component {
                             </View>
                         </View >
                     </SafeAreaView>
+                </Modal>
+
+
+
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isImageFull}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.imageFullModal()
+                    }}
+                >
+                    <SafeAreaView>
+                        <View style={{ backgroundColor: lightText, height: screen_height, width: '100%', }}>
+                            <View style={{ width: '100%', height: 50, flexDirection: 'row', alignItems: 'center', paddingLeft: 20, backgroundColor: Apptheme }}>
+                                <Feather
+                                    onPress={() => this.imageFullModal()}
+                                    name="arrow-left" color={lightText} size={22} style={styles.Icons} />
+                                <Text style={{ color: lightText, fontSize: 16, paddingLeft: 10, fontWeight: 'bold' }}> {this.state.make + " " + this.state.model}</Text>
+                            </View>
+                            <View style={{ width: '100%', height: screen_height - 220, backgroundColor: lightText,marginTop:40 }}>
+                            {!Utilities.stringIsEmpty(this.state.image[0]) ?
+                                <Image
+                                    resizeMode='cover'
+                                    style={{ width: '100%', height: '100%' }}
+                                    source={{ uri: this.state.image[0].url }}
+                                />
+                                :
+                                <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: lightBg }}>
+                                <FontAwesome name="car" size={150} color={Apptheme} />
+                            </View>
+    }
+                            </View>
+                            <View style={{ width: '100%', backgroundColor: 'gray', paddingVertical: 10, marginTop: 10, alignItems: 'center' }}>
+                                <Text style={{ color: lightText, fontSize: 14, fontWeight: 'bold' }}>
+                                    {this.state.make + " " + this.state.model + " " + this.state.engineSize + " " + this.state.derivative}
+                                </Text>
+                            </View>
+                        </View>
+
+
+                    </SafeAreaView>
+                      
                 </Modal>
             </View>
         )

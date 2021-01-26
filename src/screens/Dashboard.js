@@ -186,7 +186,7 @@ export default class Dashboard extends React.Component {
             transmissionType = item.transmissionType + " . ";
         }
         if (!Utilities.stringIsEmpty(item.engineSize) || item.engineSize > 0) {
-            engineSize = item.engineSize + "| . ";
+            engineSize = item.engineSize + " L . ";
         }
         if (!Utilities.stringIsEmpty(item.fuelType) || item.fuelType > 0) {
             fuelType = item.fuelType + "  ";

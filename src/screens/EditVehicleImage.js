@@ -43,6 +43,7 @@ export default class EditVehicleImage extends React.Component {
             selectedPosition:0,
             ModalTitle:'',
             selectedpositionUrl:'',
+            base64Image: '',
             allImages: [{ position: 1, name: "IMAGE 1", thumbUrl: '', url: '' },
             { position: 2, name: "IMAGE 2", thumbUrl: '', url: '' }, { position: 3, name: "IMAGE 3", thumbUrl: '', url: '' },
             { position: 4, name: "IMAGE 4", thumbUrl: '', url: '' }, { position: 5, name: "IMAGE 5", thumbUrl: '', url: '' },
@@ -51,6 +52,7 @@ export default class EditVehicleImage extends React.Component {
             { position: 9, name: "IMAGE 9", thumbUrl: '', url: '' },]
 
         }
+        
     }
     componentWillMount() {
         var params = this.props.navigation.state.params.item
@@ -64,24 +66,24 @@ export default class EditVehicleImage extends React.Component {
             this.setState({
                 PremiumDate:PremiumDate
             })
-        for (var i = 0; i < this.state.allImages.length; i++) {
-            for(var j=0 ; j<getAllImages.length ; j ++){
-                if(this.state.allImages[i].position ==getAllImages[j].position){
-                    this.state.allImages[i]=getAllImages[j]
+            for (var i = 0; i < this.state.allImages.length; i++) {
+                for(var j=0 ; j<getAllImages.length ; j ++){
+                    if(this.state.allImages[i].position ==getAllImages[j].position){
+                        this.state.allImages[i]=getAllImages[j]
+                    }
+                }
                 }
             }
+            else{
+                this.setState({
+                    allImages:[],
+                })
             }
-        }
-        else{
-            this.setState({
-                allImages:[],
-            })
-        }
-        // let params = undefined
-        if (!Utilities.stringIsEmpty(params)) {
-            if(params.position !=0){
-                params = ''
-            }
+            // let params = undefined
+            if (!Utilities.stringIsEmpty(params)) {
+                if(params.position !=0){
+                    params = ''
+                }
             this.setState({
                 image: params,
                 vehicleId: vehicleData.id,
@@ -98,7 +100,7 @@ export default class EditVehicleImage extends React.Component {
     openCamera = () => {
         try {
             ImagePicker.clean();
-                this.ToggleModal();
+            this.ToggleModal();
             ImagePicker.openCamera({
                 width: 200,
                 height: 200,
@@ -108,8 +110,12 @@ export default class EditVehicleImage extends React.Component {
             }).then(imageDetail => {
                 if (Object.keys(imageDetail).length > 0) {
                     var base64Image = `${imageDetail.data}`
-                 
-                    this.InsertVehicleImage(base64Image)
+                    if (this.state.selectedPosition == 0) {
+                        this.renderImage(base64Image, imageDetail)
+                    }
+                    else {
+                        this.InsertVehicleImage(base64Image)
+                    }
                 }
 
             });
@@ -132,7 +138,12 @@ export default class EditVehicleImage extends React.Component {
                 }).then(imageDetail => {
                     if (Object.keys(imageDetail).length > 0) {
                         var base64Image = `${imageDetail.data}`
-                        this.InsertVehicleImage(base64Image)
+                        if (this.state.selectedPosition == 0) {
+                            this.renderImage(base64Image, imageDetail)
+                        }
+                        else {
+                            this.InsertVehicleImage(base64Image)
+                        }
                     }
 
                 });
@@ -142,12 +153,38 @@ export default class EditVehicleImage extends React.Component {
             console.log("openGallery EditVehicleImage", e)
         }
     }
+    renderImage = (base64Image, imageDetail) => {
+        try {
+            var params = {
+                image: base64Image,
+                position: this.state.selectedPosition
+            }
+
+            let obj = {
+                url: imageDetail.path
+            }
+
+            this.setState({
+                image: obj,
+                base64Image: base64Image
+            })
+            this.setState({
+                isLoader: true
+            })
+        }
+        catch (e) {
+            this.setState({
+                isLoader: false
+            })
+            console.log("renderImage EditVehicleImage", e)
+        }
+
+    }
 
     deletePhoto = async () => {
         try {
             if (this.state.selectedPosition == 0) {
                 var getId = this.state.image.id
-
             }
             else {
                 var index = this.state.allImages.findIndex(x => x.position == this.state.selectedPosition);
@@ -186,35 +223,38 @@ export default class EditVehicleImage extends React.Component {
     }
 
     InsertVehicleImage = async (image) => {
-        try{
-        var params = {
-            vehicleId: this.state.vehicleId,
-            image: image,
-            position: this.state.selectedPosition
-        }
-        this.setState({
-            isLoader:true
-        })
-         var response = await VehicleService.InsertVehicleImage(params)
-        if (response.success) {
-            if (this.state.selectedPosition == 0) {
-                this.setState({
-                    image: response.vehicleImage,
-                    isLoader: false
-                })
+        try {
+            var params = {
+                vehicleId: this.state.vehicleId,
+                image: image,
+                position: this.state.selectedPosition
             }
-            else {
-                let index = this.state.allImages.findIndex(x => x.position == response.vehicleImage.position);
-                this.state.allImages.splice(index, 1, response.vehicleImage)
-                this.setState({
-                    allImages: this.state.allImages
-                })
-            }
-        }
-        }
-        catch(e){
             this.setState({
-                isLoader:false
+                isLoader: true
+            })
+            var response = await VehicleService.InsertVehicleImage(params)
+            if (response.success) {
+                if (this.state.selectedPosition == 0) {
+                    this.setState({
+                        image: response.vehicleImage,
+                        isLoader: false,
+                        base64Image:''
+                    })
+                }
+                else {
+                    let index = this.state.allImages.findIndex(x => x.position == response.vehicleImage.position);
+                    this.state.allImages.splice(index, 1, response.vehicleImage)
+                    this.setState({
+                        allImages: this.state.allImages,
+                        base64Image:''
+                    })
+                }
+            }
+        }
+        catch (e) {
+            this.setState({
+                isLoader: false,
+                
             })
             console.log("InsertVehicleImage EditVehicleImage", e)
         }
@@ -224,7 +264,12 @@ export default class EditVehicleImage extends React.Component {
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Edit Vehicle Image" navigation={this.props} />
-
+                {this.state.base64Image != '' &&
+                    <FontAwesome
+                        onPress={() => this.InsertVehicleImage(this.state.base64Image)}
+                        name="check" color={lightText} size={20} style={{ padding: 10, position: 'absolute', top: 50, right: 30, zIndex: 2 }}
+                    />
+                }
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -235,111 +280,113 @@ export default class EditVehicleImage extends React.Component {
                 }
                 <ScrollView keyboardShouldPersistTaps="always">
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center', borderBottomColor: "#d2d2d2", borderBottomWidth: 1 }}>
+
+
                         {!Utilities.stringIsEmpty(this.state.image) ?
                             <Transition >
                                 <TouchableOpacity
-                                style={{width: '100%', height: 270,alignItems: 'center',}}
-                                onPress={()=>{
-                                    this.setState({
-                                        ModalTitle:"Edit Main Picture",
-                                        selectedPosition:0,
-                                        selectedpositionUrl:this.state.image.url
-                                        
-                                    },()=>{
-                                       this.ToggleModal()
-                                    })
-                                }}
+                                    style={{ width: '100%', height: 270, alignItems: 'center', }}
+                                    onPress={() => {
+                                        this.setState({
+                                            ModalTitle: "Edit Main Picture",
+                                            selectedPosition: 0,
+                                            selectedpositionUrl: this.state.image.url
+
+                                        }, () => {
+                                            this.ToggleModal()
+                                        })
+                                    }}
                                 >
-                                     <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20,position:'absolute',zIndex:2,top:"40%",textAlignVertical:'center'}}>+</Text>
-                                     <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20,position:'absolute',zIndex:2,top:"50%",textAlignVertical:'center'}}>Edit Main Picture</Text>
-                                <Image
-                                    resizeMode='cover'
-                                    style={{ width: '100%', height: '100%' }}
-                                    source={{ uri: this.state.image.url }}
-                                />
+                                    <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20, position: 'absolute', zIndex: 2, top: "40%", textAlignVertical: 'center' }}>+</Text>
+                                    <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20, position: 'absolute', zIndex: 2, top: "50%", textAlignVertical: 'center' }}>Edit Main Picture</Text>
+                                    <Image
+                                        resizeMode='cover'
+                                        style={{ width: '100%', height: '100%' }}
+                                        source={{ uri: this.state.image.url }}
+                                    />
                                 </TouchableOpacity>
                             </Transition>
                             :
-                            <TouchableOpacity onPress={()=>{
+                            <TouchableOpacity onPress={() => {
                                 this.setState({
-                                    ModalTitle:"Edit Main Picture",
-                                    selectedPosition:0,
-                                    selectedpositionUrl:''
-                                    
-                                },()=>{
-                                   this.ToggleModal()
+                                    ModalTitle: "Edit Main Picture",
+                                    selectedPosition: 0,
+                                    selectedpositionUrl: ''
+
+                                }, () => {
+                                    this.ToggleModal()
                                 })
-                            }} style={{ paddingTop:20, alignItems: 'center', width: '100%', height: '100%',  backgroundColor:'#C0C0C0', }}>
-                              <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20,position:'absolute',zIndex:2,top:"65%",textAlignVertical:'center'}}>+</Text>
-                                     <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20,position:'absolute',zIndex:2,top:"75%",textAlignVertical:'center'}}>Edit Main Picture</Text>
+                            }} style={{ paddingTop: 20, alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#C0C0C0', }}>
+                                <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20, position: 'absolute', zIndex: 2, top: "65%", textAlignVertical: 'center' }}>+</Text>
+                                <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20, position: 'absolute', zIndex: 2, top: "75%", textAlignVertical: 'center' }}>Edit Main Picture</Text>
                                 <FontAwesome name="car" size={150} color={Apptheme} />
                             </TouchableOpacity>
                         }
 
                     </View>
-                    
-                        {this.state.PremiumDate > 0 &&
-                   
-                    <FlatList
-                        data={this.state.allImages}
-                        listKey={(item, index) => 'enterprise-' + index.toString()}
-                        keyExtractor={(item, index) => index.toString()}
-                        initialNumToRender={5}
-                        ref={(ref) => { this.ListView_Ref = ref; }}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={numOfColumns}
-                        renderItem={({ item, index }) => (
 
-                            <View key={index} style={styles.subImage}>
-                                { (item.url=="" )?
-                               
-                                <TouchableOpacity 
-                                onPress={()=>{
-                                    this.setState({
-                                        ModalTitle:"Edit Image "+item.position,
-                                        selectedPosition:item.position,
-                                        selectedpositionUrl:''
-                                    },()=>{
-                                       this.ToggleModal()
-                                    })
-                                }}
-                                style={{alignItems:'center',}}>
-                                <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20 }}>+</Text>
-                                <Text style={{ color: '#fff' }}>
-                                    {item.name}
-                                </Text>
-                                </TouchableOpacity>
-                                 :
-                                 <TouchableOpacity 
-                                 onPress={()=>{
-                                     this.setState({
-                                         ModalTitle:"Edit Image "+item.position,
-                                         selectedPosition:item.position,
-                                         selectedpositionUrl:item.url
-                                     },()=>{
+                    {this.state.PremiumDate > 0 &&
+
+                            <FlatList
+                            data={this.state.allImages}
+                            listKey={(item, index) => 'enterprise-' + index.toString()}
+                            keyExtractor={(item, index) => index.toString()}
+                            initialNumToRender={5}
+                            ref={(ref) => { this.ListView_Ref = ref; }}
+                            showsVerticalScrollIndicator={false}
+                            numColumns={numOfColumns}
+                            renderItem={({ item, index }) => (
+
+                                <View key={index} style={styles.subImage}>
+                                    { (item.url=="" )?
+                                
+                                    <TouchableOpacity 
+                                    onPress={()=>{
+                                        this.setState({
+                                            ModalTitle:"Edit Image "+item.position,
+                                            selectedPosition:item.position,
+                                            selectedpositionUrl:''
+                                        },()=>{
                                         this.ToggleModal()
-                                     })
-                                     
-                                 }}
-                                 style={{height:'100%',width:'100%'}}>
-                                      <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20,position:'absolute',zIndex:2,top:40,left:50 }}>+</Text>
-                                 <Image
-                                 resizeMode='cover'
-                                 style={{ width: '100%', height: '100%' }}
-                                 source={{ uri: item.url }}
-                             >
-                                 
-                             </Image>
-                              </TouchableOpacity>
-                                }
-                            </View>
+                                        })
+                                    }}
+                                    style={{alignItems:'center',}}>
+                                    <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20 }}>+</Text>
+                                    <Text style={{ color: '#fff' }}>
+                                        {item.name}
+                                    </Text>
+                                    </TouchableOpacity>
+                                    :
+                                    <TouchableOpacity 
+                                    onPress={()=>{
+                                        this.setState({
+                                            ModalTitle:"Edit Image "+item.position,
+                                            selectedPosition:item.position,
+                                            selectedpositionUrl:item.url
+                                        },()=>{
+                                            this.ToggleModal()
+                                        })
+                                        
+                                    }}
+                                    style={{height:'100%',width:'100%'}}>
+                                        <Text style={{ fontWeight: 'bold', color: "#fff", fontSize: 20,position:'absolute',zIndex:2,top:40,left:50 }}>+</Text>
+                                    <Image
+                                    resizeMode='cover'
+                                    style={{ width: '100%', height: '100%' }}
+                                    source={{ uri: item.url }}
+                                >
+
+                                            </Image>
+                                        </TouchableOpacity>
+                                    }
+                                </View>
 
 
-                        )
-                        }
-                    />
-    }
-                   {/* <View style={styles.TextFieldView}>
+                            )
+                            }
+                        />
+                    }
+                    {/* <View style={styles.TextFieldView}>
                       <View style={styles.LoginButtonView}>
                             <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.ToggleModal() }} >
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
@@ -363,16 +410,16 @@ export default class EditVehicleImage extends React.Component {
                 </ScrollView>
 
                 {this.state.ModalOpen &&
-                    <View style={{ position: 'absolute', top:(this.state.selectedpositionUrl=="")? '30%':'20%', height:(this.state.selectedpositionUrl=="")?260:320, width: '80%',marginHorizontal:'10%' }}>
-                        <SafeAreaView style={{borderColor:Apptheme,borderWidth:2, borderRadius: 10, height: '100%', width: '96%', marginHorizontal: '2%', backgroundColor: "#fff" }}>
-                               <View style={{margin:10,}}>
-                                 <Text style={{fontWeight:'bold',textAlign:'center',fontSize:18}}>
-                                   {this.state.ModalTitle}
-                                </Text>
-                               </View>
-                            
+                 <View style={{ position: 'absolute', top:(this.state.selectedpositionUrl=="")? '30%':'20%', height:(this.state.selectedpositionUrl=="")?260:320, width: '80%',marginHorizontal:'10%' }}>
+                 <SafeAreaView style={{borderColor:Apptheme,borderWidth:2, borderRadius: 10, height: '100%', width: '96%', marginHorizontal: '2%', backgroundColor: "#fff" }}>
+                        <View style={{margin:10,}}>
+                          <Text style={{fontWeight:'bold',textAlign:'center',fontSize:18}}>
+                            {this.state.ModalTitle}
+                         </Text>
+                        </View>
+
                             <View style={styles.ModalMainRow}>
-                            <View style={styles.ModalSubRow}>
+                                <View style={styles.ModalSubRow}>
                                     <TouchableOpacity
                                         onPress={() => this.openCamera()}
                                         style={styles.ModalButton}>
@@ -384,39 +431,39 @@ export default class EditVehicleImage extends React.Component {
                                     </TouchableOpacity>
                                 </View>
 
-                            <View style={styles.ModalSubRow}>
-                                <TouchableOpacity
-                                    onPress={() => this.openGallery()}
-                                    style={styles.ModalButton}>
-                                    <FontAwesome name="photo" color={Apptheme} style={{ fontSize: 30, }} />
-                                    <Text style={styles.ModalText}>
-                                        GALLERY
-                                             </Text>
-                                </TouchableOpacity>
-                            </View>
-                            {this.state.selectedpositionUrl != "" &&
                                 <View style={styles.ModalSubRow}>
                                     <TouchableOpacity
-                                        onPress={() => this.deletePhoto()}
+                                        onPress={() => this.openGallery()}
                                         style={styles.ModalButton}>
-                                        <AntDesign name="delete" color={Apptheme} style={{ fontSize: 30, }} />
+                                        <FontAwesome name="photo" color={Apptheme} style={{ fontSize: 30, }} />
                                         <Text style={styles.ModalText}>
-                                            DELETE THIS PHOTO
+                                            GALLERY
                                              </Text>
                                     </TouchableOpacity>
                                 </View>
-                            }
-                                
+                                {this.state.selectedpositionUrl != "" &&
+                                    <View style={styles.ModalSubRow}>
+                                        <TouchableOpacity
+                                            onPress={() => this.deletePhoto()}
+                                            style={styles.ModalButton}>
+                                            <AntDesign name="delete" color={Apptheme} style={{ fontSize: 30, }} />
+                                            <Text style={styles.ModalText}>
+                                                DELETE THIS PHOTO
+                                             </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                }
+
 
                             </View>
                             {/* <View style={{ justifyContent: 'center', alignItems: 'center',marginTop:10 }}> */}
-                                <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: 40, }} activeOpacity={1} onPress={() => this.ToggleModal()} >
-                                    <View style={styles.headerModalView}>
-                                        <Text style={{ fontSize: 20, color: '#333' }}>
-                                            CANCEL
+                            <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: 40, }} activeOpacity={1} onPress={() => this.ToggleModal()} >
+                                <View style={styles.headerModalView}>
+                                    <Text style={{ fontSize: 20, color: '#333' }}>
+                                        CANCEL
                                         </Text>
-                                    </View>
-                                </TouchableOpacity>
+                                </View>
+                            </TouchableOpacity>
                             {/* </View> */}
                         </SafeAreaView>
                     </View>

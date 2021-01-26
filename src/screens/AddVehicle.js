@@ -63,7 +63,7 @@ export default class AddVehicle extends React.Component {
             isInsurance: false,
             imageData: '',
             param: this.props.navigation.state.params.param,
-            display:false
+            display:true
 
 
         }
@@ -174,6 +174,7 @@ export default class AddVehicle extends React.Component {
             {
                 // PremiumDate: this.state.PremiumDate,
                 // allImages: this.state.allImages,
+                imageData:this.state.imageData,
                 item: this.state.image,
                 data: this.props.navigation.state.params.item,
                 addImage: this.addImage
@@ -196,15 +197,18 @@ export default class AddVehicle extends React.Component {
                 motDueDate: this.state.motDueDate,
                 taxDueDate: this.state.taxDueDate,
             }
-            // console.log("param",param);
-            // console.log("this.state.allData",this.state.allData);
             let data = Object.assign({}, param, this.state.allData);
             var response = await VehicleService.addNewVehicle(data)
             if (response.success) {
                 if (this.state.imageData != "") {
                     this.state.imageData.vehicleId = response.vehicle.id
-                    var res = await VehicleService.InsertVehicleImage(this.state.imageData);
-                    if (res.success) {
+                   let imageData= {
+                        vehicleId:response.vehicle.id,
+                        position:0,
+                        image:this.state.imageData.image.image
+                    }
+                    var res = await VehicleService.InsertVehicleImage(imageData);
+                   if (res.success) {
                         // this.props.navigation.navigate('Detail', { item: response.vehicle, index: 0, parent: "talk" });
                         const resetAction = StackActions.reset({
                             index: 1,
@@ -352,9 +356,7 @@ export default class AddVehicle extends React.Component {
                             value={this.state.saleSwitch} />
                     </View> */}
 
-                    <View>
-                        <Text style={{ color: Apptheme, fontSize: 20, textAlign: 'center', fontWeight: 'bold', marginTop: 10 }}>VEHICLE DETAILS</Text>
-                    </View>
+                  
 
                     <View style={styles.TextFieldView}>
                         {!this.state.display &&
@@ -451,9 +453,28 @@ export default class AddVehicle extends React.Component {
                         {this.state.display &&
                             <View>
                                 <View>
+                                    <Text style={{ color: Apptheme, fontSize: 20, textAlign: 'center', fontWeight: 'bold' }}>VEHICLE DETAILS</Text>
+                                </View>
+                                <TextField
+                                label='Description'
+                                fontSize={15}
+                                keyboardType='default'
+                                tintColor={Apptheme}
+                                baseColor={darkText}
+                                style={{fontWeight:'bold'}}
+                                errorColor="red"
+                                activeLineWidth={2}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                labelFontSize={15}
+                                value={description}
+                                onChangeText={val => {
+                                    this.onChangeText('description', val)
+                                }}
+                            />
+                            <View>
                                     <Text style={{ color: Apptheme, fontSize: 20, textAlign: 'center', fontWeight: 'bold' }}>IMPORTANT DATES</Text>
                                 </View>
-
                                 <TouchableOpacity onPress={() => {
                                     this.DateModal()
                                     this.getDate(1)
@@ -469,7 +490,7 @@ export default class AddVehicle extends React.Component {
                                         }
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
                                     this.DateModal()
@@ -487,7 +508,7 @@ export default class AddVehicle extends React.Component {
                                         }
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
                                     this.DateModal()
@@ -505,7 +526,7 @@ export default class AddVehicle extends React.Component {
 
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 {this.state.isInsurance &&
                                     <CalenderPicker
@@ -522,7 +543,7 @@ export default class AddVehicle extends React.Component {
                             <TouchableOpacity style={styles.GradientButtonView} onPress={() => this.navigateToVehicleImage()} >
                                 <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                     <Text style={styles.ButtonInnerText}>
-                                        ADD PHOTO
+                                        ADD PHOTO {this.state.imageData != "" ? "(1)" : ""}
                                     </Text>
 
                                 </LinearGradient>
@@ -728,7 +749,7 @@ const styles = StyleSheet.create({
         height: 50,
     },
     dateHeading: {
-        paddingLeft: 10, color: Apptheme, fontWeight: "bold"
+        paddingLeft: 10, color: darkText, fontWeight: "bold"
     },
     menuLoaderView: {
         position: 'absolute',

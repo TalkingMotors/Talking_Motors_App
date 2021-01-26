@@ -43,6 +43,8 @@ export default class AddVehicleImage extends React.Component {
             selectedPosition:0,
             ModalTitle:'',
             selectedpositionUrl:'',
+            base64Image: '',
+            imageData:this.props.navigation.state.params.imageData
             // allImages: [{ position: 1, name: "IMAGE 1", thumbUrl: '', url: '' },
             // { position: 2, name: "IMAGE 2", thumbUrl: '', url: '' }, { position: 3, name: "IMAGE 3", thumbUrl: '', url: '' },
             // { position: 4, name: "IMAGE 4", thumbUrl: '', url: '' }, { position: 5, name: "IMAGE 5", thumbUrl: '', url: '' },
@@ -51,43 +53,21 @@ export default class AddVehicleImage extends React.Component {
             // { position: 9, name: "IMAGE 9", thumbUrl: '', url: '' },]
 
         }
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            this.componentDidAppear()
+        })
     }
-    componentWillMount() {
+    componentDidAppear() {
         var params = this.props.navigation.state.params.item
         let vehicleData = this.props.navigation.state.params.data
-        let getAllImages = this.props.navigation.state.params.allImages
-        // let PremiumDate = this.props.navigation.state.params.PremiumDate
-        // this.setState({
-        //     vehicleId: vehicleData.id,
-        // })
-        // if(PremiumDate > 0){
-        //     this.setState({
-        //         PremiumDate:PremiumDate
-        //     })
-        // for (var i = 0; i < this.state.allImages.length; i++) {
-        //     for(var j=0 ; j<getAllImages.length ; j ++){
-        //         if(this.state.allImages[i].position ==getAllImages[j].position){
-        //             this.state.allImages[i]=getAllImages[j]
-        //         }
-        //     }
-        //     }
-        // }
-        // else{
-        //     this.setState({
-        //         allImages:[],
-        //     })
-        // }
-        // let params = undefined
-        // if (!Utilities.stringIsEmpty(params)) {
-        //     if(params.position !=0){
-        //         params = ''
-        //     }
-        //     this.setState({
-        //         image: params,
-        //         vehicleId: vehicleData.id,
-        //         PremiumDate:PremiumDate
-        //     })
-        // }
+        let getAllImages = this.props.navigation.state.params.allImages;
+        let imageData = this.props.navigation.state.params.imageData
+        if(params=='' && imageData !=''){
+           this.setState({
+                image:imageData.image
+            })
+        }
+      
     }
 
     ToggleModal() {
@@ -108,14 +88,14 @@ export default class AddVehicleImage extends React.Component {
             }).then(imageDetail => {
                 if (Object.keys(imageDetail).length > 0) {
                     var base64Image = `${imageDetail.data}`
-                 
-                    this.InsertVehicleImage(base64Image)
+                    this.renderImage(base64Image, imageDetail)
+                    // this.InsertVehicleImage(base64Image)
                 }
 
             });
         }
         catch (e) {
-            console.log("openCamera Exception EditVehicleImage", e)
+            console.log("openCamera Exception AddVehicleImage", e)
         }
     }
     openGallery = () => {
@@ -132,17 +112,45 @@ export default class AddVehicleImage extends React.Component {
                 }).then(imageDetail => {
                     if (Object.keys(imageDetail).length > 0) {
                         var base64Image = `${imageDetail.data}`
-                        this.InsertVehicleImage(base64Image)
+                        // this.InsertVehicleImage(base64Image)
+                        this.renderImage(base64Image, imageDetail)
                     }
 
                 });
             }
             )
         } catch (e) {
-            console.log("openGallery EditVehicleImage", e)
+            console.log("openGallery AddVehicleImage", e)
         }
     }
+    renderImage = (base64Image, imageDetail) => {
+        try {
+            var params = {
+                image: base64Image,
+                position: this.state.selectedPosition,
+                url :imageDetail.path
+            }
 
+            let obj = {
+                url: imageDetail.path
+            }
+
+            this.setState({
+                image: params,
+                base64Image: base64Image
+            })
+            this.setState({
+                isLoader: true
+            })
+        }
+        catch (e) {
+            this.setState({
+                isLoader: false
+            })
+            console.log("renderImage AddVehicleImage", e)
+        }
+
+    }
     deletePhoto = async () => {
         try {
             if (this.state.selectedPosition == 0) {
@@ -189,13 +197,13 @@ export default class AddVehicleImage extends React.Component {
         try{
         var params = {
             // vehicleId: this.state.vehicleId,
+
             image: image,
             position: this.state.selectedPosition
         }
         this.setState({
             isLoader:true
         })
-            console.log("this.props",this.props);
             this.props.navigation.state.params.addImage(params)
             this.props.navigation.goBack();
             //  var response = await VehicleService.InsertVehicleImage(params)
@@ -219,15 +227,21 @@ export default class AddVehicleImage extends React.Component {
             this.setState({
                 isLoader:false
             })
-            console.log("InsertVehicleImage EditVehicleImage", e)
+            console.log("InsertVehicleImage AddVehicleImage", e)
         }
 
     }
     render() {
-        return (
+         return (
             <View style={styles.ParentView}>
-                <Topbar ParentPage="Add Vehicle Image" navigation={this.props} />
 
+                <Topbar ParentPage="Add Image" navigation={this.props} />
+                {this.state.base64Image != '' &&
+                    <FontAwesome
+                        onPress={() => this.InsertVehicleImage(this.state.image)}
+                        name="check" color={lightText} size={20} style={{ padding: 10, position: 'absolute', top: 50, right: 30, zIndex: 2 }}
+                    />
+                }
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator

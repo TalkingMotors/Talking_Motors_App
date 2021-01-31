@@ -409,7 +409,7 @@ export default class Messenger extends React.Component {
                 typeMessage: "",
                 isLoad: false,
                 sendButtonVisible: false,
-                conversationId:response.response.conversation.id
+                conversationId:this.state.conversationId
             }));
             
             this.getConverationDetail(response.conversation.id)

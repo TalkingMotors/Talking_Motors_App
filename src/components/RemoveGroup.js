@@ -32,7 +32,7 @@ export default class RemoveGroup extends Component {
         this.props.removeGroupToUser();
     }
     seletedItem = (item) => {
-        console.log("item", item)
+        // console.log("item", item)
         this.setState({
             seletedItem: item.user.userId
         })
@@ -44,8 +44,7 @@ export default class RemoveGroup extends Component {
         }
     }
     render() {
-        console.log("this.props.members", this.props.members);
-
+     
         return (
             <Modal
                 animationType="fade"

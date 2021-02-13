@@ -81,7 +81,6 @@ export default class CreateGroup extends React.Component {
         var registerNo = this.state.registerNo;
         if (!Utilities.stringIsEmpty(registerNo)) {
             var response = await vehicleService.searchRegisterNo(registerNo)
-            console.log("response", response);
             if (response.success) {
                 if (!Utilities.stringIsEmpty(response.vehicle)) {
                     this.addPerson()
@@ -127,10 +126,8 @@ export default class CreateGroup extends React.Component {
                 name: this.state.groupName,
                 users: arr
             }
-            console.log("param", param);
             var response = await MessagesService.createGroup(param)
-            console.log("response",response);
-            if(response.success){
+             if(response.success){
                 this.isgroupModal()
                 this.props.navigation.navigate("Messenger", { conversationId: response.conversation.id })
             }

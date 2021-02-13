@@ -9,6 +9,7 @@ import {
     Image,
     ActivityIndicator,
     StatusBar,
+    Linking,
     Keyboard,
     Dimensions,
     TouchableOpacity
@@ -25,13 +26,17 @@ import * as Utilities from "../helpers/Utilities";
 import * as UserService from '../services/User';
 import Constants from "../helpers/Constants";
 import Storage from '../helpers/Storage';
-import SplashScreen from 'react-native-splash-screen'
+import SplashScreen from 'react-native-splash-screen';
+import Firebase from 'react-native-firebase';
+import * as VehicleService from '../services/Vehicle';
+var _dynamicLinkListener;
 export default class Login extends React.Component {
 
     constructor(props) {
         super(props)
         this.state = {
             secureTextEntry: true,
+            count: 0,
             // username: "maazmehtabuddin95@gmail.com",
             // password: "12345678",
             // username: "Manawar@talkingmotorsapp.com",
@@ -59,6 +64,8 @@ export default class Login extends React.Component {
             }
             else {
                 SplashScreen.hide();
+                // this.setUpDynamicLink();
+                // this.setUpDeepLink();
             }
         }
         );
@@ -72,13 +79,15 @@ export default class Login extends React.Component {
                     Storage.userData = JSON.parse(response);
                     this.props.navigation.replace("Home")
                     SplashScreen.hide();
+                    // this.setUpDynamicLink();
+                    // this.setUpDeepLink();
 
                 }
             })
 
         }
     }
-    componentDidMount = () => {
+    componentWillMount() {
         this._didFocusSubscription = this.props.navigation.addListener('didFocus', payload => {
             if (Object.keys(Storage.userData).length > 0) {
 
@@ -89,10 +98,102 @@ export default class Login extends React.Component {
             else {
 
                 SplashScreen.hide();
+                this.setUpDynamicLink();
+                this.setUpDeepLink();
             }
         }
         );
+    }
+    componentDidMount = () => {
+
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
+            this.cleanUpDynamicLink();
+            this.cleanUpDeepLink();
+            Linking.removeEventListener('url', this.handleUrl);
+        })
         // SplashScreen.hide();
+    }
+    componentWillUnmount() {
+        // this.cleanUpDynamicLink();
+        // this.cleanUpDeepLink();
+        Linking.removeEventListener('url', this.handleUrl);
+    }
+
+    setUpDynamicLink = () => {
+        // will work when link is opening the app
+        Firebase.links()
+            .getInitialLink()
+            .then((url) => {
+                this.handleURL(url);
+            });
+
+        // listener will work when app is already opened or in background
+        this._dynamicLinkListener = Firebase.links().onLink((url) => {
+            this.handleURL(url);
+        });
+    }
+
+    setUpDeepLink = () => {
+        // will work when link is opening the app
+        Linking.getInitialURL().then(url => {
+            this.handleURL(url);
+        });
+
+        // listener will work when app is already opened or in background
+        Linking.addEventListener('url', this.handleURL);
+    }
+
+    cleanUpDynamicLink = () => {
+        this._dynamicLinkListener();
+    }
+
+    cleanUpDeepLink = () => {
+        Linking.removeEventListener('url', this.handleURL);
+    }
+
+    handleURL = (event) => {
+        let url = "";
+
+        if (!event) {
+            return "";
+        }
+
+        if (typeof event == 'string') {
+            url = event;
+            url = url.split('/');
+            if (url.length == 5) {
+
+                let registerNo = url[4]
+                if (this.state.count == 0) {
+                    this.setState({
+                        count: this.state.count + 1
+                    })
+                    this.navigateToDetailDeepLinking(registerNo)
+                }
+
+            }
+        } else {
+            url = (event.url) ? event.url : "";
+        }
+
+        if (!url) {
+            return;
+        }
+
+
+     }
+
+    navigateToDetailDeepLinking = async (registerNo) => {
+        try {
+            response = await VehicleService.searchRegisterNo(registerNo)
+            if (!Utilities.stringIsEmpty(response.vehicle) && response.success) {
+                this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+
+            }
+        }
+        catch (e) {
+            console.log("exception e", e)
+        }
     }
     onChangeText = (key, value) => {
         this.setState({ [key]: value, loginFail: false }, () => {
@@ -120,7 +221,6 @@ export default class Login extends React.Component {
             })
             let params = { "email": this.state.username, "password": this.state.password }
             UserService.login(params).then(response => {
-                console.log("response", response);
                 if (response) {
                     if (response.success) {
                         Storage.userData = response.user;
@@ -160,6 +260,7 @@ export default class Login extends React.Component {
                     translucent={false}
                     backgroundColor={Apptheme}
                 />
+                <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -200,7 +301,7 @@ export default class Login extends React.Component {
                     <View style={styles.TextFieldView}>
                         <TextField
                             label='Enter Email'
-                            fontSize={13}
+                            fontSize={15}
                             keyboardType='email-address'
                             tintColor={Apptheme}
                             baseColor={Apptheme}
@@ -208,7 +309,7 @@ export default class Login extends React.Component {
                             activeLineWidth={2}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            labelFontSize={13}
+                            labelFontSize={15}
                             value={this.state.username}
                             onChangeText={val => {
                                 this.onChangeText('username', val.trim())
@@ -230,14 +331,14 @@ export default class Login extends React.Component {
                             <TextField
                                 label='Enter Password'
                                 keyboardType='default'
-                                fontSize={13}
+                                fontSize={15}
                                 tintColor={Apptheme}
                                 baseColor={Apptheme}
                                 errorColor="red"
                                 activeLineWidth={2}
                                 autoCapitalize="none"
                                 autoCorrect={false}
-                                labelFontSize={13}
+                                labelFontSize={15}
                                 secureTextEntry={this.state.secureTextEntry}
                                 value={this.state.password}
                                 onChangeText={val => {

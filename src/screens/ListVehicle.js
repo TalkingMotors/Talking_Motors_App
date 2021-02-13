@@ -11,7 +11,8 @@ import {
     Dimensions,
     ActivityIndicator,
     Linking,
-    Alert
+    Alert,
+    TextInput
 
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -34,7 +35,6 @@ export default class ListVehicle extends React.Component {
             isLoader: false,
             param: 0
         }
-        console.log("!!", this.props.navigation.state.params)
         if (!Utilities.stringIsEmpty(this.props.navigation.state.params)) {
             this.state.param = 1;
             this.setState({
@@ -55,59 +55,63 @@ export default class ListVehicle extends React.Component {
 
 
     addVehicle = async () => {
-        this.setState({
-            isloader: true
-        })
-        var data = this.state.newVehicle;
-        var obj = {
-            bodyTypeID: data.bodyTypeId,
-            buildYear: data.buildYear,
-            colourChangeCount: data.colourChangeCount,
-            colourID: data.colourId,
-            driverSeatPositionID: data.driverSeatPositionId,
-            derivative: data.derivative,
-            description: "",
-            doorCount: data.doorCount,
-            driveTypeID: data.driveTypeId,
-            engineCylinderConfigID: data.engineCylinderConfigId,
-            engineFuelDeliveryID: data.engineFuelDeliveryId,
-            enginePowerBhp: data.enginePowerBhp,
-            engineSizeID: data.engineSizeId,
-            engineValveCount: data.engineValveCount,
-            exactModel: data.exactModel,
-            forSale: false,
-            fuelTypeID: data.fuelTypeId,
-            gearCount: data.gearCount,
-            makeID: data.makeId,
-            modelID: data.modelId,
-            postcode: "",
-            registrationNumber: this.state.registerNo.toUpperCase(),
-            roadFundLicenseBandID: data.roadFundLicenseBandId,
-            roadFundLicenseSixMonth: data.roadFundLicenseSixMonth,
-            roadFundLicenseTwelveMonth: data.roadFundLicenseTwelveMonth,
-            seatCount: data.seatCount,
-            stolen: true,
-            transmissionTypeID: data.transmissionTypeId,
-        }
-        var response = await VehicleService.addNewVehicle(obj)
-        if (response.success) {
-            this.props.navigation.navigate('EditVehicle', { item: response.vehicle });
+        try {
+            this.setState({
+                isloader: true
+            })
+            var data = this.state.newVehicle;
+            var obj = {
+                bodyTypeID: data.bodyTypeId,
+                buildYear: data.buildYear,
+                colourChangeCount: data.colourChangeCount,
+                colourID: data.colourId,
+                driverSeatPositionID: data.driverSeatPositionId,
+                derivative: data.derivative,
+                description: "",
+                doorCount: data.doorCount,
+                driveTypeID: data.driveTypeId,
+                engineCylinderConfigID: data.engineCylinderConfigId,
+                engineFuelDeliveryID: data.engineFuelDeliveryId,
+                enginePowerBhp: data.enginePowerBhp,
+                engineSizeID: data.engineSizeId,
+                engineValveCount: data.engineValveCount,
+                exactModel: data.exactModel,
+                forSale: false,
+                fuelTypeID: data.fuelTypeId,
+                gearCount: data.gearCount,
+                makeID: data.makeId,
+                modelID: data.modelId,
+                postcode: "",
+                registrationNumber: this.state.registerNo.toUpperCase(),
+                roadFundLicenseBandID: data.roadFundLicenseBandId,
+                roadFundLicenseSixMonth: data.roadFundLicenseSixMonth,
+                roadFundLicenseTwelveMonth: data.roadFundLicenseTwelveMonth,
+                seatCount: data.seatCount,
+                stolen: true,
+                transmissionTypeID: data.transmissionTypeId,
+            }
+            // var response = await VehicleService.addNewVehicle(obj)
+            // if (response.success) {
+            this.props.navigation.navigate('AddVehicle', { item: obj, param: this.state.param });
             this.setState({
                 isloader: false,
                 newVehicle: ''
 
             })
-        }
-        else {
-            this.setState({
-                isloader: false
-            })
+            // }
+            // else {
+            //     this.setState({
+            //         isloader: false
+            //     })
+            // }
+        } catch (e) {
+            console.log("addVehicle Exception", e);
         }
     }
 
     searchVehicleBy = async () => {
         //let { registerNo } = this.state
-        var  registerNo  = this.state.registerNo.replace(/ /g,'')
+        var registerNo = this.state.registerNo.replace(/ /g, '')
         this.setState({
             isloader: true
         })
@@ -148,7 +152,6 @@ export default class ListVehicle extends React.Component {
             }
             else {
                 var response = await VehicleService.getVehicleData(registerNo)
-                console.log("response", response);
                 if (Utilities.stringIsEmpty(!response.vehicleData.makeId)) {
                     this.setState({
                         newVehicle: response.vehicleData,
@@ -195,7 +198,7 @@ export default class ListVehicle extends React.Component {
                         />
                     </View>
                 }
-
+                <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
                 <ScrollView style={{ width: '100%' }}>
                     {(this.state.param == 0) ?
                         <View style={{ width: '100%', height: 200, justifyContent: 'center', alignItems: 'center' }}>
@@ -206,10 +209,10 @@ export default class ListVehicle extends React.Component {
                                 source={require('../images/banner.jpg')}
                             />
                             <View style={{ position: 'absolute', alignItems: 'center', }}>
-                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold', paddingHorizontal: 5 }}>
+                                <Text style={{ color: lightText, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 5 }}>
                                     List your vehicle to chat with friends,
                         </Text>
-                                <Text style={{ color: lightText, fontSize: 20, fontWeight: 'bold', paddingHorizontal: 5 }}>
+                                <Text style={{ color: lightText, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 5 }}>
                                     family and other car enthusiasts.
                         </Text>
                                 <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, textAlign: 'center', paddingHorizontal: 5 }}>
@@ -226,11 +229,11 @@ export default class ListVehicle extends React.Component {
                                 source={require('../images/background.png')}
                             />
                             <View style={{ position: 'absolute', alignItems: 'center' }}>
-                                <Text style={{ textAlign: 'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                    Sell your vehicle quickly and
+                                <Text style={{ textAlign: 'center', color: lightText, fontSize: 18, fontWeight: 'bold' }}>
+                                    Sell your vehicle quickly and effortlessly
                                      </Text>
-                                <Text style={{ textAlign: 'center', color: lightText, fontSize: 20, fontWeight: 'bold' }}>
-                                    effortlessly with a quick and easy process.
+                                <Text style={{ textAlign: 'center', color: lightText, fontSize: 18, fontWeight: 'bold' }}>
+                                    with a quick and easy process.
                                     </Text>
                                 <Text style={{ color: lightText, fontSize: 14, paddingTop: 10, paddingHorizontal: 5, textAlign: 'center' }}>
                                     Selling has never been easier with our seamless process, you can create am AD in seconds and most
@@ -247,20 +250,24 @@ export default class ListVehicle extends React.Component {
                                         fontWeight: 'bold',
                                     }}
                                     autoFocus={true}
+                                    autoCapitalize={'characters'}
                                     label='Registration Number'
                                     fontSize={15}
-                                    keyboardType='default'
+                                    keyboardType='ascii-capable'
                                     tintColor={Apptheme}
                                     baseColor={Apptheme}
                                     errorColor="red"
                                     activeLineWidth={2}
-                                    autoCapitalize='characters'
+
+                                    // autoCapitalize='characters'
+                                      autoCapitalize="characters"
                                     labelFontSize={13}
                                     value={this.state.registerNo}
                                     onChangeText={val => {
                                         this.onChangeText('registerNo', val.trim())
                                     }}
                                 />
+                              
                             </View>
                             <View style={{ width: '94%', marginHorizontal: '3%', justifyContent: 'center', alignItems: 'center' }}>
                                 <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.searchVehicleBy() }}>
@@ -281,42 +288,42 @@ export default class ListVehicle extends React.Component {
                             </View>
                             <View style={{ backgroundColor: "#ebebeb" }}>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.make}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.model}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.colour}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.fuelType}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.engineSizeLitre + "0 Liter"}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.gearCount + " Gears"}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.doorCount + " Doors"}
                                     </Text>
                                 </View>
                                 <View style={styles.newVehicleView}>
-                                    <Text>
+                                    <Text style={styles.textValue}>
                                         {this.state.newVehicle.seatCount + " Seats"}
                                     </Text>
                                 </View>
@@ -325,7 +332,7 @@ export default class ListVehicle extends React.Component {
                                 <TouchableOpacity style={styles.GradientButtonView} onPress={() => { this.addVehicle() }}>
                                     <LinearGradient colors={LinearColor} style={styles.GradientButtonView}>
                                         <Text style={styles.ButtonInnerText}>
-                                            ADD VEHICLE DETAIL
+                                            ADD VEHICLE DETAILS
                                 </Text>
                                     </LinearGradient>
                                 </TouchableOpacity>
@@ -341,10 +348,9 @@ export default class ListVehicle extends React.Component {
 
 const styles = StyleSheet.create({
     ParentView: {
-        alignItems: 'center',
         width: '100%',
         height: '100%',
-        backgroundColor: lightBg
+        backgroundColor: lightBg,
     },
     TextFieldView: {
         width: '92%',
@@ -371,7 +377,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         paddingVertical: 10,
-        color: darkText
+        color: "#000"
     },
     menuLoaderView: {
         position: 'absolute',
@@ -384,4 +390,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         top: 60
     },
+    textValue: {
+        color: "#000",
+        fontWeight: 'bold'
+    }
 })

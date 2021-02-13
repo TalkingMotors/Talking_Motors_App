@@ -117,7 +117,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
  * and the benefits of using Hermes will therefore be sharply reduced.
  */
-def enableHermes = project.ext.react.get("enableHermes", false);
+def enableHermes = project.ext.react.get("enableHermes", true);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -126,16 +126,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    dexOptions {
-       javaMaxHeapSize "4g"
-    }
-
+  
     defaultConfig {
         applicationId "com.talkingmotorsapp.talkingmotors"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
     }
     splits {
@@ -171,10 +169,16 @@ android {
             // Caution! In production, you need to generate your own keystore file.
             // see https://facebook.github.io/react-native/docs/signed-apk-android.
             signingConfig signingConfigs.release
-            minifyEnabled enableProguardInReleaseBuilds
+             minifyEnabled true
+            shrinkResources true
+
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+        dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -199,6 +203,15 @@ android {
         pickFirst '**/armeabi-v7a/libjsc.so'
     }
 }
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support' && requested.name != 'multidex') {
+            details.useVersion "${rootProject.ext.supportLibVersion}"
+        }
+    }
+}
+
 
 dependencies {
     implementation project(':react-native-vector-icons')
@@ -209,6 +222,8 @@ dependencies {
     implementation "com.google.firebase:firebase-core:17.1.0"
     implementation "com.google.firebase:firebase-auth:18.1.0"
     implementation "com.google.firebase:firebase-messaging:20.0.0"
+    implementation "com.google.firebase:firebase-dynamic-links:19.0.0"
+    implementation "com.google.firebase:firebase-invites:17.0.0"
 
      if (enableHermes) {
       def hermesPath = "../../node_modules/hermesvm/android/";

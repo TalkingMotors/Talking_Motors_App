@@ -5,7 +5,6 @@ import Storage from '../helpers/Storage';
 export let MyConversations = async () => {
     try {
         if (Storage.networkStatus.isConnected) {
-
             let response = await fetch(APIConstants.GET_MY_CONVERSATIONS_ENDPOINT + '?inviteStatuses=1&inviteStatuses=3&inviteStatuses=5&numberOfResults=-11', {
                 method: 'GET',
                 headers: Utilities.setHeaders()
@@ -43,7 +42,6 @@ export let GetConversationDetail = async (id) => {
 export let getConversationByUserIds = async (param) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log("!!", APIConstants.GET_CONVERSATION_BY_USER_IDS_ENDPOINT + "?" + param.userIds + "&vrm=" + param.vrm + "&numberOfResults=50")
             let response = await fetch(APIConstants.GET_CONVERSATION_BY_USER_IDS_ENDPOINT + "?" + param.userIds + "&vrm=" + param.vrm + "&numberOfResults=50", {
                 method: 'GET',
                 headers: Utilities.setHeaders()
@@ -61,8 +59,6 @@ export let getConversationByUserIds = async (param) => {
 
 export let sendMessageToConversation = async (params) => {
     try {
-        console.log("!!!!", JSON.stringify(params))
-        console.log("API", APIConstants.SEND_MESSAGE_TO_CONVERSATION_ENDPOINT)
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.SEND_MESSAGE_TO_CONVERSATION_ENDPOINT, {
                 method: 'POST',
@@ -195,8 +191,7 @@ export let updateGroupInvite = async (params) => {
 
 export let updateConversationName = async (params) => {
     try {
-        console.log(APIConstants.SET_CONVERSATION_NAME_ENDPOINT);
-        if (Storage.networkStatus.isConnected) {
+         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.SET_CONVERSATION_NAME_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
@@ -215,8 +210,7 @@ export let updateConversationName = async (params) => {
 
 export let ClearChatHistory = async (params) => {
     try {
-        console.log(APIConstants.CLEAR_CHAT_HISTORY_ENDPOINT);
-        if (Storage.networkStatus.isConnected) {
+         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.CLEAR_CHAT_HISTORY_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
@@ -235,8 +229,7 @@ export let ClearChatHistory = async (params) => {
 
 export let BlockUser = async (params) => {
     try {
-        console.log(APIConstants.BLOCK_USER_ENDPOINT);
-        if (Storage.networkStatus.isConnected) {
+         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.BLOCK_USER_ENDPOINT, {
                 method: 'POST',
                 headers: Utilities.setHeaders(),
@@ -254,7 +247,6 @@ export let BlockUser = async (params) => {
 }
 export let GetBlockUser = async () => {
     try {
-        console.log(APIConstants.GET_BLOCKED_USERS);
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.GET_BLOCKED_USERS, {
                 method: 'GET',
@@ -272,7 +264,6 @@ export let GetBlockUser = async () => {
 }
 export let UnBlockUsers = async (params) => {
     try {
-        console.log(APIConstants.UNBLOCK_USER_ENDPOINT);
         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UNBLOCK_USER_ENDPOINT, {
                 method: 'DELETE',

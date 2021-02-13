@@ -33,7 +33,6 @@ export default class InviteGroup extends Component {
         this.props.inviteModal();
     }
     seletedItem = (item) => {
-        console.log("item", item)
         this.setState({
             seletedItem: item.id
         })

@@ -48,8 +48,7 @@ export default class Users extends React.Component {
     GetBlockUser = () => {
         try {
             let members = this.props.navigation.state.params.members;
-            console.log("members", members);
-            var invitedMembers = [];
+             var invitedMembers = [];
             var Leftmember = [];
             var joinedmember = []
             joinedmember = members.filter(i => i.status.id == 3)

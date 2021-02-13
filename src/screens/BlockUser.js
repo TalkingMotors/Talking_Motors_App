@@ -47,11 +47,9 @@ export default class BlockUser extends React.Component {
         try {
             MessagesService.GetBlockUser().then(respose => {
                 if (respose) {
-                    console.log("respose", respose);
                     if (respose.success) {
                         if (respose.users.length > 0) {
                             this.state.List = respose.users
-                            console.log("List", this.state.List);
                             this.setState({
                                 List: this.state.List,
                                 isLoad: false
@@ -82,11 +80,9 @@ export default class BlockUser extends React.Component {
             let params = {
                 userId: user.userId
             }
-            console.log("params", params)
             MessagesService.UnBlockUsers(params).then(respose => {
 
-                console.log("respose", respose);
-                if (respose) {
+                 if (respose) {
                     if (respose.success) {
                         // this.GetBlockUser();
                         this.props.navigation.goBack();

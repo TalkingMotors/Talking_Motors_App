@@ -17,7 +17,8 @@ import {
     Alert,
     StyleSheet,
     KeyboardAvoidingView,
-    TouchableOpacity
+    TouchableOpacity,
+    Platform
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -178,10 +179,16 @@ export default class Messenger extends React.Component {
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide)
     }
     _keyboardDidShow() {
+        try{
 
         this.setState({
             isKeyboard: true
         })
+        this.scrollView.scrollResponderScrollToEnd({ animated: true });
+    }
+    catch(e){
+        console.log("Excetopn _keyboardDidShow",e)
+    }
     }
 
     _keyboardDidHide() {
@@ -259,8 +266,7 @@ export default class Messenger extends React.Component {
                 if (respose) {
                     if (respose.success) {
                         this.state.conversationDetail = respose.conversation
-                        console.log("ikm-messages", this.state.conversationDetail)
-                        //var obj = JSON.parse(jsonObj)[0];
+                         //var obj = JSON.parse(jsonObj)[0];
 
                         // respose.conversation.messages.forEach(element => {
                         //     element._id = element.id;
@@ -290,7 +296,7 @@ export default class Messenger extends React.Component {
                         });
 
                         if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
-                            this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
+                            this.updateConversationStatus(this.state.messages[0].id);
                         }
 
                         this.state.lastReadMessageId = this.state.conversationDetail.lastReadMessageId
@@ -357,7 +363,6 @@ export default class Messenger extends React.Component {
 
         })
         this.state.userIds = userIds;
-        console.log("userids", this.state.userIds)
     }
     onChangeText = (key, value) => {
         if (Utilities.stringIsEmpty(value)) {
@@ -384,7 +389,8 @@ export default class Messenger extends React.Component {
                 messages: [...prevState.messages, response.conversationMessage],
                 typeMessage: "",
                 isLoad: false,
-                sendButtonVisible: false
+                sendButtonVisible: false,
+                
             }));
             this.getConverationDetail(this.state.conversationId)
         })
@@ -397,11 +403,13 @@ export default class Messenger extends React.Component {
             isLoad: true
         })
         MessagesService.sendMessage(params).then(response => {
+            this.state.conversationId = response.conversation.id
             this.setState(prevState => ({
                 messages: [...prevState.messages, response.conversationMessage],
                 typeMessage: "",
                 isLoad: false,
-                sendButtonVisible: false
+                sendButtonVisible: false,
+                conversationId:this.state.conversationId
             }));
             this.getConverationDetail(response.conversation.id)
         })
@@ -461,9 +469,7 @@ export default class Messenger extends React.Component {
                 conversationId: this.state.conversationId,
                 userId: userId
             }
-            console.log("param", param)
             var response = await MessagesService.removeUserToGroup(param);
-            console.log("response", response);
             if (response.success) {
                 this.getConverationDetail(this.state.conversationId);
             }
@@ -531,10 +537,8 @@ export default class Messenger extends React.Component {
         var param = {
             userId: this.state.conversationDetail.owner.userId,
         }
-        console.log("param", param);
         MessagesService.BlockUser(param).then(response => {
-            console.log("response", response);
-        })
+         })
 
 
     }
@@ -545,9 +549,7 @@ export default class Messenger extends React.Component {
         var param = {
             conversationId: this.state.conversationId,
         }
-        console.log("param", param);
-        MessagesService.ClearChatHistory(param).then(response => {
-            console.log("response", response);
+         MessagesService.ClearChatHistory(param).then(response => {
             this.setState({
                 messages: {}
             })
@@ -562,7 +564,6 @@ export default class Messenger extends React.Component {
             id: this.state.conversationId,
             name: this.state.convoname,
         }
-        console.log("param", param);
         MessagesService.updateConversationName(param).then(response => {
             console.log("updateConversationName", response)
             this.setState({
@@ -633,18 +634,26 @@ export default class Messenger extends React.Component {
                         />
                     </View>
                 }
+                   <ImageBackground style={{ width: '100%',position:'absolute',zIndex:-1,height:'100%' }} source={require('../images/tmmesbackan.png')} >
+                                    
+                
                 <ScrollView ref={ref => this.scrollView = ref}
+                  showsVerticalScrollIndicator={false}
+                  onScroll={Keyboard.dismiss} keyboardDismissMode='interactive' keyboardShouldPersistTaps='handled'
+                onScroll={this.handleScroll}
                     onContentSizeChange={(contentWidth, contentHeight) => {
                         this.scrollView.scrollResponderScrollToEnd({ animated: true });
-                    }} style={{ marginBottom: 0 }}>
+                    }} style={{ marginTop:60 }}>
+                         <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : null}
+                keyboardVerticalOffset="0"
+                style={{ flex: 1 }}
+            >
                     <View >
-                        <KeyboardAvoidingView
-                            keyboardVerticalOffset="80"
-                            enabled>
+                        
 
                             <ScrollView >
-                                <ImageBackground style={{ width: '100%' }} source={require('../images/tmmesbackan.png')} >
-                                    <View style={styles.MessengerView}>
+                               <View style={styles.MessengerView}>
                                         <View style={styles.MessengerViewList}>
 
                                             <FlatList
@@ -685,8 +694,7 @@ export default class Messenger extends React.Component {
                                                                             }
                                                                             {item.imageUrl != null &&
                                                                                <Image
-                                                                                // resizeMode="center"
-                                                                                  resizeMode="stretch"
+                                                                                 resizeMode="stretch"
                                                                                 style={{width:150,height:260,marginBottom:10,}}
                                                                                 source={{ uri: item.imageUrl }}
                                                                             />
@@ -720,8 +728,7 @@ export default class Messenger extends React.Component {
                                                                             {item.imageUrl != null &&
                                                                                
                                                                               <Image
-                                                                                // resizeMode="center"
-                                                                                  resizeMode="stretch"
+                                                                                 resizeMode="stretch"
                                                                                 style={{width:150,height:260,marginBottom:10,}}
                                                                                 source={{ uri: item.imageUrl }}
                                                                             />
@@ -743,7 +750,7 @@ export default class Messenger extends React.Component {
                                             />
 
                                             {this.state.messages.length == 0 &&
-                                                <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                                                <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center',marginTop:200 }}>
                                                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                                                         <FontAwesome name="comments" color={Apptheme} style={{ alignItems: 'center' }} size={80} />
                                                         <Text style={{ paddingVertical: 10, textAlign: 'center', fontSize: 20, color: Apptheme, fontWeight: 'bold' }}>
@@ -758,13 +765,13 @@ export default class Messenger extends React.Component {
 
                                         </View>
                                     </View>
-                                </ImageBackground>
+                          
                             </ScrollView>
-                        </KeyboardAvoidingView>
-
-                    </View>
+                      </View>
+                      </KeyboardAvoidingView> 
                 </ScrollView>
-                <View style={{ flexDirection: 'row', width: '100%', height: 55, }}>
+   
+                <View style={{ flexDirection: 'row', width: '100%', height: 55,marginBottom:(Platform.OS.toLowerCase()=="ios"?(this.state.isKeyboard)?0:10:(this.state.isKeyboard)?0:0) }}>
                     <TouchableOpacity
                         onPress={() => this.cameraModal()}
                         style={{ width: '15%', justifyContent: 'center', alignItems: 'center' }}>
@@ -790,7 +797,8 @@ export default class Messenger extends React.Component {
 
 
                 </View>
-
+                
+                </ImageBackground>
                 {this.state.isCameraModal &&
                     <View style={{ position: 'absolute', top:'25%', height:260, width: '80%',marginHorizontal:'10%' }}>
                         <SafeAreaView style={{borderColor:Apptheme,borderWidth:2, borderRadius: 10, height: '100%', width: '96%', marginHorizontal: '2%', backgroundColor: "#fff" }}>
@@ -1125,7 +1133,7 @@ const styles = StyleSheet.create({
     },
     MessengerView: {
         width: '100%',
-        height: screen_height - 130,
+        // height: screen_height - 200,
         justifyContent: 'flex-end'
     },
     MessengerViewList: {

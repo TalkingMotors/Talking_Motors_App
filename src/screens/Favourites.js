@@ -23,6 +23,7 @@ import { FluidNavigator, Transition } from '../../lib';
 import * as Utilities from "../helpers/Utilities";
 import * as VehicleService from '../services/Vehicle';
 import VehicleImage from '../components/VehicleImage';
+const screen_width = Dimensions.get('window').width;
 const moment = require('moment-timezone');
 export default class UsersVehicle extends React.Component {
     constructor(props) {
@@ -82,7 +83,6 @@ export default class UsersVehicle extends React.Component {
         try{
             
             var response = await VehicleService.favorites()
-            console.log("response",response);
             if (!Utilities.stringIsEmpty(response.vehicles) || response.success) {
             if (response.vehicles.length > 0) {
                 for (var i = 0; i < response.vehicles.length; i++) {
@@ -192,6 +192,16 @@ export default class UsersVehicle extends React.Component {
             return (<Text style={styles.noRecordFoundText}>{this.state.emptyList}</Text>)
         }
     }
+
+    postCode = (item) => {
+        let postcode = "";
+        let price = ""
+        if (!Utilities.stringIsEmpty(item.postcode) || item.postcode > 0) {
+            postcode = item.postcode + " ";
+        }
+        
+        return postcode
+    }
     render() {
         return (
             <View style={styles.ParentView}>
@@ -220,35 +230,55 @@ export default class UsersVehicle extends React.Component {
 
                         renderItem={({ item, index }) =>
                             (
-                                <View key={index}>
-
-                                    <LinearGradient
-                                        colors={LinearColor} style={{ borderRadius: 10, borderWidth: 1, borderColor: Apptheme, elevation: 3, marginVertical: 10, width: '94%', marginHorizontal: '3%', }}>
-                                        <TouchableOpacity
-                                            onPress={this.detail.bind(this, item, index)}
-                                            style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 120, }}>
-                                            <View style={{ width: '35%', alignItems: 'center', justifyContent: 'center' }}>
-                                                {item.PremiumDate > 0 && 
-                                                    <Text style={{zIndex:2,position:'absolute',top:13,color:'#fefefe',fontSize:10,right:70,borderRadius:3,backgroundColor:Apptheme,padding:2,rotation:-40}}>Premium</Text>
-                                                }
-                                                <VehicleImage param={item.images} />
+                            <View
+                                key={index}
+                                style={{ borderRadius: 0, borderWidth: 1, borderColor: '#777', elevation: 3, marginVertical: 4, width: '100%', marginHorizontal: 0, }}>
+                                <TouchableOpacity
+                                    onPress={this.detail.bind(this, item, index)}
+                                    style={{ width: '100%', justifyContent: 'center', flexDirection: 'row', height: 100, }}>
+                                    <View style={{ width: 100, alignItems: 'center', justifyContent: 'center', }}>
+                                        {item.PremiumDate > 0 &&
+                                            <View
+                                                style={{
+                                                    width: 0,
+                                                    borderTopWidth: 0,
+                                                    borderRightWidth: 0,
+                                                    borderBottomWidth: 80 / 2.0,
+                                                    borderLeftWidth: 40,
+                                                    borderTopColor: 'transparent',
+                                                    borderRightColor: 'transparent',
+                                                    borderBottomColor: 'transparent',
+                                                    borderLeftColor: Apptheme,
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    position: 'absolute', zIndex: 2, top: 0,
+                                                    left: 0
+                                                }}
+                                            >
+                                                <Text style={{ color: '#fff', position: 'absolute', right: 20, zIndex: 3, fontWeight: 'bold', fontSize: 14, top: 5 }}>P</Text>
                                             </View>
-                                            <View style={{ width: '65%', justifyContent: 'center' }}>
-                                                <Text style={{ color: lightText, textAlign: 'center', fontSize: 14, fontWeight: 'bold' }}>
+                                        }
+                                        <VehicleImage param={item.images} />
+                                    </View>
+                                    <View style={{ width: screen_width - 102, justifyContent: 'center' }}>
+                                        <Text style={{ color: '#000', textAlign: 'left', paddingHorizontal: 5, fontSize: 14, fontWeight: 'bold' }}>
 
-                                                    {this.mainTitle(item)}
-                                                </Text>
-                                                <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                    {this.subTitle(item)}
+                                            {this.mainTitle(item)}
+                                        </Text>
+                                        <Text style={{ color: Apptheme, fontSize: 12, fontWeight: 'bold', textAlign: 'left', paddingHorizontal: 5 }}>
+                                            {this.subTitle(item)}
 
-                                                </Text>
-                                                <Text style={{ color: lightText, fontSize: 12, textAlign: 'center', paddingHorizontal: 10 }}>
-                                                   {this.detailText(item)}
-                                                </Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    </LinearGradient>
-                                </View>
+                                            <Text style={{ color: darkText }}>
+                                                {this.postCode(item)}
+                                            </Text>
+                                        </Text>
+                                        <Text style={{ color: darkText, fontSize: 12, textAlign: 'center', paddingHorizontal: 5 }}>
+                                            {this.detailText(item)}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+             
                             )}
  ListEmptyComponent={this.flatListEmptyMessage}
                     />

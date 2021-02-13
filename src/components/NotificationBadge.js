@@ -223,9 +223,9 @@ class NotificationBadges extends React.Component {
 	showNotificationAndroid = (notification) => {
 		try {
 			const data = notification.data;
-			console.log("Notification Badges", notification.data)
-			console.log("title", data.title);
-			console.log("message", data.message);
+			// console.log("Notification Badges", notification.data)
+			// console.log("title", data.title);
+			// console.log("message", data.message);
 			let message = JSON.parse(data.message);
 			this.setState({
 				title: data.title,

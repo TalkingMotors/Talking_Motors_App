@@ -7,7 +7,6 @@ import Storage from '../helpers/Storage';
 export let VehicleLookup = async () => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.VEHICLE_LOOKUPS_ENDPOINT  )
             let response = await fetch(APIConstants.VEHICLE_LOOKUPS_ENDPOINT , {
                 method: 'GET',
                 crossDomain: true,
@@ -26,7 +25,6 @@ export let VehicleLookup = async () => {
 export let VehicleLookupAllFeatures = async () => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.VEHICLE_LOOKUPS_FEATURES_ENDPOINT  )
             let response = await fetch(APIConstants. VEHICLE_LOOKUPS_FEATURES_ENDPOINT , {
                 method: 'GET',
                 crossDomain: true,

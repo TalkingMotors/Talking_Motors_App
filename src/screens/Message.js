@@ -59,7 +59,16 @@ export default class Message extends React.Component {
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
             this.setState({
                 isLoad: true,
-                myConversation: []
+                myConversation: [],
+                isModal: false,
+            isKeyboard: false,
+            registerNo: '',
+            myConversation: [],
+            invitedMembers: [],
+            Leftmember: [],
+            joinedmember: [],
+            isInviteModal: false,
+            conversationId: 0
             })
         })
     }

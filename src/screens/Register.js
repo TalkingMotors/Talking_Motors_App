@@ -163,7 +163,8 @@ export default class Register extends React.Component {
 
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Registration" navigation={this.props} />
-
+                <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
+              
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator

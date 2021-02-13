@@ -100,6 +100,7 @@ export default class EditVehicle extends React.Component {
                 postCode: params.postcode,
                 price: (params.price > 0) ? params.price : "",
                 saleSwitch: params.sold,
+                saleSwitch: this.props.navigation.state.params.forSale,
                 mileage: (!Utilities.stringIsEmpty(params.userMileage) ? params.userMileage : ""),
                 image: sortedImage[0],
                 features: params.features,
@@ -176,7 +177,6 @@ export default class EditVehicle extends React.Component {
             }
             var response = await VehicleService.UpdateVehicle(param)
             if (response) {
-                console.log("response", response);
                 GetSpecificVehicle(this.state.allData.id)
                 this.setState({
                     isLoader: false
@@ -262,9 +262,8 @@ export default class EditVehicle extends React.Component {
     }
 
     render() {
-        console.log("this.state",this.state);
         let description=this.state.description;
-        console.log("description",description);
+      
         return (
             <View style={styles.ParentView}>
                 <Topbar ParentPage="Edit Your Vehicle" navigation={this.props} />
@@ -284,7 +283,8 @@ export default class EditVehicle extends React.Component {
                     <View style={[styles.ButtonView, { alignItems: 'center', justifyContent: 'center', marginTop: 20, flexDirection: 'row', }]}>
                         <Text >For Sale? </Text>
                         <Switch
-                            thumbColor={Apptheme}
+                            trackColor={{ false: "green", true: "green" }}
+                            thumbColor={lightText}
                             onValueChange={this.toggleSwitch}
                             value={this.state.saleSwitch} />
                     </View>
@@ -331,7 +331,7 @@ export default class EditVehicle extends React.Component {
                                         this.onChangeText('price', val)
 
                                     }}
-                                />
+                                 />
                                 <TextField
                                     label='Mileage'
                                     fontSize={13}
@@ -409,7 +409,7 @@ export default class EditVehicle extends React.Component {
                                         }
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
                                     this.DateModal()
@@ -427,7 +427,7 @@ export default class EditVehicle extends React.Component {
                                         }
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
                                     this.DateModal()
@@ -445,7 +445,7 @@ export default class EditVehicle extends React.Component {
 
                                     </Text>
 
-                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={Apptheme} />
+                                    <FontAwesome style={{ position: 'absolute', right: 10 }} name="calendar" size={18} color={darkText} />
                                 </TouchableOpacity>
                                 {this.state.isInsurance &&
                                     <CalenderPicker
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
         height: 50,
     },
     dateHeading: {
-        paddingLeft: 10, color: Apptheme, fontWeight: "bold"
+        paddingLeft: 10, color: darkText, fontWeight: "bold"
     },
     menuLoaderView: {
         position: 'absolute',

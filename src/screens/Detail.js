@@ -12,6 +12,7 @@ import {
     StyleSheet,
     Linking,
     Switch,
+    Platform,
     Share,
     Alert,
     Dimensions,
@@ -47,11 +48,13 @@ import RNIap, {
     purchaseErrorListener,
     purchaseUpdatedListener,
 } from 'react-native-iap';
+import * as MessagesService from '../services/Messages';
+var screen_height = Dimensions.get('window').height;
 export var GetSpecificVehicle;
 const itemSkus = Platform.select({
     ios: [
-        'com.cooni.point1000',
-        'com.cooni.point5000', // dooboolab
+        'uk.co.talkingMotors.talkingMotors.iapFinanceCheck',
+        'uk.co.talkingMotors.talkingMotors.iapMotAndMileageCheck', // dooboolab
     ],
     android: [
         // 'android.test.purchased', // subscription
@@ -105,14 +108,23 @@ export default class Detail extends React.Component {
             financeDetail: [],
             userMileage: '',
             postcode: '',
+            myConversation: [],
+            conversationId:0,
+            isImageFull:false
         }
         this.AddFavourite = this.AddFavourite.bind(this);
         this.RemoveFavourite = this.RemoveFavourite.bind(this);
         this.shareAction = this.shareAction.bind(this);
+        this.imageFullModal = this.imageFullModal.bind(this);
         this.onShare = this.onShare.bind(this);
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.GetSpecificVehicle(this.props.navigation.state.params.item.id)
 
+        })
+    }
+    imageFullModal = () => {
+        this.setState({
+            isImageFull: !this.state.isImageFull
         })
     }
     ToggleModal = () => {
@@ -144,7 +156,6 @@ export default class Detail extends React.Component {
     }
     stateupdate = (vehicleData) => {
         try {
-            console.log("vehicleData", vehicleData);
             this.setState({
                 registerNo: vehicleData.registrationNumber,
                 vehicleId: vehicleData.id,
@@ -175,6 +186,7 @@ export default class Detail extends React.Component {
                 shareLoader: false
             }, () => {
                 this.favIcon();
+                this.getMyConversations();
             })
         }
         catch (e) {
@@ -250,14 +262,14 @@ export default class Detail extends React.Component {
                 if (receipt) {
                     try {
                         console.log("receipt", receipt);
-                        // if (Platform.OS === 'ios') {
-                        //   finishTransactionIOS(purchase.transactionId);
-                        // } else if (Platform.OS === 'android') {
-                        //   // If consumable (can be purchased again)
-                        //   consumePurchaseAndroid(purchase.purchaseToken);
-                        //   // If not consumable
-                        //   acknowledgePurchaseAndroid(purchase.purchaseToken);
-                        // }
+                        if (Platform.OS === 'ios') {
+                            finishTransactionIOS(purchase.transactionId);
+                        } else if (Platform.OS === 'android') {
+                            // If consumable (can be purchased again)
+                            consumePurchaseAndroid(purchase.purchaseToken);
+                            // If not consumable
+                            acknowledgePurchaseAndroid(purchase.purchaseToken);
+                        }
                         const ackResult = await finishTransaction(purchase);
                     } catch (ackErr) {
                     }
@@ -309,15 +321,12 @@ export default class Detail extends React.Component {
 
             let result = await RNIap.requestPurchase(sku);
             if (result) {
-                console.log("result", result);
-                console.log("selectPackage", this.state.selectPackage);
                 if (this.state.selectPackage == 1) {
                     this.state.ismotDataDetail = true
                     this.setState({
                         ismotDataDetail: this.state.ismotDataDetail
                     })
                     var response = await VehicleService.modData(this.state.registerNo)
-                    console.log("response", response);
                     if (response.success) {
                         if (response.motHistoryData.motHistoryRecordCount > 0) {
                             this.setState({
@@ -332,7 +341,6 @@ export default class Detail extends React.Component {
                         isfinanceDetail: this.state.isfinanceDetail
                     })
                     var response = await VehicleService.financeDetail(this.state.registerNo)
-                    console.log("response", response);
                     if (response.success) {
                         if (response.financeData.financeRecordList > 0) {
                             this.setState({
@@ -361,20 +369,70 @@ export default class Detail extends React.Component {
             allfeatures: allfeatures,
 
         })
-  }
+    }
 
     EditVehicle = () => {
         let data = this.props.navigation.state.params.item;
-        this.state.vehicleData.PremiumDate=this.PremiumPackgedDateChecked(this.state.vehicleData.premiumListingExpires)
+        this.state.vehicleData.PremiumDate = this.PremiumPackgedDateChecked(this.state.vehicleData.premiumListingExpires)
 
         this.props.navigation.navigate("EditVehicle", {
             item: this.state.vehicleData,
-            allfeatures: this.state.allfeatures
+            allfeatures: this.state.allfeatures,
+            forSale: this.state.forSale
         })
     }
     viewMessage = () => {
         this.props.navigation.navigate("Message")
     }
+
+    getMyConversations = () => {
+        try {
+            MessagesService.MyConversations().then(respose => {
+                if (respose) {
+                    if (respose.success) {
+                        this.state.myConversation = respose.conversations.reverse()
+                        var conversation = this.state.myConversation.sort((a, b) => new Date(b.mostRecentMessageDate) - new Date(a.mostRecentMessageDate))
+                        this.state.myConversation = conversation
+                        if (this.state.ownerId != this.state.userId) {
+                            let conversationId = 0
+                            for (let index = 0; index < conversation.length; index++) {
+                               for (let j = 0; j < conversation[index].members.length; j++) {
+                                    if (this.state.ownerId == conversation[index].members[j].user.userId) {
+                                        conversationId = conversation[index]
+                                        this.state.conversationId = conversationId.id
+                                        this.setState({
+                                            conversationId: conversationId.id
+                                        })
+                                     
+                                        return
+                                    }
+                                }
+                            }
+                        }
+
+
+
+
+
+
+                    }
+                }
+                else {
+                    this.setState({
+                        isLoad: false
+                    })
+                }
+            })
+        }
+        catch (e) {
+            this.setState({
+                isLoad: false
+            })
+            console.log("get conversation error", e.message)
+        }
+    }
+
+
     sendMessage = () => {
         try {
             if (Object.keys(Storage.userData).length > 0) {
@@ -387,7 +445,7 @@ export default class Detail extends React.Component {
                     message: "",
                     image: null
                 }
-                this.props.navigation.navigate("Messenger", { conversationId: 0, messageBody: message })
+                this.props.navigation.navigate("Messenger", { conversationId: this.state.conversationId, messageBody: message })
             }
             else {
                 this.ToggleModal();
@@ -424,8 +482,7 @@ export default class Detail extends React.Component {
             let params = {
                 vehicleId: this.state.vehicleData.id
             }
-            console.log("params", params);
-            var response = await VehicleService.addFavourite(params)
+             var response = await VehicleService.addFavourite(params)
             if (response.success) {
                 this.stateupdate(response.vehicle);
             }
@@ -491,6 +548,10 @@ export default class Detail extends React.Component {
     toggleSwitch = () => {
         this.setState({
             forSale: !this.state.forSale
+        }, () => {
+            if (this.state.forSale) {
+                this.EditVehicle();
+            }
         })
     }
 
@@ -565,6 +626,7 @@ export default class Detail extends React.Component {
                     EditVehicle={this.EditVehicle}
                     parent={this.state.parent}
                     navigation={this.props} />
+
                 {this.state.isloader &&
                     <View style={styles.menuLoaderView}>
                         <ActivityIndicator
@@ -573,24 +635,27 @@ export default class Detail extends React.Component {
                         />
                     </View>
                 }
-                <ScrollView style={{ paddingBottom: 20 }}>
+                <ScrollView style={{ paddingBottom: 20, marginBottom: (Platform.OS === 'ios') ? 50 : 0 }}>
                     <View style={{ width: '100%', height: 270, justifyContent: 'center', alignItems: 'center' }}>
                         {!Utilities.stringIsEmpty(this.state.image[0]) ?
                             <Transition shared={`imageUrl${this.props.navigation.state.params.index}`}>
-                                {(this.state.image.length > 1) ?
-                                    <View>
-
-                                        <Text style={{ zIndex: 2, position: 'absolute', top: 22, color: '#fefefe', fontSize: 14, rotation: -40, left: 4, borderRadius: 3, backgroundColor: Apptheme, paddingVertical: 2, paddingHorizontal: 5, }}>Premium</Text>
-                                        <Slider Image={this.state.image} />
-                                    </View>
-                                    :
-                                    <Image
-                                        resizeMode='cover'
-                                        style={{ width: '100%', height: '100%' }}
-                                        source={{ uri: this.state.image[0].url }}
-                                    />
-                                }
-                            </Transition>
+                            {(this.state.image.length > 1) ?
+                                <View>
+                                     <Text style={{ zIndex: 2, position: 'absolute', top: 22, color: '#fefefe', fontSize: 14, rotation: -40, left: 4, borderRadius: 3, backgroundColor: Apptheme, paddingVertical: 2, paddingHorizontal: 5, }}>Premium</Text>
+                                    <Slider Image={this.state.image} />
+                                </View>
+                                :
+                                <TouchableOpacity activeOpacity={1}  style={{width:'100%',height:'100%'}}
+                                 onPress={()=>this.imageFullModal()}>
+                                <Image
+                                   
+                                    resizeMode='cover'
+                                    style={{ width: '100%', height: '100%' }}
+                                    source={{ uri: this.state.image[0].url }}
+                                />
+                               </TouchableOpacity>
+                            }
+                        </Transition>
                             :
                             <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: lightBg }}>
                                 <FontAwesome name="car" size={150} color={Apptheme} />
@@ -833,7 +898,9 @@ export default class Detail extends React.Component {
                         <Text >For Sale: </Text>
                         {(this.state.userId == this.state.ownerId) ?
                             <Switch
-                                thumbColor={Apptheme}
+                                trackColor={{ false: "green", true: "green" }}
+                                thumbColor={lightText}
+                                ios_backgroundColor="green"
                                 onValueChange={this.toggleSwitch}
                                 value={this.state.forSale} />
                             :
@@ -1049,6 +1116,47 @@ export default class Detail extends React.Component {
                             </View>
                         </View >
                     </SafeAreaView>
+                </Modal>
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={this.state.isImageFull}
+                    onRequestClose={() => {
+                        console.warn("Modal has been closed.");
+                        this.imageFullModal()
+                    }}
+                >
+                    <SafeAreaView>
+                        <View style={{ backgroundColor: lightText, height: screen_height, width: '100%', }}>
+                            <View style={{ width: '100%', height: 50, flexDirection: 'row', alignItems: 'center', paddingLeft: 20, backgroundColor: Apptheme }}>
+                                <Feather
+                                    onPress={() => this.imageFullModal()}
+                                    name="arrow-left" color={lightText} size={22} style={styles.Icons} />
+                                <Text style={{ color: lightText, fontSize: 16, paddingLeft: 10, fontWeight: 'bold' }}> {this.state.make + " " + this.state.model}</Text>
+                            </View>
+                            <View style={{ width: '100%', height: screen_height - 220, backgroundColor: lightText,marginTop:40 }}>
+                            {!Utilities.stringIsEmpty(this.state.image[0]) ?
+                                <Image
+                                    resizeMode='cover'
+                                    style={{ width: '100%', height: '100%' }}
+                                    source={{ uri: this.state.image[0].url }}
+                                />
+                                :
+                                <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: lightBg }}>
+                                <FontAwesome name="car" size={150} color={Apptheme} />
+                            </View>
+    }
+                            </View>
+                            <View style={{ width: '100%', backgroundColor: 'gray', paddingVertical: 10, marginTop: 10, alignItems: 'center' }}>
+                                <Text style={{ color: lightText, fontSize: 14, fontWeight: 'bold' }}>
+                                    {this.state.make + " " + this.state.model + " " + this.state.engineSize + " " + this.state.derivative}
+                                </Text>
+                            </View>
+                        </View>
+
+
+                    </SafeAreaView>
+                      
                 </Modal>
             </View>
         )

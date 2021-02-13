@@ -85,14 +85,12 @@ onChangeText = (key, value) => {
             }
             let params = { email: this.state.email, code: this.state.Code, password: this.state.Password, 
                 confirmPassword: this.state.ConformPassword, }
-                console.log("params",params);
                 this.setState({
                     isloader: true
                 })
                     // let response=await UserService.ForgotPasswordComplete(params)
                     UserService.ForgotPasswordComplete(params).then(response => {
                         if (response) {
-                            console.log("response",response);
                             if (response.success) {
                                 Storage.userData = response.user;
                                 Storage.jwt_Token = response.token;
@@ -125,8 +123,7 @@ onChangeText = (key, value) => {
     }
     componentWillMount(){
         if(Object.keys(Storage.userData).length > 0) {
-            console.log("Storage.userData",Storage.userData);
-            this.setState({
+             this.setState({
                 email:Storage.userData.email
             })
         }

@@ -130,7 +130,8 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification</Text>
                         <Switch
-                            thumbColor={(this.state.NotificationSwitch) ? Apptheme : "#999"}
+                            trackColor={{ false: "green", true: "green" }}
+                            thumbColor={(this.state.NotificationSwitch) ? lightText : "#999"}
                             onValueChange={this.NotificationSwitch}
                             value={this.state.NotificationSwitch} />
                     </View>
@@ -138,7 +139,8 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification Sound</Text>
                         <Switch
-                            thumbColor={(this.state.NotificationSound) ? Apptheme : "#999"}
+                            trackColor={{ false: "green", true: "green" }}
+                            thumbColor={(this.state.NotificationSound) ? lightText : "#999"}
                             onValueChange={this.NotificationSound}
                             value={this.state.NotificationSound} />
                     </View>
@@ -147,7 +149,8 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification Vibrate</Text>
                         <Switch
-                            thumbColor={(this.state.NotificationVibrate) ? Apptheme : "#999"}
+                         trackColor={{ false: "green", true: "green" }}
+                            thumbColor={(this.state.NotificationVibrate) ? lightText : "#999"}
                             onValueChange={this.NotificationVibrate}
                             value={this.state.NotificationVibrate} />
                     </View>
@@ -156,7 +159,8 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Notification LED</Text>
                         <Switch
-                            thumbColor={(this.state.NotificationLed) ? Apptheme : "#999"}
+                         trackColor={{ false: "green", true: "green" }}
+                            thumbColor={(this.state.NotificationLed) ? lightText : "#999"}
                             onValueChange={this.NotificationLed}
                             value={this.state.NotificationLed} />
                     </View>
@@ -165,7 +169,8 @@ export default class Setting extends React.Component {
                     <View style={styles.TextView}>
                         <Text style={styles.Text}>Location Services</Text>
                         <Switch
-                            thumbColor={(this.state.LocationService) ? Apptheme : "#999"}
+                          trackColor={{ false: "green", true: "green" }}
+                         thumbColor={(this.state.LocationService) ? lightText : "#999"}
                             onValueChange={this.LocationService}
                             value={this.state.LocationService} />
                     </View>

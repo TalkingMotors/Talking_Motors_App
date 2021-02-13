@@ -10,7 +10,7 @@ import {
     StatusBar,
     Modal,
     BackHandler,
-    StyleSheet,
+    StyleSheet, Linking,
     ImageBackground,
     Dimensions,
     TouchableOpacity
@@ -19,7 +19,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import LinearGradient from 'react-native-linear-gradient';
-import { Apptheme,GreenBg, lightText, darkText, LinearColor, lightBg ,TooltipBg} from '../helpers/CommponStyle';
+import { Apptheme, GreenBg, lightText, darkText, LinearColor, lightBg, TooltipBg } from '../helpers/CommponStyle';
 import Topbar from '../components/Topbar';
 import TalkModal from '../components/Talk';
 import SearchVehicleModal from '../components/SearchVehicle';
@@ -33,9 +33,16 @@ import Constants from "../helpers/Constants";
 import AndroidNotification from '../components/AndroidNotification';
 import IOSNotification from '../components/IOSNotification';
 export var SearchVehicleModalToggle;
+export var TalkModalToggle;
 import { NavigationEvents } from 'react-navigation';
 import Sidebar from '../../ContentComponent';
 import SideMenu from 'react-native-side-menu';
+var headerHeight = 50;
+let screenheight = Dimensions.get('window').height;
+import DeepLinking from 'react-native-deep-linking';
+import Firebase from 'react-native-firebase';
+import * as VehicleService from '../services/Vehicle';
+var _dynamicLinkListener;
 export default class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -62,13 +69,16 @@ export default class Home extends React.Component {
 
         this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
             this.updateTopBar()
+            this.setState({
+                parent: ''
+            })
             if (Object.keys(Storage.userData).length > 0) {
                 this.setState({
-                    toolTipVisible: (Storage.userData.thumbUrl != null) ? false : true
+                    toolTipVisible: (Storage.userData.thumbUrl != null) ? false : true,
                 })
 
             }
-            
+
         })
         this.TalkModalToggle = this.TalkModalToggle.bind(this)
         this.SearchVehicleModalToggle = this.SearchVehicleModalToggle.bind(this)
@@ -117,9 +127,13 @@ export default class Home extends React.Component {
             isModal: !this.state.isModal
         })
     }
+
+
     componentDidMount = () => {
         if (Object.keys(Storage.userData).length > 0) {
             this.getUserBy(Storage.userData.userId)
+
+
         }
 
         this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => {
@@ -128,14 +142,98 @@ export default class Home extends React.Component {
             //     isOpen: false
             // })
         })
+        this.setUpDynamicLink();
+        this.setUpDeepLink();
+        // Firebase.links()
+        // .getInitialLink()
+        // .then((url) => {
+        //     console.log("Firebase",url)
+        //     // this.handleURL(url);
+        // });
+
+
 
     }
+    handleUrl = ({ url }) => {
+    
+    }
     componentWillUnmount() {
-        console.log("componentWillUnmount")
+        this.cleanUpDynamicLink();
+        this.cleanUpDeepLink();
+        Linking.removeEventListener('url', this.handleUrl);
         // this.setState({
         //     isOpen: false
         // })
         // BackHandler.removeEventListener('hardwareBackPress', this.backAndroidHandler)
+    }
+    setUpDynamicLink = () => {
+        // will work when link is opening the app
+        Firebase.links()
+            .getInitialLink()
+            .then((url) => {
+                this.handleURL(url);
+            });
+
+        // listener will work when app is already opened or in background
+        this._dynamicLinkListener = Firebase.links().onLink((url) => {
+            this.handleURL(url);
+        });
+    }
+
+setUpDeepLink = () => {
+        // will work when link is opening the app
+        Linking.getInitialURL().then(url => {
+            this.handleURL(url);
+        });
+
+        // listener will work when app is already opened or in background
+        Linking.addEventListener('url', this.handleURL);
+    }
+
+cleanUpDynamicLink = () => {
+        this._dynamicLinkListener();
+    }
+
+cleanUpDeepLink = () => {
+        Linking.removeEventListener('url', this.handleURL);
+    }
+
+handleURL = (event) => {
+        let url = "";
+
+        if (!event) {
+            return "";
+        }
+
+        if (typeof event == 'string') {
+            url = event;
+            url = url.split('/');
+            if(url.length ==5){
+
+                let registerNo = url[4]
+                 this.navigateToDetailDeepLinking(registerNo)
+            }
+        } else {
+            url = (event.url) ? event.url : "";
+        }
+
+        if (!url) {
+            return;
+        }
+
+
+    }
+    navigateToDetailDeepLinking = async (registerNo) => {
+        try {
+            response = await VehicleService.searchRegisterNo(registerNo)
+            if (!Utilities.stringIsEmpty(response.vehicle) && response.success) {
+                this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+
+            }
+        }
+        catch (e) {
+            console.log("exception e", e)
+        }
     }
     getUserBy = (userId) => {
         try {
@@ -143,7 +241,6 @@ export default class Home extends React.Component {
                 if (respose) {
                     if (respose.success) {
                         Storage.userData = respose.user;
-                        console.log(" Storage.userData", Storage.userData);
                         Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(respose.user))
                     }
                 }
@@ -173,7 +270,7 @@ export default class Home extends React.Component {
         }
     }
 
-    TalkModalToggle = (parent) => {
+    TalkModalToggle = TalkModalToggle = (parent) => {
         this.setState({
             isTalkModal: !this.state.isTalkModal,
 
@@ -210,8 +307,13 @@ export default class Home extends React.Component {
                 }}
 
             >
-                <View style={styles.ParentView}>
 
+                <SafeAreaView style={{ flex: 0, backgroundColor: Apptheme }} />
+
+                <View onLayout={event => {
+                    const layout = event.nativeEvent.layout;
+                    headerHeight = layout.height
+                }}>
                     <Topbar
                         toggle={this.toggle}
                         updateTopBar={this.updateTopBar}
@@ -222,11 +324,8 @@ export default class Home extends React.Component {
 
 
 
-
-
-
                     {Object.keys(Storage.userData).length > 0 && this.state.toolTipVisible &&
-                        <View style={{ width: 150, height: 40,borderRadius:5, position: 'absolute', top: 60,  right: 5, backgroundColor: TooltipBg, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ width: 150, height: 40, borderRadius: 5, position: 'absolute', top: 60, right: 5, backgroundColor: TooltipBg, justifyContent: 'center', alignItems: 'center' }}>
                             <FontAwesome name="caret-up"
                                 size={26}
                                 color={TooltipBg}
@@ -235,9 +334,11 @@ export default class Home extends React.Component {
                             <Text style={{ color: lightText }}>Add a profile image</Text>
                         </View>
                     }
+                </View>
+                <View style={styles.ParentView}>
                     <View style={styles.BoxView}>
 
-                        
+
                         <View style={styles.BoxParent}>
                             <TouchableOpacity
                                 activeOpacity={1}
@@ -272,8 +373,9 @@ export default class Home extends React.Component {
                                 onPressIn={() => this.setState({ Text2: Apptheme })}
                                 onPressOut={() => this.setState({ Text2: lightText })}
                                 onPress={() => {
+                                    this.state.parent = "talk"
                                     this.setState({
-                                        parent: "talk"
+                                        parent: this.state.parent
                                     })
                                     this.TalkModalToggle()
                                 }}
@@ -323,7 +425,13 @@ export default class Home extends React.Component {
                                 // underlayColor="transparent"
                                 onPressIn={() => this.setState({ Text4: Apptheme })}
                                 onPressOut={() => this.setState({ Text4: lightText })}
-                                onPress={() => this.SearchVehicleModalToggle()}
+                                onPress={() => {
+                                    this.state.parent = "talk"
+                                    this.setState({
+                                        parent: this.state.parent
+                                    })
+                                    this.SearchVehicleModalToggle()
+                                }}
                                 style={styles.ButtonViewImage}>
                                 <View style={styles.ImageView}>
                                     <Image
@@ -351,8 +459,10 @@ export default class Home extends React.Component {
                                 onPressIn={() => this.setState({ Text5: Apptheme })}
                                 onPressOut={() => this.setState({ Text5: darkText })}
                                 onPress={() => {
+
+                                    this.state.parent = "vehicle_Check"
                                     this.setState({
-                                        parent: "vehicle_Check"
+                                        parent: this.state.parent
                                     })
                                     this.TalkModalToggle()
                                 }}
@@ -450,10 +560,10 @@ const styles = StyleSheet.create({
 
     },
     BoxView: {
-        height: '93%', flexDirection: 'column', width: '100%'
+        height: screenheight - headerHeight, flexDirection: 'column', width: '100%'
     },
     BoxParent: {
-        width: '100%', height: '20%'
+        width: '100%', height: '19%'
     },
     ButtonView: {
         width: '100%',

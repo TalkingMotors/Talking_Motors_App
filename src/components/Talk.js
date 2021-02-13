@@ -21,8 +21,14 @@ export default class Talk extends Component {
             TalkModal: true,
             isKeyboard: false,
             registerNo: '',
+            parent:''
         }
-
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => {
+            this.state.parent = this.props.parent;
+            this.setState({
+                parent:this.state.parent
+            })
+        })
         this._keyboardDidShow = this._keyboardDidShow.bind(this);
         this._keyboardDidHide = this._keyboardDidHide.bind(this);
 
@@ -54,56 +60,104 @@ export default class Talk extends Component {
         this.setState({ [key]: value, })
     }
     searchVehicleBy = async () => {
-        let { registerNo } = this.state
-        var response;
-        if (!Utilities.stringIsEmpty(registerNo)) {
-            if (Object.keys(Storage.userData).length > 0) {
+       var { registerNo } = this.state
+        if(!Utilities.stringIsEmpty(this.props.parent) && this.props.parent == "vehicle_Check"){
+            var res = await VehicleService.getVehicleData(registerNo);
+           if(res.success && res.vehicleData.bodyType != null){
+                        this.props.navigation.navigate("DvlaDetails",{params:res.vehicleData})
+                        this.TalkModalToggle();
+                    }
+                   
+                    else{
+                        Alert.alert(
+                            "Vehicle not found",
+                            "this vehicle has not been found in the DVLA database.",
+                            [
+                                {
+                                    text: "CLOSE",
+                                    onPress: () => console.log("Cancel Pressed"),
+                                    style: "cancel"
+                                },
 
-                response = await VehicleService.getVehicleBy(registerNo)
-                if (!Utilities.stringIsEmpty(response.vehicle) && response.vehicle.registrationNumber.toLowerCase() == registerNo.toLowerCase()) {
-                    this.TalkModalToggle();
-                    this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+                            ],
+                            { cancelable: false }
+                        );
+                        return
+                    }
+
+                }
+               
+               
+        else {
+            var response;
+            if (!Utilities.stringIsEmpty(registerNo)) {
+                if (Object.keys(Storage.userData).length > 0) {
+
+                    response = await VehicleService.getVehicleBy(registerNo)
+                    if (!Utilities.stringIsEmpty(response.vehicle) && response.vehicle.registrationNumber.toLowerCase() == registerNo.toLowerCase()) {
+                        this.TalkModalToggle();
+                        this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+                    }
+                    else {
+                        var res = await VehicleService.getVehicleData(registerNo)
+                       if (res.success && res.vehicleData.bodyType != null) {
+                            this.props.navigation.navigate("DvlaDetails", { params: res.vehicleData })
+                            this.TalkModalToggle();
+                        }
+
+                        else {
+                            Alert.alert(
+                                "Vehicle not found",
+                                "this vehicle has not been found in the DVLA database.",
+                                [
+                                    {
+                                        text: "CLOSE",
+                                        onPress: () => console.log("Cancel Pressed"),
+                                        style: "cancel"
+                                    },
+
+                                ],
+                                { cancelable: false }
+                            );
+                            // this.TalkModalToggle();
+                        }
+
+
+                    }
                 }
                 else {
-                    this.TalkModalToggle();
-                    Alert.alert(
-                        "Vehicle not found",
-                        "this vehicle has not been found in the DVLA database.",
-                        [
-                            {
-                                text: "CLOSE",
-                                onPress: () => console.log("Cancel Pressed"),
-                                style: "cancel"
-                            },
+                    response = await VehicleService.searchRegisterNo(registerNo)
+                    if (!Utilities.stringIsEmpty(response.vehicle) && response.success) {
+                        this.TalkModalToggle();
+                        this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
+                    }
+                    else {
+                        var res = await VehicleService.getVehicleData(registerNo)
+                        if(res.success && res.vehicleData.bodyType != null){
+                            this.props.navigation.navigate("DvlaDetails", { params: res.vehicleData })
+                            this.TalkModalToggle();
+                        }
 
-                        ],
-                        { cancelable: false }
-                    );
-                }
-            }
-            else {
-                response = await VehicleService.searchRegisterNo(registerNo)
-                if (!Utilities.stringIsEmpty(response.vehicle) && response.success) {
-                    this.TalkModalToggle();
-                    this.props.navigation.navigate('Detail', { item: response.vehicle, index: 1, parent: this.props.parent });
-                }
-                else {
-                    this.TalkModalToggle();
-                    Alert.alert(
-                        "Vehicle not found",
-                        "this vehicle has not been found in the DVLA database.",
-                        [
-                            {
-                                text: "CLOSE",
-                                onPress: () => console.log("Cancel Pressed"),
-                                style: "cancel"
-                            },
+                        else {
+                            // this.TalkModalToggle();
+                            Alert.alert(
+                                "Vehicle not found",
+                                "this vehicle has not been found in the DVLA database.",
+                                [
+                                    {
+                                        text: "CLOSE",
+                                        onPress: () => console.log("Cancel Pressed"),
+                                        style: "cancel"
+                                    },
 
-                        ],
-                        { cancelable: false }
-                    );
-                }
+                                ],
+                                { cancelable: false }
+                            );
+                        }
 
+                    }
+
+                }
             }
         }
     }
@@ -136,15 +190,15 @@ export default class Talk extends Component {
                             <View style={styles.TextFieldView}>
                                 <TextField
                                     label='Registration number'
-                                    fontSize={13}
+                                    fontSize={15}
                                     keyboardType='default'
                                     tintColor={Apptheme}
                                     baseColor={Apptheme}
                                     errorColor="red"
                                     activeLineWidth={2}
-                                    autoCapitalize="none"
-                                    autoCorrect={false}
-                                    labelFontSize={13}
+                                    autoCapitalize='characters'
+                                    style={{fontWeight:'bold'}}
+                                    labelFontSize={15}
                                     value={this.state.registerNo}
                                     onChangeText={val => {
                                         this.onChangeText('registerNo', val.trim())

@@ -25,8 +25,8 @@ import RNIap, {
 
 const itemSkus = Platform.select({
   ios: [
-    'com.cooni.point1000',
-    'com.cooni.point5000', // dooboolab
+    'uk.co.talkingMotors.talkingMotors.iapPremiumListing',
+    'uk.co.talkingMotors.talkingMotors.iapPremiumListing2Month', // dooboolab
   ],
   android: [
     // 'android.test.purchased', // subscription
@@ -71,14 +71,14 @@ export default class PremiumModal extends Component {
         const receipt = purchase.transactionReceipt;
         if (receipt) {
           try {
-            // if (Platform.OS === 'ios') {
-            //   finishTransactionIOS(purchase.transactionId);
-            // } else if (Platform.OS === 'android') {
-            //   // If consumable (can be purchased again)
-            //   consumePurchaseAndroid(purchase.purchaseToken);
-            //   // If not consumable
-            //   acknowledgePurchaseAndroid(purchase.purchaseToken);
-            // }
+           if (Platform.OS === 'ios') {
+               finishTransactionIOS(purchase.transactionId);
+            } else if (Platform.OS === 'android') {
+             // If consumable (can be purchased again)
+              consumePurchaseAndroid(purchase.purchaseToken);
+              // If not consumable
+               acknowledgePurchaseAndroid(purchase.purchaseToken);
+             }
             const ackResult = await finishTransaction(purchase);
           } catch (ackErr) {
           }
@@ -108,7 +108,9 @@ export default class PremiumModal extends Component {
   }
   getItems = async () => {
     try {
+      // console.log("getItems !!!")
       const products = await RNIap.getProducts(itemSkus);
+      // console.log("products",products);
       // const products = await RNIap.getSubscriptions(itemSkus);
       this.setState({ productList: products });
     } catch (err) {
@@ -122,7 +124,6 @@ export default class PremiumModal extends Component {
         'Get available purchases (non-consumable or unconsumed consumable)',
       );
       const purchases = await RNIap.getAvailablePurchases();
-      console.info('Available purchases :: ', purchases);
       if (purchases && purchases.length > 0) {
         this.setState({
           availableItemsMessage: `Got ${purchases.length} items.`,
@@ -139,8 +140,7 @@ export default class PremiumModal extends Component {
 
       let result = await RNIap.requestPurchase(sku);
       if (result) {
-        console.log("Premimum Package Purchase")
-
+     
       }
     } catch (err) {
       console.warn(err.code, err.message);

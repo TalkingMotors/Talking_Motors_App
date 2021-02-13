@@ -5,7 +5,6 @@ import Storage from '../helpers/Storage';
 export let deleteVehicle = async (params) => {
     try {
         if (Storage.networkStatus.isConnected) {
-           console.log(APIConstants.VEHICLE_ENDPOINT)
             let response = await fetch(APIConstants.VEHICLE_ENDPOINT, {
                 method: 'DELETE',
                 crossDomain: true,
@@ -13,7 +12,6 @@ export let deleteVehicle = async (params) => {
                 body: JSON.stringify(params)
             })
             let result = response.json()
-            console.log("deleteVehicle result",result);
             return result;
         } else {
             return null
@@ -27,14 +25,12 @@ export let deleteVehicle = async (params) => {
 export let favorites = async () => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.FAVOURITE_VEHICLE_ENDPOINT)
             let response = await fetch(APIConstants.FAVOURITE_VEHICLE_ENDPOINT, {
                 method: 'GET',
                 crossDomain: true,
                 headers: Utilities.setHeaders()
             })
             let result = response.json()
-            console.log("result",result);
             return result;
         } else {
             return null
@@ -161,7 +157,6 @@ export let getVehicleBy = async (vrn) => {
 export let myVehicle = async () => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.MY_VEHICLES_ENDPOINT)
             let response = await fetch(APIConstants.MY_VEHICLES_ENDPOINT, {
                 method: 'GET',
                 crossDomain: true,
@@ -182,8 +177,7 @@ export let myVehicle = async () => {
 export let RemoveVehicleImage = async (params) => {
     try {
        if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.REMOVE_VEHICLE_IMAGE_ENDPOINT)
-            let response = await fetch(APIConstants.REMOVE_VEHICLE_IMAGE_ENDPOINT, {
+             let response = await fetch(APIConstants.REMOVE_VEHICLE_IMAGE_ENDPOINT, {
                 method: 'DELETE',
                 crossDomain: true,
                 headers: Utilities.setHeaders(),
@@ -202,8 +196,7 @@ export let RemoveVehicleImage = async (params) => {
 export let InsertVehicleImage = async (params) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.INSERT_VEHICLE_IMAGE_ENDPOINT)
-            let response = await fetch(APIConstants.INSERT_VEHICLE_IMAGE_ENDPOINT, {
+             let response = await fetch(APIConstants.INSERT_VEHICLE_IMAGE_ENDPOINT, {
                 method: 'POST',
                 headers: Utilities.setHeaders(),
                 body: JSON.stringify(params)
@@ -220,9 +213,7 @@ export let InsertVehicleImage = async (params) => {
 }
 export let addNewVehicle = async (params) => {
     try {
-        console.log("params",params);
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.VEHICLE_ENDPOINT)
             let response = await fetch(APIConstants.VEHICLE_ENDPOINT, {
                 method: 'POST',
                 headers: Utilities.setHeaders(),
@@ -241,7 +232,6 @@ export let addNewVehicle = async (params) => {
 export let UpdateVehicle = async (params) => {
     try {
        if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.VEHICLE_ENDPOINT)
             let response = await fetch(APIConstants.VEHICLE_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
@@ -261,8 +251,7 @@ export let UpdateVehicle = async (params) => {
 export let GetSpecificVehicle = async (id) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.VEHICLE_ENDPOINT)
-           let response = await fetch(APIConstants.VEHICLE_ENDPOINT + id, {
+              let response = await fetch(APIConstants.VEHICLE_ENDPOINT + id, {
                 method: 'GET',
                 headers: Utilities.setHeaders(),
                 // body: JSON.stringify(params)
@@ -280,7 +269,6 @@ export let GetSpecificVehicle = async (id) => {
 export let removeFavourite = async (params) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.REMOVE_FAVOURITE_VEHICLE_ENDPOINT)
            let response = await fetch(APIConstants.REMOVE_FAVOURITE_VEHICLE_ENDPOINT , {
                 method: 'DELETE',
                 headers: Utilities.setHeaders(),
@@ -299,7 +287,6 @@ export let removeFavourite = async (params) => {
 export let addFavourite = async (params) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.ADD_FAVOURITE_VEHICLE_ENDPOINT)
            let response = await fetch(APIConstants.ADD_FAVOURITE_VEHICLE_ENDPOINT , {
                 method: 'POST',
                 headers: Utilities.setHeaders(),

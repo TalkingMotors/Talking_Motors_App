@@ -91,8 +91,7 @@ export default class ChangePassword extends React.Component {
             })
             var params = { "email": this.state.email }
             let response = await UserService.ForgetPasswordCode(params)
-            console.log("response",response);
-            if (response.success) {
+             if (response.success) {
                 this.setState({
                     isloader:false
                 })

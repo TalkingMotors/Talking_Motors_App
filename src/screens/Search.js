@@ -164,7 +164,6 @@ export default class Messenger extends React.Component {
                 if (respose) {
                      if (respose.success) {
                         this.state.conversationDetail = respose.conversation
-                        console.log("ikm-messages",this.state.conversationDetail)
                         //var obj = JSON.parse(jsonObj)[0];
                         
                         // respose.conversation.messages.forEach(element => {
@@ -194,7 +193,6 @@ export default class Messenger extends React.Component {
                             
                         });
 
-                        console.log("ikm-messages",this.state.messages)
                         if (this.state.messages.length > 0 && this.state.conversationDetail.numberOfUnreadMessages > 0) {
                             this.updateConversationStatus(this.state.messages[this.state.messages.length - 1].id);
                         }
@@ -234,15 +232,12 @@ export default class Messenger extends React.Component {
         }
     }
     updateConversationStatus = async (messageId) => {
-        console.log("messageId", messageId)
-        console.log("conversationId", this.state.conversationId)
-        var param = {
+          var param = {
             conversationId: this.state.conversationId,
             messageId: messageId,
 
         }
         MessagesService.updateMessageStatusToRead(param).then(response => {
-            console.log("updateMessageStatusToRead", response)
         })
     }
 
@@ -255,7 +250,6 @@ export default class Messenger extends React.Component {
 
         })
         this.state.userIds = userIds;
-        console.log("userids", this.state.userIds)
     }
     onChangeText = (key, value) => {
         if (Utilities.stringIsEmpty(value)) {
@@ -372,9 +366,7 @@ export default class Messenger extends React.Component {
             id: this.state.conversationId,
             name: this.state.convoname,
         }
-        console.log("param", param);
         MessagesService.updateConversationName(param).then(response => {
-            console.log("updateConversationName", response)
             this.setState({
                 senderName : this.state.convoname
             })

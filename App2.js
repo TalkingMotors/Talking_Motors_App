@@ -13,7 +13,9 @@ import React from 'react';
 import {
     SafeAreaView,
     ScrollView,
+    StatusBar,
     View,
+    Platform,
     Text,
     Image
 } from 'react-native';
@@ -48,7 +50,13 @@ import CreateGroup from './src/screens/CreateGroup';
 import NotificationBadges from './src/components/NotificationBadge';
 import ContentComponent from './ContentComponent';
 import LoginScreen from './src/screens/Login'
-import HomeScreen from './src/screens/Home'
+import HomeScreen from './src/screens/Home';
+import AddVehicle from './src/screens/AddVehicle';
+import AddVehicleImage from './src/screens/AddVehicleImage';
+import DvlaDetails from './src/screens/DvlaDetails';
+
+const prefix = 'talkingmotorsapp://';
+// const prefix = 'supermeal://';
 console.disableYellowBox = true;
 // export default class App extends React.Component {
 //     render() {
@@ -67,9 +75,13 @@ console.disableYellowBox = true;
 //     );
 // }
 
+StatusBar.setTranslucent(false);
+StatusBar.setBackgroundColor('#FE6801');
+StatusBar.setHidden(false)
+
 const AppNavigator = createStackNavigator({
     Login: { screen: Login },
-    Home: { screen: Home },
+    Home: { screen: Home, path: 'search/:param', },
     Profile: { screen: Profile },
     Dashboard: { screen: Dashboard },
     Search: { screen: Search },
@@ -92,7 +104,11 @@ const AppNavigator = createStackNavigator({
     CreateGroup: { screen: CreateGroup, },
     Users: { screen: Users, },
     ForgotPassword: { screen: ForgotPassword, },
-    NotificationBadges: { screen: NotificationBadges, }
+    AddVehicle: { screen: AddVehicle },
+    AddVehicleImage: { screen: AddVehicleImage },
+    NotificationBadges: { screen: NotificationBadges, },
+    DvlaDetails: { screen: DvlaDetails, }
+
 
 },
     {
@@ -128,7 +144,10 @@ const AppNavigator = createStackNavigator({
 );
 
 const TalkingMotors = createAppContainer(AppNavigator)
-export default TalkingMotors
+
+// const SupermealApp = createAppContainer(AppNavigator)
+const MainApp = () => <TalkingMotors uriPrefix={prefix} />;
+export default MainApp
 
 // const AppDrawerContainer = createDrawerNavigator({
 // Login: { screen: Login },

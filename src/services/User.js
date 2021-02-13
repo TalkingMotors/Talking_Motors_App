@@ -44,7 +44,6 @@ export let register = async(params) => {
 export let getUserById = async(userId) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            console.log(APIConstants.GET_USER_BY_USER_ID_ENDPOINT + userId)
             let response = await fetch(APIConstants.GET_USER_BY_USER_ID_ENDPOINT + userId)
             let result = response.json()
             return result;
@@ -79,8 +78,7 @@ export let updateUser = async(userObj) => {
 
 export let changeProfilePhoto = async(image) => {
     try {
-        console.log(APIConstants.UPDATE_PROFILE_IMAGE_ENDPOINT);
-        if (Storage.networkStatus.isConnected) {
+         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.UPDATE_PROFILE_IMAGE_ENDPOINT, {
                 method: 'PATCH',
                 headers: Utilities.setHeaders(),
@@ -100,8 +98,7 @@ export let changeProfilePhoto = async(image) => {
 }
 export let removeProfileImage = async() => {
     try {
-        console.log(APIConstants.REMOVE_USER_IMAGE_ENDPOINT);
-        if (Storage.networkStatus.isConnected) {
+         if (Storage.networkStatus.isConnected) {
             let response = await fetch(APIConstants.REMOVE_USER_IMAGE_ENDPOINT, {
                 method: 'DELETE',
                 headers: Utilities.setHeaders(),
@@ -121,7 +118,7 @@ export let removeProfileImage = async() => {
 export let ForgetPasswordCode = async(params) => {
     try {
         if (Storage.networkStatus.isConnected) {
-            let response = await fetch(APIConstants.FORGOTTEN_PASSWORD_ENDPOINT, {
+             let response = await fetch(APIConstants.FORGOTTEN_PASSWORD_ENDPOINT, {
                 method: 'POST',
                 headers: Utilities.setHeaders(),
                 body: JSON.stringify(params)

@@ -14,7 +14,6 @@ export default class AndroidNotification extends Component {
     await firebase.messaging().getToken()
       .then(fcmToken => {
         if (fcmToken) {
-          console.log("fcmToken", fcmToken);
           NetInfo.fetch().then(isConnected => {
             if (isConnected) {
               let udid = DeviceInfo.getUniqueId();
@@ -30,7 +29,6 @@ export default class AndroidNotification extends Component {
     var notificationOpen = await firebase.notifications().getInitialNotification();
     if (notificationOpen) {
       var notification = notificationOpen.notification;
-      console.log("notificationOpen App Background", notificationOpen);
       //App Background
       DeviceHelper.showAndroidNotification(notification, this.props)
       firebase.notifications().removeDeliveredNotification(notification.notificationId);
@@ -42,7 +40,6 @@ export default class AndroidNotification extends Component {
     this.notificationListener = firebase.notifications().onNotification((notification) => {
       // notification.android.setChannelId(Constants.firebaseChannelId).android.setSmallIcon('ic_launcher');
       // firebase.notifications().displayNotification(notification);
-      console.log("notificationOpen 2", notification);
       Storage.NotificationObject = notification;
       Storage.hasNewNotification = true;
       // DeviceHelper.showAndroidNotification(notification)
@@ -50,7 +47,6 @@ export default class AndroidNotification extends Component {
 
     });
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-      console.log("notificationOpen  App Foreground", notification);
       var notification = notificationOpen.notification;
       //App Foreground 
       DeviceHelper.showAndroidNotification(notification, this.props)

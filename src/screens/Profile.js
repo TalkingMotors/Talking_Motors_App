@@ -84,6 +84,8 @@ export default class Profile extends React.Component {
     }
 
     openCamera = () => {
+        try{
+        ImagePicker.clean();
         this.setState({
             ModalOpen: false
         })
@@ -100,8 +102,15 @@ export default class Profile extends React.Component {
             }
 
         });
+    }catch(e){
+        console.log("Exception  openCamera",e)
     }
+    }
+
+
+    
     openGallery = () => {
+        try{
         ImagePicker.clean();
         this.setState({
             ModalOpen: !this.state.ModalOpen
@@ -120,12 +129,14 @@ export default class Profile extends React.Component {
             });
         }
         )
+    }catch(e){
+        console.log("Exception openGallery",e)
+    }
     }
     updateUser = () => {
         try {
 
             Keyboard.dismiss()
-            console.log("this.state", this.state);
             if (Utilities.stringIsEmpty(this.state.email)) {
                 this.setState({
                     errorEmaill: true
@@ -160,7 +171,6 @@ export default class Profile extends React.Component {
             UserService.updateUser(userObject).then(response => {
                 if (response) {
                     if (response.success) {
-                        console.log("response", response);
                         Storage.userData = response.user;
                         Utilities.asyncStorage_SaveKey(Constants.USER_DATA, JSON.stringify(response.user))
 
